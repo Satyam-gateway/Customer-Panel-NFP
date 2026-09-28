@@ -1,0 +1,96 @@
+1685     <section class="screen" id="progress">
+1686       <div class="page-h">
+1687         <h1>daun</h1>
+1688         <p>Satyam is building this for you · Ship contract</p>
+1689       </div>
+1690 
+1691       <div class="focus">
+1692         <div class="focus-top">
+1693           <div class="av lg" data-dot="live" style="background:#00875A">SJ</div>
+1694           <h3>Right now he's on Stripe webhook retries</h3>
+1695           <button class="btn sm" data-person="sj">Message Satyam</button>
+1696         </div>
+1697         <div class="focus-grid">
+1698           <div><div class="fg-l">Where we are</div>
+1699             <div class="fg-v"><span class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><b>60%</b></span></div>
+1700           </div>
+1701           <div><div class="fg-l">Next you'll see</div><div class="fg-v">Payments working end to end</div></div>
+1702           <div><div class="fg-l">Expected</div><div class="fg-v">Friday, 2 October</div></div>
+1703         </div>
+1704       </div>
+1705 
+1706       <div class="day">Today</div>
+1707 
+1708       <div class="upd open">
+1709         <button class="upd-h">
+1710           <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+1711           <div class="upd-t">Stopped customers being charged twice</div>
+1712           <span class="pill live"><i class="dot"></i>Ready for you</span>
+1713           <span class="upd-when">08:40</span>
+1714           <span class="chev">▸</span>
+1715         </button>
+1716         <div class="upd-body">
+1717           <p>When Stripe retried a webhook, we were processing it twice and charging the customer again. Every webhook now carries an idempotency key, so a repeat just gets ignored.</p>
+1718           <div class="deliv">
+1719             <div><span style="color:var(--live)">✓</span> Duplicate charges are no longer possible on retry</div>
+1720             <div><span style="color:var(--live)">✓</span> Covered by tests that simulate Stripe retrying <span class="code">webhooks.test.ts</span></div>
+1721             <div><span style="color:var(--live)">✓</span> Live on staging — worth a look before it ships</div>
+1722           </div>
+1723           <div class="upd-acts">
+1724             <button class="btn sm solid">Looks good</button>
+1725             <button class="btn sm">Ask for changes</button>
+1726             <button class="btn sm">Open on staging</button>
+1727           </div>
+1728         </div>
+1729       </div>
+1730 
+1731       <div class="upd">
+1732         <button class="upd-h">
+1733           <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+1734           <div class="upd-t">Checking webhooks really came from Stripe</div>
+1735           <span class="pill moving"><i class="dot"></i>Working on it</span>
+1736           <span class="upd-when">11:15</span>
+1737           <span class="chev">▸</span>
+1738         </button>
+1739         <div class="upd-body">
+1740           <p>Right now anyone who knows your webhook URL could post to it. Adding signature checks so only Stripe can.</p>
+1741           <div class="deliv">
+1742             <div><span style="color:var(--moving)">◐</span> Signature checking written, testing against real events</div>
+1743             <div><span class="code">stripe/verify.ts</span></div>
+1744           </div>
+1745         </div>
+1746       </div>
+1747 
+1748       <div class="day">Yesterday</div>
+1749 
+1750       <div class="upd">
+1751         <button class="upd-h">
+1752           <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+1753           <div class="upd-t">Test payments now work without touching real money</div>
+1754           <span class="pill mute">Done</span>
+1755           <span class="upd-when">16:20</span>
+1756           <span class="chev">▸</span>
+1757         </button>
+1758         <div class="upd-body">
+1759           <p>Separated test and live Stripe keys so you can try checkout end to end without charging anyone.</p>
+1760         </div>
+1761       </div>
+1762 
+1763       <div class="upd">
+1764         <button class="upd-h">
+1765           <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+1766           <div class="upd-t">Read through your Figma and flagged two gaps</div>
+1767           <span class="pill turn">Needs your call</span>
+1768           <span class="upd-when">10:05</span>
+1769           <span class="chev">▸</span>
+1770         </button>
+1771         <div class="upd-body">
+1772           <p>The designs don't cover what a customer sees when a card is declined, or when they close the tab mid-payment. Both will happen. Tell me how you want them to behave and I'll build it.</p>
+1773           <div class="upd-acts">
+1774             <button class="btn sm solid">Answer this</button>
+1775             <button class="btn sm">Book 10 minutes with Satyam</button>
+1776           </div>
+1777         </div>
+1778       </div>
+1779     </section>
+1780 

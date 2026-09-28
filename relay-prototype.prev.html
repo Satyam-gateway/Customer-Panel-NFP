@@ -149,63 +149,6 @@ a{color:inherit;text-decoration:none}
 .nt-none b{display:block;font-size:15px;font-weight:600;margin-bottom:5px}
 .nt-none span{font-size:13.5px;color:var(--muted);max-width:44ch;display:inline-block;line-height:1.6}
 
-/* ---------- sessions: feed ---------- */
-.nt-tab .n.q{background:var(--line-soft);color:var(--muted)}
-.nt-tab.on .n.q{background:rgba(255,255,255,.2);color:#fff}
-
-.srow{display:flex;gap:13px;align-items:center;width:100%;text-align:left;cursor:pointer;
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:13px 17px 13px 14px;margin-bottom:8px;box-shadow:var(--shadow);
-  transition:border-color .12s}
-.srow:hover{border-color:#CFD5D6}
-.srow-b{flex:1;min-width:0}
-.srow-t{font-size:14px;font-weight:600;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
-.srow-s{font-size:12.5px;color:var(--faint);margin-top:4px;display:flex;align-items:center;gap:7px}
-.srow-when{font-size:12px;color:var(--faint);flex:none}
-.tagp{font-size:11px;font-weight:700;background:var(--line-soft);color:var(--muted);
-  border-radius:5px;padding:2px 7px;flex:none}
-.tagp.one{background:none;border:1px dashed var(--line);color:var(--faint)}
-button.tagp{cursor:pointer}
-button.tagp:hover{background:var(--line);color:var(--ink)}
-
-/* ---------- session detail ---------- */
-.sx-h{display:flex;align-items:flex-start;gap:15px;margin-bottom:20px}
-.sx-t{flex:1;min-width:0}
-.sx-t h1{font-size:25px;font-weight:600;letter-spacing:-.015em}
-.sx-m{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px;
-  font-size:12.5px;color:var(--faint)}
-.sx-m>span+span::before{content:"\00b7";margin-right:9px}
-.sx-open{background:var(--turn-bg);border:1px solid rgba(180,83,9,.24);
-  border-radius:var(--r-md);padding:15px 17px 13px;margin-bottom:6px}
-.sx-open h4{font-size:13px;font-weight:700;color:var(--turn);margin-bottom:4px}
-.sx-open .open-row{border-bottom:1px solid rgba(180,83,9,.14)}
-.sx-open .open-row:last-of-type{border-bottom:0}
-.sx-open .open-row>span{color:#8A4308}
-.sx-open-n{font-size:12.5px;color:#8A4308;opacity:.85;margin-top:7px}
-.sx-open.flash{animation:sxflash 1.5s ease-out}
-@keyframes sxflash{0%,30%{box-shadow:0 0 0 4px rgba(180,83,9,.22)}100%{box-shadow:0 0 0 0 rgba(180,83,9,0)}}
-
-.sx-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
-.sx-foot-h{font-size:12px;font-weight:700;color:var(--faint);margin-bottom:11px}
-.sx-comp{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 15px 11px}
-.sx-comp textarea{display:block;width:100%;min-height:60px;resize:vertical;border:0;outline:0;
-  background:none;font:inherit;font-size:13.5px;line-height:1.55;color:var(--ink);padding:0}
-.sx-comp textarea::placeholder{color:var(--faint)}
-.sx-bar{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;
-  border-top:1px solid var(--line-soft)}
-.sx-bar .who-free{flex:1;min-width:0;font-size:11.5px;color:var(--faint);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sx-sent{font-size:13px;color:var(--muted);background:var(--line-soft);
-  border-radius:var(--r-md);padding:11px 14px;margin-top:10px;line-height:1.55}
-.sx-sent b{color:var(--ink);font-weight:600}
-#session .callbar{margin:0 0 14px;max-width:none}
-
-/* ---------- project detail: sessions ---------- */
-.pj-empty{background:var(--card);border:1px dashed var(--line);border-radius:var(--r-md);
-  padding:28px 20px;text-align:center}
-.pj-empty b{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
-.pj-empty span{font-size:13px;color:var(--muted)}
-
 /* ---------- home: quiet sections ---------- */
 .quiet{margin-top:28px}
 .quiet-h{font-size:12px;font-weight:700;color:var(--faint);margin-bottom:10px}
@@ -973,29 +916,29 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
         <div class="quiet">
           <div class="quiet-h">Left open from your last calls</div>
           <div class="strips">
-            <button class="strip" data-session="s-checkout">
+            <button class="strip" data-go="project">
               <div class="av" data-dot="live" style="background:#00875A">SJ</div>
               <div class="strip-main">
                 <b>Checkout does too much in one request</b>
                 <span class="strip-sub">Palm Seas &middot; from your call with Satyam on Tuesday</span>
               </div>
-              <span class="btn sm solid" data-continue="s-checkout">Continue the session</span>
+              <span class="btn sm solid">Get a quote</span>
             </button>
-            <button class="strip" data-session="s-checkout">
+            <button class="strip" data-go="project">
               <div class="av" data-dot="live" style="background:#00875A">SJ</div>
               <div class="strip-main">
                 <b>No retry handling on failed payments</b>
                 <span class="strip-sub">Palm Seas &middot; from your call with Satyam on Tuesday</span>
               </div>
-              <span class="btn sm solid" data-continue="s-checkout">Continue the session</span>
+              <span class="btn sm solid">Get a quote</span>
             </button>
-            <button class="strip" data-session="s-ios">
+            <button class="strip" data-go="sessions">
               <div class="av" data-dot="off" style="background:#9AA1A6">AD</div>
               <div class="strip-main">
                 <b>iOS build breaks again after every dependency update</b>
                 <span class="strip-sub">TrackFit &middot; from your call with Arjun on 17 Sep</span>
               </div>
-              <span class="btn sm solid" data-continue="s-ios">Continue the session</span>
+              <span class="btn sm solid">Get a quote</span>
             </button>
           </div>
         </div>
@@ -1007,21 +950,21 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
       <div class="quiet">
         <div class="quiet-h">Left open from your last calls</div>
         <div class="strips">
-          <button class="strip" data-session="s-checkout">
+          <button class="strip" data-go="project">
             <div class="av" data-dot="live" style="background:#00875A">SJ</div>
             <div class="strip-main">
               <b>Checkout does too much in one request</b>
               <span class="strip-sub">Palm Seas &middot; flagged by Satyam on Tuesday</span>
             </div>
-            <span class="btn sm solid" data-continue="s-checkout">Continue the session</span>
+            <span class="btn sm solid">Get a quote</span>
           </button>
-          <button class="strip" data-session="s-ios">
+          <button class="strip" data-go="sessions">
             <div class="av" data-dot="off" style="background:#9AA1A6">AD</div>
             <div class="strip-main">
               <b>iOS build breaks after every dependency update</b>
               <span class="strip-sub">TrackFit &middot; flagged by Arjun on 17 Sep</span>
             </div>
-            <span class="btn sm solid" data-continue="s-ios">Continue the session</span>
+            <span class="btn sm solid">Get a quote</span>
           </button>
         </div>
       </div>
@@ -1455,7 +1398,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
               </ul>
               <div class="sd-open">
                 <b>Still open from this call</b>
-                <div class="open-row"><span>iOS build breaks after every dependency update</span><button class="btn sm solid" data-continue="s-ios">Continue the session</button></div>
+                <div class="open-row"><span>iOS build breaks after every dependency update</span><button class="btn sm solid">Get a quote</button></div>
               </div>
             </div>
 
@@ -1707,26 +1650,74 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
       </div>
     </section>
 
-    <!-- ============ SESSIONS ============ -->
+    <!-- ============ CALLS ============ -->
     <section class="screen" id="sessions">
       <div class="page-h">
         <h1>Sessions</h1>
-        <p>Each session is one thread of work. A session can hold several calls.</p>
+        <p>Every call you have had, and what came out of it</p>
       </div>
 
-      <div class="nt-bar">
-        <button class="nt-tab on" data-sfilter="all">All<span class="n q" id="sfAll">0</span></button>
-        <button class="nt-tab" data-sfilter="project">On a project<span class="n q" id="sfProj">0</span></button>
-        <button class="nt-tab" data-sfilter="loose">One-off<span class="n q" id="sfLoose">0</span></button>
+      <div class="day">This week</div>
+      <div class="upd open">
+        <button class="upd-h">
+          <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+          <div class="upd-t">Checkout timing out on Palm Seas</div>
+          <span class="pill mute">18 min</span>
+          <span class="upd-when">Tue, 23 Sep</span>
+          <span class="chev">▸</span>
+        </button>
+        <div class="upd-body">
+          <p>Traced the timeout to cold starts on the checkout function. Satyam got you unblocked for launch, but flagged that the underlying design needs work.</p>
+          <div class="art">
+            <h5>What came out of it</h5>
+            <ul>
+              <li><span style="color:var(--live)">✓</span> Raised the function timeout to 30s — checkout works again today</li>
+              <li><span style="color:var(--live)">✓</span> Added logging around the Stripe call <span class="code">checkout.ts</span></li>
+              <li><span style="color:var(--turn)">!</span> Checkout does too much in one request — needs a rebuild</li>
+            </ul>
+            <button class="btn sm" data-ts="ts-f1">Read transcript</button>
+            <button class="btn sm solid" data-go="contracts">Get this quoted</button>
+            <div class="tscript" id="ts-f1">
+              <div class="ts-h">TRANSCRIPT &middot; 18 min &middot; Tue 23 Sep</div>
+              <div class="ts-body">
+                <div class="ts-l"><div class="ts-t">00:02</div><div class="ts-w me">You</div><div class="ts-x">Checkout is timing out for real customers. This is live right now.</div></div>
+                <div class="ts-l"><div class="ts-t">04:30</div><div class="ts-w">Satyam</div><div class="ts-x">It is not Stripe. Your function has a 10 second ceiling and cold starts are eating most of it.</div></div>
+                <div class="ts-l"><div class="ts-t">06:12</div><div class="ts-w">Satyam</div><div class="ts-x">Raising it to 30 seconds. Checkout will work today &mdash; but this is a patch.</div></div>
+                <div class="ts-l"><div class="ts-t">09:10</div><div class="ts-w">Satyam</div><div class="ts-x">Checkout does inventory, payment and email in one request. It should be queued.</div></div>
+                <div class="ts-l"><div class="ts-t">12:48</div><div class="ts-w">Satyam</div><div class="ts-x">I will write it up and quote it so you can decide without pressure.</div></div>
+              </div>
+              <div class="ts-f">Billed at 18 minutes.</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div id="sessFeed"></div>
-    </section>
+      <div class="upd">
+        <button class="upd-h">
+          <div class="av" data-dot="live" style="background:#2456C8">PN</div>
+          <div class="upd-t">Epicmail bounce handling</div>
+          <span class="pill mute">7 min</span>
+          <span class="upd-when">Mon, 22 Sep</span>
+          <span class="chev">▸</span>
+        </button>
+        <div class="upd-body">
+          <p>Walked through why some campaign emails were silently dropping. Priya set up bounce logging so you can see it happening.</p>
+        </div>
+      </div>
 
-    <!-- ============ SESSION DETAIL ============ -->
-    <section class="screen" id="session">
-      <button class="back" data-go="sessions">&larr; All sessions</button>
-      <div id="sessDetail"></div>
+      <div class="day">Earlier</div>
+      <div class="upd">
+        <button class="upd-h">
+          <div class="av" data-dot="off" style="background:#9AA1A6">AD</div>
+          <div class="upd-t">TrackFit build failing on iOS</div>
+          <span class="pill mute">24 min</span>
+          <span class="upd-when">Thu, 17 Sep</span>
+          <span class="chev">▸</span>
+        </button>
+        <div class="upd-body">
+          <p>Certificate had expired. Arjun regenerated it and walked you through doing it yourself next time.</p>
+        </div>
+      </div>
     </section>
 
     <!-- ============ CONTRACTS ============ -->
@@ -2014,28 +2005,28 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
       <div class="band">
         <div class="rows">
-          <button class="row flat" data-project="palmseas">
+          <button class="row flat" data-go="project">
             <div class="row-main">
               <div class="row-title">Palm Seas</div>
               <div class="row-sub">3 sessions &middot; last call Tuesday with Satyam</div>
             </div>
             <div class="row-side"><span class="pill turn">Quote ready</span></div>
           </button>
-          <button class="row flat" data-project="epicmail">
+          <button class="row flat" data-go="project">
             <div class="row-main">
               <div class="row-title">Epicmail</div>
               <div class="row-sub">2 sessions &middot; Priya asked you a question 2 hours ago</div>
             </div>
             <div class="row-side"><span class="pill turn">Needs a reply</span></div>
           </button>
-          <button class="row flat" data-project="trackfit">
+          <button class="row flat" data-go="project">
             <div class="row-main">
               <div class="row-title">TrackFit</div>
               <div class="row-sub">1 session &middot; last call 17 Sep with Arjun</div>
             </div>
             <div class="row-side"><span class="pill mute">Quiet</span></div>
           </button>
-          <button class="row flat" data-project="yopbox">
+          <button class="row flat" data-go="project">
             <div class="row-main">
               <div class="row-title">YopBox</div>
               <div class="row-sub">No sessions yet</div>
@@ -2049,7 +2040,132 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
     <!-- ============ PROJECT DETAIL ============ -->
     <section class="screen" id="project">
       <button class="back" data-go="projects">&larr; All projects</button>
-      <div id="projDetail"></div>
+
+      <div class="proj-h">
+        <div>
+          <h1>Palm Seas</h1>
+          <div class="stack">
+            <span>Next.js</span><span>Stripe</span><span>Supabase</span><span>Vercel</span>
+          </div>
+        </div>
+        <button class="btn go">Get help with this</button>
+      </div>
+
+      <div class="psum">
+        <div class="psum-h">Project summary</div>
+        <p>A booking site for a diving school. You are building it; Relay engineers come in when
+           you get stuck and leave once it is working again.</p>
+        <div class="psum-grid">
+          <div>
+            <b>Where it stands</b>
+            <span>Checkout times out on cold starts. A temporary fix is live, but the underlying
+                  design needs rebuilding.</span>
+          </div>
+          <div>
+            <b>Waiting on you</b>
+            <span>Satyam has quoted the rebuild at &euro;3,200. Nothing starts until you decide.</span>
+          </div>
+          <div>
+            <b>Who knows this project</b>
+            <span>Satyam (3 sessions), Meera (1 session)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiet">
+        <div class="quiet-h">Sessions on this project &middot; 3</div>
+        <div class="sess-list">
+
+          <button class="sess open" data-sess="p1">
+            <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+            <div class="sess-main">
+              <div class="sess-title">Checkout timing out</div>
+              <div class="sess-sub">Satyam &middot; 18 min &middot; Tue 23 Sep</div>
+            </div>
+            <i class="chev">&#9662;</i>
+          </button>
+          <div class="smark-detail on" id="p1">
+            <div class="sd-h">What came out of it</div>
+            <ul>
+              <li>Raised the function timeout to 30s &mdash; checkout works again today</li>
+              <li>Added logging around the Stripe call</li>
+              <li>Checkout does too much in one request &mdash; needs a rebuild</li>
+            </ul>
+            <div class="sd-open">
+              <b>Still open from this call</b>
+              <div class="open-row"><span>Checkout does too much in one request</span><button class="btn sm solid">Get a quote</button></div>
+              <div class="open-row"><span>No retry handling on failed payments</span><button class="btn sm solid">Get a quote</button></div>
+            </div>
+            <div class="sd-acts"><button class="btn sm" data-ts="ts-p1">Read transcript</button></div>
+            <div class="tscript" id="ts-p1">
+              <div class="ts-h">TRANSCRIPT &middot; 18 min &middot; Tue 23 Sep</div>
+              <div class="ts-body">
+                <div class="ts-l"><div class="ts-t">00:02</div><div class="ts-w me">You</div><div class="ts-x">Checkout is timing out for real customers. This is live right now.</div></div>
+                <div class="ts-l"><div class="ts-t">04:30</div><div class="ts-w">Satyam</div><div class="ts-x">It is not Stripe. Your function has a 10 second ceiling and cold starts are eating most of it.</div></div>
+                <div class="ts-l"><div class="ts-t">06:12</div><div class="ts-w">Satyam</div><div class="ts-x">Raising it to 30 seconds. Checkout will work today &mdash; but this is a patch.</div></div>
+                <div class="ts-l"><div class="ts-t">09:10</div><div class="ts-w">Satyam</div><div class="ts-x">Checkout does inventory, payment and email in one request. It should be queued.</div></div>
+                <div class="ts-l"><div class="ts-t">12:48</div><div class="ts-w">Satyam</div><div class="ts-x">I will write it up and quote it so you can decide without pressure.</div></div>
+              </div>
+              <div class="ts-f">Billed at 18 minutes.</div>
+            </div>
+          </div>
+
+          <button class="sess" data-sess="p2">
+            <div class="av" data-dot="live" style="background:#00875A">SJ</div>
+            <div class="sess-main">
+              <div class="sess-title">Stripe webhook basics</div>
+              <div class="sess-sub">Satyam &middot; 12 min &middot; Fri 19 Sep</div>
+            </div>
+            <i class="chev">&#9662;</i>
+          </button>
+          <div class="smark-detail" id="p2">
+            <div class="sd-h">What came out of it</div>
+            <ul>
+              <li>Walked through how webhook signatures work and why yours were failing</li>
+              <li>Set up a test endpoint so you can replay events yourself</li>
+            </ul>
+            <div class="sd-acts"><button class="btn sm" data-ts="ts-p2">Read transcript</button></div>
+            <div class="tscript" id="ts-p2">
+              <div class="ts-h">TRANSCRIPT &middot; 12 min &middot; Fri 19 Sep</div>
+              <div class="ts-body">
+                <div class="ts-l"><div class="ts-t">00:05</div><div class="ts-w me">You</div><div class="ts-x">Stripe says it is sending webhooks. My endpoint says the signature is invalid.</div></div>
+                <div class="ts-l"><div class="ts-t">01:40</div><div class="ts-w">Satyam</div><div class="ts-x">Your framework is parsing the body to JSON before you verify. The signature is over the raw bytes, so it never matches.</div></div>
+                <div class="ts-l"><div class="ts-t">05:15</div><div class="ts-w">Satyam</div><div class="ts-x">Read the raw body on that route only. Verifying now &mdash; that is a pass.</div></div>
+                <div class="ts-l"><div class="ts-t">09:30</div><div class="ts-w">Satyam</div><div class="ts-x">I am leaving you a test endpoint so you can replay an event yourself instead of waiting on a real one.</div></div>
+              </div>
+              <div class="ts-f">Billed at 12 minutes.</div>
+            </div>
+          </div>
+
+          <button class="sess" data-sess="p3">
+            <div class="av" data-dot="busy" style="background:#B45309">MI</div>
+            <div class="sess-main">
+              <div class="sess-title">First look at the codebase</div>
+              <div class="sess-sub">Meera &middot; 31 min &middot; Fri 12 Sep</div>
+            </div>
+            <i class="chev">&#9662;</i>
+          </button>
+          <div class="smark-detail" id="p3">
+            <div class="sd-h">What came out of it</div>
+            <ul>
+              <li>Read through the project and wrote the stack notes every engineer now starts from</li>
+              <li>Flagged that checkout and booking are tangled together</li>
+            </ul>
+            <div class="sd-acts"><button class="btn sm" data-ts="ts-p3">Read transcript</button></div>
+            <div class="tscript" id="ts-p3">
+              <div class="ts-h">TRANSCRIPT &middot; 31 min &middot; Fri 12 Sep</div>
+              <div class="ts-body">
+                <div class="ts-l"><div class="ts-t">00:10</div><div class="ts-w me">You</div><div class="ts-x">Most of this was generated. I can read it but I could not tell you why it is arranged this way.</div></div>
+                <div class="ts-l"><div class="ts-t">02:20</div><div class="ts-w">Meera</div><div class="ts-x">That is normal and it is fine. Let me go through it and write down what is actually here.</div></div>
+                <div class="ts-l"><div class="ts-t">16:05</div><div class="ts-w">Meera</div><div class="ts-x">Checkout and booking share state they should not share. Nothing is broken today, but changing one will break the other eventually.</div></div>
+                <div class="ts-l"><div class="ts-t">28:40</div><div class="ts-w">Meera</div><div class="ts-x">I am saving stack notes to the project. Whoever you speak to next starts from these instead of asking you again.</div></div>
+              </div>
+              <div class="ts-f">Billed at 31 minutes.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </section>
 
   </main>
@@ -2143,7 +2259,7 @@ const PEOPLE = {
 };
 
 /* detail screens keep their parent lit in the rail */
-const PARENT_NAV={contract:'contracts', project:'projects', session:'sessions'};
+const PARENT_NAV={contract:'contracts', project:'projects'};
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on',n.dataset.go===id));
@@ -2665,446 +2781,6 @@ document.addEventListener('click',e=>{
   if(l==='Ask Priya what it would break') return once('Asked Priya — she will reply in the thread');
 });
 
-/* ================= projects -> sessions -> calls ================= */
-
-const PROJECTS={
-  palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'],
-    blurb:'A booking site for a diving school. You are building it; Relay engineers come in when you get stuck and leave once it is working again.',
-    stands:'Checkout times out on cold starts. A temporary fix is live, but the underlying design needs rebuilding.',
-    waiting:'Satyam has quoted the rebuild at &euro;3,200. Nothing starts until you decide.'},
-  epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'],
-    blurb:'A campaign tool you run for a handful of clients. Small, but it sends real mail, so quiet failures are expensive.',
-    stands:'Bounced campaign emails were being dropped silently. Logging is in, so you can see it happening now.',
-    waiting:'Priya wants to know whether bounces should retry or just be reported to you. She is holding the quote until you answer.'},
-  trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'],
-    blurb:'A fitness tracker you took over from another developer. Most of your Relay time here goes on builds and releases rather than features.',
-    stands:'The iOS certificate had expired and builds were failing. Arjun regenerated it and showed you how to do it yourself.',
-    waiting:'Nothing today. Meera has a kickoff booked for the sync rewrite on Mon 29 Sep.'},
-  yopbox:{n:'YopBox', stack:['Astro','Cloudflare'],
-    blurb:'The newest of your projects. Nothing has gone wrong yet, so no engineer has been in.',
-    stands:'Nothing has needed an engineer yet.',
-    waiting:'Nothing.'}
-};
-
-/* a session is one thread of work. it holds one or more calls. */
-const SESSIONS={
-  's-checkout':{
-    t:'Checkout timing out', proj:'palmseas', who:'sj', state:'open',
-    started:'Tue, 23 Sep', last:'Wed, 24 Sep', grp:'This week',
-    open:['Checkout does too much in one request','No retry handling on failed payments'],
-    calls:[
-      {h:'Getting checkout working again', when:'Tue, 23 Sep', mins:18,
-       p:'Traced the timeout to cold starts on the checkout function. Satyam got you unblocked for launch, but flagged that the underlying design needs work.',
-       out:[['ok','Raised the function timeout to 30s &mdash; checkout works again today'],
-            ['ok','Added logging around the Stripe call <span class="code">checkout.ts</span>'],
-            ['flag','Checkout does too much in one request &mdash; needs a rebuild']],
-       ts:[['00:02','You','Checkout is timing out for real customers. This is live right now.'],
-           ['04:30','Satyam','It is not Stripe. Your function has a 10 second ceiling and cold starts are eating most of it.'],
-           ['06:12','Satyam','Raising it to 30 seconds. Checkout will work today &mdash; but this is a patch.'],
-           ['09:10','Satyam','Checkout does inventory, payment and email in one request. It should be queued.'],
-           ['12:48','Satyam','I will write it up and quote it so you can decide without pressure.']]},
-      {h:'Going through the rebuild', when:'Wed, 24 Sep', mins:6,
-       p:'You came back to understand what a rebuild would actually touch before deciding anything.',
-       out:[['ok','Walked the queue design and what it replaces'],
-            ['ok','Agreed the queue goes in before launch, not after'],
-            ['flag','No retry handling on failed payments &mdash; still open']],
-       ts:[['00:03','You','I wanted to go through the rebuild before I sign anything.'],
-           ['00:20','Satyam','Good. The queue is the part that actually fixes it &mdash; everything else is tidying.'],
-           ['02:48','You','Does it have to be done before launch?'],
-           ['03:05','Satyam','Yes. Retrofitting it afterwards means touching live orders, and that is a worse afternoon.']]}
-    ]},
-
-  's-s3':{
-    t:'Why is my S3 bill suddenly &pound;180?', proj:null, who:'ks', state:'done',
-    started:'Wed, 24 Sep', last:'Wed, 24 Sep', grp:'This week',
-    open:[],
-    calls:[
-      {h:'Tracking down the cost', when:'Wed, 24 Sep', mins:9,
-       p:'A one-off. Nothing to do with a project &mdash; you just wanted the number explained.',
-       out:[['ok','Found a lifecycle rule that was never applied, so nothing ever expired'],
-            ['ok','Applied it &mdash; the bill should drop next cycle']],
-       ts:[['00:04','You','My S3 bill tripled and I have not changed anything.'],
-           ['01:15','Kabir','You are storing every image version forever. There is no lifecycle rule on that bucket.'],
-           ['05:40','Kabir','Rule applied. Old versions expire after 30 days from now on.']]}
-    ]},
-
-  's-bounce':{
-    t:'Epicmail bounce handling', proj:'epicmail', who:'pn', state:'open',
-    started:'Mon, 22 Sep', last:'Mon, 22 Sep', grp:'This week',
-    open:['Decide whether bounces retry or are just reported'],
-    calls:[
-      {h:'Finding the dropped emails', when:'Mon, 22 Sep', mins:7,
-       p:'Walked through why some campaign emails were silently dropping. Priya set up bounce logging so you can see it happening.',
-       out:[['ok','Bounce logging is in &mdash; every drop is now recorded'],
-            ['flag','Priya needs to know if bounces should retry before she can quote it']],
-       ts:[['00:06','You','Some people say they never got the campaign. I have no idea who.'],
-           ['01:30','Priya','You are not storing bounces at all. Mailgun is telling you and it is going nowhere.'],
-           ['04:10','Priya','Logging them now. Before I quote the fix &mdash; do you want failed ones retried, or just reported to you?']]}
-    ]},
-
-  's-webhook':{
-    t:'Stripe webhook basics', proj:'palmseas', who:'sj', state:'done',
-    started:'Fri, 19 Sep', last:'Fri, 19 Sep', grp:'Earlier',
-    open:[],
-    calls:[
-      {h:'Why the signatures were failing', when:'Fri, 19 Sep', mins:12,
-       p:'Not broken code &mdash; a body-parsing order problem that catches almost everyone.',
-       out:[['ok','Walked through how webhook signatures work and why yours were failing'],
-            ['ok','Set up a test endpoint so you can replay events yourself']],
-       ts:[['00:05','You','Stripe says it is sending webhooks. My endpoint says the signature is invalid.'],
-           ['01:40','Satyam','Your framework is parsing the body to JSON before you verify. The signature is over the raw bytes, so it never matches.'],
-           ['05:15','Satyam','Read the raw body on that route only. Verifying now &mdash; that is a pass.'],
-           ['09:30','Satyam','I am leaving you a test endpoint so you can replay an event yourself instead of waiting on a real one.']]}
-    ]},
-
-  's-ios':{
-    t:'TrackFit build failing on iOS', proj:'trackfit', who:'ad', state:'open',
-    started:'Thu, 17 Sep', last:'Thu, 17 Sep', grp:'Earlier',
-    open:['iOS build breaks again after every dependency update'],
-    calls:[
-      {h:'Getting a build out', when:'Thu, 17 Sep', mins:24,
-       p:'Certificate had expired. Arjun regenerated it and walked you through doing it yourself next time.',
-       out:[['ok','Regenerated the signing certificate &mdash; the build went through'],
-            ['ok','Wrote down the steps so you can do it without a call'],
-            ['flag','It breaks again after every dependency update &mdash; the real fix is CI']],
-       ts:[['00:08','You','The iOS build fails and the error tells me nothing useful.'],
-           ['03:20','Arjun','Your signing certificate expired eleven days ago. That is the whole error.'],
-           ['11:05','Arjun','Regenerated and building. This will keep happening until releases run in CI rather than off your laptop.']]}
-    ]},
-
-  's-pg':{
-    t:'Quick Postgres index question', proj:null, who:'pn', state:'done',
-    started:'Mon, 15 Sep', last:'Mon, 15 Sep', grp:'Earlier',
-    open:[],
-    calls:[
-      {h:'Which index to add', when:'Mon, 15 Sep', mins:6,
-       p:'Six minutes to answer something that had been bothering you for a week.',
-       out:[['ok','Added a composite index instead of the two single ones you were about to add'],
-            ['ok','Query went from 1.9s to 40ms']],
-       ts:[['00:02','You','Do I need one index per column or one across both?'],
-           ['00:40','Priya','One across both, in the order your WHERE clause uses them. Two separate ones will barely help here.'],
-           ['03:30','Priya','Run it again. 40 milliseconds &mdash; that is the whole problem solved.']]}
-    ]},
-
-  's-firstlook':{
-    t:'First look at the codebase', proj:'palmseas', who:'md', state:'done',
-    started:'Fri, 12 Sep', last:'Fri, 12 Sep', grp:'Earlier',
-    open:[],
-    calls:[
-      {h:'Reading the project end to end', when:'Fri, 12 Sep', mins:31,
-       p:'The session every later engineer starts from. Meera read the whole project and wrote the stack notes.',
-       out:[['ok','Read through the project and wrote the stack notes every engineer now starts from'],
-            ['flag','Checkout and booking are tangled together &mdash; changing one will break the other eventually']],
-       ts:[['00:10','You','Most of this was generated. I can read it but I could not tell you why it is arranged this way.'],
-           ['02:20','Meera','That is normal and it is fine. Let me go through it and write down what is actually here.'],
-           ['16:05','Meera','Checkout and booking share state they should not share. Nothing is broken today, but changing one will break the other eventually.'],
-           ['28:40','Meera','I am saving stack notes to the project. Whoever you speak to next starts from these instead of asking you again.']]}
-    ]},
-
-  's-deliver':{
-    t:'Emails landing in spam', proj:'epicmail', who:'pn', state:'done',
-    started:'Wed, 10 Sep', last:'Wed, 10 Sep', grp:'Earlier',
-    open:[],
-    calls:[
-      {h:'Fixing your sending reputation', when:'Wed, 10 Sep', mins:14,
-       p:'Deliverability rather than code. Nothing was broken &mdash; the domain was simply never set up to prove who it was.',
-       out:[['ok','Set up SPF, DKIM and DMARC on the sending domain'],
-            ['ok','Test sends now land in the inbox on all three providers you checked']],
-       ts:[['00:05','You','Gmail puts everything we send straight in spam.'],
-           ['02:10','Priya','You have no DKIM and your SPF does not include Mailgun. You are unauthenticated mail.'],
-           ['09:45','Priya','Records are in. Give DNS an hour, then test again &mdash; it should be clean.']]}
-    ]}
-};
-
-let SESS_ORDER=['s-checkout','s-s3','s-bounce','s-webhook','s-ios','s-pg','s-firstlook','s-deliver'];
-
-const fName=k=>PEOPLE[k].n.split(' ')[0];
-const sessMins=s=>s.calls.reduce((a,c)=>a+c.mins,0);
-const plural=(n,w)=>n+' '+w+(n===1?'':'s');
-function paintIn(el){el.querySelectorAll('.av').forEach(a=>paintAvatar(a,a.textContent))}
-
-/* ---------- the sessions feed ---------- */
-let sFilter='all';
-function sessKeys(f){
-  return SESS_ORDER.filter(k=>{
-    const s=SESSIONS[k];
-    return f==='all' || (f==='project' ? !!s.proj : !s.proj);
-  });
-}
-function sessRow(k){
-  const s=SESSIONS[k], p=PEOPLE[s.who];
-  return '<button class="srow" data-session="'+k+'">'+
-    '<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
-    '<div class="srow-b">'+
-      '<div class="srow-t">'+s.t+
-        (s.open.length?'<span class="pill turn">'+plural(s.open.length,'thing')+' open</span>':'')+'</div>'+
-      '<div class="srow-s">'+
-        (s.proj?'<span class="tagp">'+PROJECTS[s.proj].n+'</span>':'<span class="tagp one">One-off</span>')+
-        '<span>'+p.n+'</span><span>&middot;</span><span>'+plural(s.calls.length,'call')+'</span>'+
-        '<span>&middot;</span><span>'+sessMins(s)+' min</span>'+
-      '</div>'+
-    '</div>'+
-    '<span class="srow-when">'+s.last+'</span></button>';
-}
-function renderSessFeed(){
-  const keys=sessKeys(sFilter);
-  let html='', g=null;
-  keys.forEach(k=>{
-    const s=SESSIONS[k];
-    if(s.grp!==g){html+='<div class="day">'+s.grp+'</div>'; g=s.grp}
-    html+=sessRow(k);
-  });
-  const f=document.getElementById('sessFeed');
-  f.innerHTML=html;
-  paintIn(f);
-  document.getElementById('sfAll').textContent=sessKeys('all').length;
-  document.getElementById('sfProj').textContent=sessKeys('project').length;
-  document.getElementById('sfLoose').textContent=sessKeys('loose').length;
-}
-
-/* ---------- one call inside a session ---------- */
-function callHtml(k,c,i,lastOne){
-  const s=SESSIONS[k], p=PEOPLE[c.who||s.who], id=k+'-c'+i;
-  return '<div class="upd'+(lastOne?' open':'')+'">'+
-    '<button class="upd-h">'+
-      '<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
-      '<div class="upd-t">Call '+(i+1)+' &middot; '+c.h+'</div>'+
-      '<span class="pill mute">'+c.mins+' min</span>'+
-      '<span class="upd-when">'+c.when+'</span>'+
-      '<span class="chev">&#9656;</span>'+
-    '</button>'+
-    '<div class="upd-body">'+
-      (c.p?'<p>'+c.p+'</p>':'')+
-      '<div class="art"><h5>What came out of it</h5><ul>'+
-        c.out.map(o=>'<li><span style="color:var(--'+(o[0]==='flag'?'turn':'live')+')">'+
-          (o[0]==='flag'?'!':'&#10003;')+'</span> '+o[1]+'</li>').join('')+
-      '</ul>'+
-      (c.ts?'<button class="btn sm" data-ts="ts-'+id+'">Read transcript</button>'+
-        '<div class="tscript" id="ts-'+id+'">'+
-          '<div class="ts-h">TRANSCRIPT &middot; '+c.mins+' min &middot; '+c.when+'</div>'+
-          '<div class="ts-body">'+c.ts.map(l=>
-            '<div class="ts-l"><div class="ts-t">'+l[0]+'</div>'+
-            '<div class="ts-w'+(l[1]==='You'?' me':'')+'">'+l[1]+'</div>'+
-            '<div class="ts-x">'+l[2]+'</div></div>').join('')+'</div>'+
-          '<div class="ts-f">Billed at '+c.mins+' minutes.</div>'+
-        '</div>':'')+
-      '</div>'+
-    '</div></div>';
-}
-
-/* ---------- session detail ---------- */
-let currentSession=null;
-function renderSession(key,flash){
-  const s=SESSIONS[key]; if(!s) return;
-  currentSession=key;
-  const p=PEOPLE[s.who], first=fName(s.who);
-  const n=s.calls.length;
-
-  document.getElementById('sessDetail').innerHTML=
-    '<div class="sx-h">'+
-      '<div class="av lg" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
-      '<div class="sx-t"><h1>'+s.t+'</h1>'+
-        '<div class="sx-m">'+
-          (s.proj?'<button class="tagp" data-project="'+s.proj+'">'+PROJECTS[s.proj].n+'</button>'
-                 :'<span class="tagp one">Not on a project</span>')+
-          '<span>'+p.n+'</span><span>'+plural(n,'call')+'</span>'+
-          '<span>'+sessMins(s)+' min billed</span><span>Started '+s.started+'</span>'+
-        '</div>'+
-      '</div>'+
-      (s.proj?'':'<button class="btn sm" data-filesess="'+key+'">File under a project</button>')+
-    '</div>'+
-    (s.open.length?
-      '<div class="sx-open'+(flash?' flash':'')+'"><h4>Still open from this session</h4>'+
-        s.open.map(o=>'<div class="open-row"><span>'+o+'</span></div>').join('')+
-        '<p class="sx-open-n">Nothing here is lost. '+first+
-        ' has the whole history &mdash; pick it up on the next call.</p></div>':'')+
-    '<div class="day">'+plural(n,'call')+' in this session</div>'+
-    '<div id="sxCalls">'+s.calls.map((c,i)=>callHtml(key,c,i,i===n-1)).join('')+'</div>'+
-    '<div class="sx-foot" id="sxFoot">'+
-      '<div class="sx-foot-h">'+
-        (s.state==='open'?'Carry on where you left off':'Finished &mdash; but you can always reopen it')+
-      '</div>'+
-      '<div class="sx-comp">'+
-        '<textarea placeholder="Message '+first+' about this session"></textarea>'+
-        '<div class="sx-bar">'+
-          '<span class="who-free">'+p.r+'</span>'+
-          '<button class="btn sm go sx-call">Start a call</button>'+
-          '<button class="btn sm solid sx-send">Send</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-
-  paintIn(document.getElementById('sessDetail'));
-  show('session');
-}
-
-/* ---------- a call, from inside the session ---------- */
-function sessionCall(){
-  const foot=document.getElementById('sxFoot');
-  if(!foot || foot.querySelector('.callbar')) return;
-  const s=SESSIONS[currentSession], p=PEOPLE[s.who], first=fName(s.who);
-
-  const bar=document.createElement('div');
-  bar.className='callbar';
-  bar.innerHTML='<span class="dotpulse"></span><div class="cb-main">'+
-    '<div class="cb-t">Calling '+first+'&hellip;</div>'+
-    '<div class="cb-s">The meter starts when they pick up</div></div>'+
-    '<button class="cb-share" hidden>Share screen</button>'+
-    '<button class="cb-end">Cancel</button>';
-  foot.insertBefore(bar,foot.firstChild);
-  bar.scrollIntoView({block:'center',behavior:'smooth'});
-
-  let secs=0,timer;
-  setTimeout(()=>{
-    if(!bar.isConnected) return;
-    bar.querySelector('.cb-t').textContent='On a call with '+first+' · '+s.t;
-    bar.querySelector('.cb-end').textContent='End call';
-    bar.querySelector('.cb-share').hidden=false;
-    timer=setInterval(()=>{
-      secs++;
-      const m=String(Math.floor(secs/60)).padStart(2,'0'), x=String(secs%60).padStart(2,'0');
-      bar.querySelector('.cb-s').innerHTML=m+':'+x+' &middot; on the meter';
-    },1000);
-  },1600);
-
-  bar.querySelector('.cb-share').addEventListener('click',ev=>{
-    ev.stopPropagation();
-    const btn=ev.currentTarget;
-    if(btn.classList.toggle('on')){
-      btn.textContent='Stop sharing';
-      bar.querySelector('.cb-t').textContent=first+' can see your screen';
-    }else{
-      btn.textContent='Share screen';
-      bar.querySelector('.cb-t').textContent='On a call with '+first+' · '+s.t;
-    }
-  });
-
-  bar.querySelector('.cb-end').addEventListener('click',ev=>{
-    ev.stopPropagation();
-    clearInterval(timer);
-    const mins=Math.max(1,Math.round(secs/60));
-    bar.remove();
-    if(secs===0){toast('Call cancelled — nothing was billed');return}
-    toast('Call ended · '+mins+' min — writing your summary…');
-    setTimeout(()=>closeCall(currentSession,mins),2200);
-  });
-}
-
-function closeCall(key,mins){
-  const s=SESSIONS[key], first=fName(s.who);
-  s.calls.push({
-    h:'Picked it back up', when:'Just now', mins:mins,
-    p:'You reopened this session and '+first+' carried on from the notes above &mdash; no re-explaining.',
-    out:[['ok','Went back over where this was left'],
-         ['ok','Agreed the next step before anything gets built']],
-    ts:[['00:03','You','Picking this back up &mdash; can we carry on from where we stopped?'],
-        ['00:18',first,'Yes. I have the notes from last time, nothing has changed underneath.'],
-        ['00:52',first,'Let me walk you through the next step before you commit to anything.']]
-  });
-  s.last='Just now';
-  s.grp='This week';
-  SESS_ORDER=[key].concat(SESS_ORDER.filter(k=>k!==key));
-  renderSession(key);
-  renderSessFeed();
-  toast('Summary written — this session now has '+plural(s.calls.length,'call'));
-  const calls=document.getElementById('sxCalls');
-  if(calls) calls.lastElementChild.scrollIntoView({block:'center',behavior:'smooth'});
-}
-
-/* ---------- project detail ---------- */
-function renderProject(key){
-  const P=PROJECTS[key]; if(!P) return;
-  const keys=SESS_ORDER.filter(k=>SESSIONS[k].proj===key);
-  const tally={};
-  keys.forEach(k=>{const w=SESSIONS[k].who; tally[w]=(tally[w]||0)+1});
-  const knows=Object.keys(tally).map(w=>fName(w)+' ('+plural(tally[w],'session')+')').join(', ');
-  const mins=keys.reduce((a,k)=>a+sessMins(SESSIONS[k]),0);
-
-  document.getElementById('projDetail').innerHTML=
-    '<div class="proj-h">'+
-      '<div><h1>'+P.n+'</h1>'+
-        '<div class="stack">'+P.stack.map(t=>'<span>'+t+'</span>').join('')+'</div></div>'+
-      '<button class="btn go" data-newsess="'+key+'">Get help with this</button>'+
-    '</div>'+
-    '<div class="psum">'+
-      '<div class="psum-h">Project summary</div><p>'+P.blurb+'</p>'+
-      '<div class="psum-grid">'+
-        '<div><b>Where it stands</b><span>'+P.stands+'</span></div>'+
-        '<div><b>Waiting on you</b><span>'+P.waiting+'</span></div>'+
-        '<div><b>Who knows this project</b><span>'+
-          (knows||'No one yet &mdash; no engineer has been in')+'</span></div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="quiet">'+
-      '<div class="quiet-h">Sessions on this project &middot; '+keys.length+
-        (mins?' &middot; '+mins+' min in total':'')+'</div>'+
-      (keys.length?keys.map(sessRow).join('')
-        :'<div class="pj-empty"><b>No sessions yet</b>'+
-         '<span>Nothing has gone wrong here. When it does, the session lands on this page.</span></div>')+
-    '</div>';
-
-  paintIn(document.getElementById('projDetail'));
-  show('project');
-}
-
-/* ---------- wiring ---------- */
-document.addEventListener('click',e=>{
-  const tab=e.target.closest('[data-sfilter]');
-  if(tab){
-    e.stopPropagation();
-    document.querySelectorAll('[data-sfilter]').forEach(t=>t.classList.toggle('on',t===tab));
-    sFilter=tab.dataset.sfilter;
-    renderSessFeed();
-    return;
-  }
-
-  const cont=e.target.closest('[data-continue]');
-  if(cont){
-    e.stopPropagation();
-    renderSession(cont.dataset.continue,true);
-    return;
-  }
-
-  const pj=e.target.closest('[data-project]');
-  if(pj){e.stopPropagation();renderProject(pj.dataset.project);return}
-
-  const row=e.target.closest('[data-session]');
-  if(row){e.stopPropagation();renderSession(row.dataset.session);return}
-
-  const nf=e.target.closest('[data-newsess]');
-  if(nf){e.stopPropagation();toast('Describe what is wrong and we will match you with someone free');return}
-
-  const fs=e.target.closest('[data-filesess]');
-  if(fs){
-    e.stopPropagation();
-    const s=SESSIONS[fs.dataset.filesess];
-    s.proj='trackfit';
-    renderSession(fs.dataset.filesess);
-    renderSessFeed();
-    toast('Filed under TrackFit — it picked up the stack notes');
-    return;
-  }
-
-  if(e.target.closest('.sx-call')){e.stopPropagation();sessionCall();return}
-
-  const send=e.target.closest('.sx-send');
-  if(send){
-    e.stopPropagation();
-    const comp=send.closest('.sx-comp'), ta=comp.querySelector('textarea');
-    const txt=ta.value.trim();
-    if(!txt){ta.focus();return}
-    const first=fName(SESSIONS[currentSession].who);
-    const note=document.createElement('div');
-    note.className='sx-sent';
-    note.innerHTML='<b>&#10003; Sent to '+first+' &mdash; just now</b><br>'+escHtml(txt);
-    comp.parentNode.appendChild(note);
-    ta.value='';
-    toast('Sent to '+first+' — messages between calls are free');
-  }
-});
-
-renderSessFeed();
-
 /* ================= notifications ================= */
 const nScreen=document.getElementById('notifs');
 const nList=document.getElementById('nList');
@@ -3409,7 +3085,7 @@ function writeSummary(thread,mins){
     '<li>Agreed the queue goes in before the launch, not after</li></ul>'+
     '<div class="sd-open"><b>Still open from this call</b>'+
     '<div class="open-row"><span>No retry handling on failed payments</span>'+
-    '<button class="btn sm solid" data-continue="s-checkout">Continue the session</button></div></div>'+
+    '<button class="btn sm solid">Get a quote</button></div></div>'+
     '<div class="sd-acts"><button class="btn sm" data-ts="ts-'+id+'">Read transcript</button></div>'+
     '<div class="tscript" id="ts-'+id+'">'+
       '<div class="ts-h">TRANSCRIPT &middot; '+mins+' min &middot; just now</div>'+
@@ -3458,6 +3134,12 @@ document.addEventListener('click',e=>{
     const row=b.closest('.sd-file');
     if(row){row.innerHTML='&#10003; Filed under <b>TrackFit</b> &mdash; it picked up the stack';row.style.background='var(--live-bg)';row.style.color='var(--live)'}
     toast('Session filed under TrackFit');
+    return;
+  }
+  if(label==='Get a quote'){
+    const row=b.closest('.open-row');
+    if(row){b.outerHTML='<span style="font-size:11.5px;font-weight:700;color:var(--live)">&#10003; Quote requested</span>'}
+    toast('Sent — you will have a quote within a day');
     return;
   }
   if(label==='Find someone free'){toast('Describe the problem and we will match you with someone on React Native');return}

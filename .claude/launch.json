@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8756"],
       "port": 8756
+    },
+    {
+      "name": "relay-alt",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8761"],
+      "port": 8761
     }
   ]
 }
