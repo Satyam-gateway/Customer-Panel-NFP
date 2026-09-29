@@ -4,14 +4,32 @@
     {
       "name": "relay",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8756"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8756"
+      ],
       "port": 8756
     },
     {
       "name": "relay-alt",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8761"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8761"
+      ],
       "port": 8761
+    },
+    {
+      "name": "relay-profile",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8767"
+      ],
+      "port": 8767
     },
     {
       "name": "prototype",
