@@ -235,16 +235,6 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .sx-m{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px;
   font-size:12.5px;color:var(--faint)}
 .sx-m>span+span::before{content:"\00b7";margin-right:9px}
-.sx-open{background:var(--turn-bg);border:1px solid rgba(180,83,9,.24);
-  border-radius:var(--r-md);padding:15px 17px 13px;margin-bottom:6px}
-.sx-open h4{font-size:13px;font-weight:700;color:var(--turn);margin-bottom:4px}
-.sx-open .open-row{border-bottom:1px solid rgba(180,83,9,.14)}
-.sx-open .open-row:last-of-type{border-bottom:0}
-.sx-open .open-row>span{color:#8A4308}
-.sx-open-n{font-size:12.5px;color:#8A4308;opacity:.85;margin-top:7px}
-.sx-open.flash{animation:sxflash 1.5s ease-out}
-@keyframes sxflash{0%,30%{box-shadow:0 0 0 4px rgba(180,83,9,.22)}100%{box-shadow:0 0 0 0 rgba(180,83,9,0)}}
-
 .sx-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
 .sx-foot-h{font-size:12px;font-weight:700;color:var(--faint);margin-bottom:11px}
 .sx-comp{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 15px 11px}
@@ -259,6 +249,38 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   border-radius:var(--r-md);padding:11px 14px;margin-top:10px;line-height:1.55}
 .sx-sent b{color:var(--ink);font-weight:600}
 #session .callbar{margin:0 0 14px;max-width:none}
+
+/* ---------- session summary: written by Relay, compounded across calls ---------- */
+.sx-sum{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:16px 19px 15px;margin-bottom:10px}
+.sx-sum-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sx-sum-h b{font-size:11px;font-weight:700;color:var(--faint)}
+.sx-sum-h .stamp{margin-left:auto;font-size:11px;color:var(--faint);font-weight:500}
+.spark{width:13px;height:13px;flex:none;fill:var(--moving);display:block}
+.sx-sum p{font-size:13.5px;line-height:1.68;color:var(--ink);margin:0;max-width:74ch}
+.sx-sum .shim{display:none;flex-direction:column;gap:9px;padding:3px 0 4px}
+.sx-sum.writing p{display:none}
+.sx-sum.writing .shim{display:flex}
+.shim i{display:block;height:9px;border-radius:5px;
+  background:linear-gradient(90deg,var(--line-soft) 25%,var(--line) 50%,var(--line-soft) 75%);
+  background-size:220% 100%;animation:shimmer 1.1s linear infinite}
+.shim i:nth-child(2){width:93%}
+.shim i:nth-child(3){width:61%}
+@keyframes shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+.sx-sum.fresh{animation:sumin 1.6s ease-out}
+@keyframes sumin{0%,25%{box-shadow:0 0 0 4px var(--moving-bg)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+
+/* ---------- session thread ---------- */
+.sx-thread{margin-top:4px}
+.sx-thread .upd{margin-bottom:16px}
+.sx-thread .msg{margin:0 0 16px}
+.sx-thread .msg .bub{line-height:1.55}
+.sx-left{display:flex;align-items:center;gap:12px;margin:24px 0 20px}
+.sx-left::before,.sx-left::after{content:"";flex:1;height:1px;background:var(--line)}
+.sx-left span{font-size:11.5px;font-weight:700;color:var(--faint);flex:none}
+.sx-left.here span{color:var(--moving)}
+.sx-daymark{font-size:11.5px;font-weight:600;color:var(--faint);text-align:center;margin:0 0 15px}
+
 
 /* ---------- project detail: sessions ---------- */
 .pj-empty{background:var(--card);border:1px dashed var(--line);border-radius:var(--r-md);
@@ -492,7 +514,10 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .stack span{font-size:11.5px;font-weight:600;color:var(--muted);
   background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
 .psum{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px}
-.psum-h{font-size:11px;font-weight:700;color:var(--faint);margin-bottom:9px}
+.psum-h{font-size:11px;font-weight:700;color:var(--faint);margin-bottom:9px;
+  display:flex;align-items:center;gap:8px}
+.psum-h .stamp{margin-left:auto;font-weight:500}
+.psum.fresh{animation:sumin 1.6s ease-out}
 .psum>p{font-size:13.5px;line-height:1.6;color:var(--ink);margin:0 0 16px;max-width:70ch}
 .psum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px;
   border-top:1px solid var(--line);padding-top:15px}
@@ -525,7 +550,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
 /* ---------- main ---------- */
 .main{overflow-y:auto;position:relative}
-.screen{display:none;padding:34px 40px 80px;max-width:1080px}
+.screen{display:none;padding:34px 40px 80px;max-width:1080px;margin-inline:auto}
 .screen.on{display:block}
 .screen.wide{max-width:none}
 .page-h{margin-bottom:28px}
@@ -674,6 +699,65 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .ts-x{flex:1;min-width:0;color:var(--muted)}
 .ts-f{padding:9px 14px;border-top:1px solid var(--line);
   font-size:11px;color:var(--faint);background:var(--card)}
+
+/* ---------- home: matching an engineer ---------- */
+.match{border:1px solid var(--line);border-radius:var(--r-md);background:var(--paper);padding:17px 19px}
+.match-q{font-size:12.5px;color:var(--muted);line-height:1.6;max-width:66ch;
+  border-left:2px solid var(--line);padding-left:13px;margin-bottom:16px}
+.match-w{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--muted);padding:6px 0}
+.match-w .dotpulse{width:9px;height:9px;border-radius:50%;background:var(--live);flex:none;
+  animation:pulse 1.4s infinite}
+.match-hit{display:flex;align-items:center;gap:14px;animation:mpop .2s ease-out}
+.match-hit .mh-b{flex:1;min-width:0}
+.mh-n{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.mh-r{font-size:12.5px;color:var(--muted);margin-top:3px}
+.mh-k{font-size:12px;color:var(--faint);margin-top:7px}
+.match-acts{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:14px;
+  border-top:1px solid var(--line)}
+.match-acts .sp{flex:1}
+
+/* ---------- modal: add a session to a project ---------- */
+.modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;
+  padding:26px;background:rgba(20,24,26,.34)}
+.modal.on{display:flex}
+.modal-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  width:560px;max-width:100%;max-height:84vh;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 26px 64px rgba(20,24,26,.30);animation:mpop .16s ease-out}
+@keyframes mpop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+.modal-h{padding:20px 22px 15px;border-bottom:1px solid var(--line)}
+.modal-h h3{font-size:17px;font-weight:600;letter-spacing:-.012em}
+.modal-h p{font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:6px;max-width:60ch}
+.modal-b{padding:15px 22px 4px;overflow-y:auto;flex:1}
+.modal-f{display:flex;align-items:center;gap:9px;padding:13px 22px;
+  border-top:1px solid var(--line);background:var(--paper)}
+.pk-foot{flex:1;min-width:0;font-size:11.5px;color:var(--faint)}
+.btn.solid:disabled{opacity:.4;cursor:default}
+
+.pk{display:flex;align-items:center;gap:13px;width:100%;text-align:left;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 14px;margin-bottom:8px;transition:border-color .12s}
+.pk:hover{border-color:#CFD5D6}
+.pk.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.pk-b{flex:1;min-width:0}
+.pk-n{font-size:13.5px;font-weight:600}
+.pk-s{font-size:12px;color:var(--faint);margin-top:3px}
+.pk-stack{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.pk-stack span{font-size:10.5px;font-weight:600;color:var(--muted);
+  background:var(--line-soft);border-radius:4px;padding:2px 7px}
+.pk-tick{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);flex:none;
+  display:grid;place-items:center;font-size:11px;color:transparent}
+.pk.on .pk-tick{background:var(--ink);border-color:var(--ink);color:#fff}
+.pk.new{border-style:dashed;background:none}
+.pk.new .pk-n{color:var(--muted)}
+.pk.new:hover .pk-n{color:var(--ink)}
+
+.pk-form{border:1px solid var(--ink);border-radius:var(--r-md);padding:15px 16px;margin-bottom:8px}
+.pk-form label{display:block;font-size:11px;font-weight:700;color:var(--faint);margin-bottom:6px}
+.pk-form input{width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 11px;
+  font:inherit;font-size:13px;color:var(--ink);background:var(--paper);outline:0}
+.pk-form input:focus{border-color:var(--ink)}
+.pk-form .fld2{margin-top:12px}
+.pk-form .hint{font-size:11.5px;color:var(--faint);line-height:1.55;margin-top:9px}
 
 /* ---------- toast ---------- */
 #toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,14px);
@@ -1391,7 +1475,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
               </ul>
               <div class="sd-file">
                 This call is not filed under a project, so it did not pick up a stack.
-                <button class="btn sm">File it</button>
+                <button class="btn sm">Add to project</button>
               </div>
             </div>
 
@@ -2183,36 +2267,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
       </div>
 
       <div class="band">
-        <div class="rows">
-          <button class="row flat" data-project="palmseas">
-            <div class="row-main">
-              <div class="row-title">Palm Seas</div>
-              <div class="row-sub">3 sessions &middot; last call Tuesday with Satyam</div>
-            </div>
-            <div class="row-side"><span class="pill turn">Quote ready</span></div>
-          </button>
-          <button class="row flat" data-project="epicmail">
-            <div class="row-main">
-              <div class="row-title">Epicmail</div>
-              <div class="row-sub">2 sessions &middot; Priya asked you a question 2 hours ago</div>
-            </div>
-            <div class="row-side"><span class="pill turn">Needs a reply</span></div>
-          </button>
-          <button class="row flat" data-project="trackfit">
-            <div class="row-main">
-              <div class="row-title">TrackFit</div>
-              <div class="row-sub">1 session &middot; last call 17 Sep with Arjun</div>
-            </div>
-            <div class="row-side"><span class="pill mute">Quiet</span></div>
-          </button>
-          <button class="row flat" data-project="yopbox">
-            <div class="row-main">
-              <div class="row-title">YopBox</div>
-              <div class="row-sub">No sessions yet</div>
-            </div>
-            <div class="row-side"><span class="btn sm go">Get help</span></div>
-          </button>
-        </div>
+        <div class="rows" id="projRows"></div>
       </div>
     </section>
 
@@ -2269,7 +2324,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
         <!-- your team -->
         <div class="band">
           <div class="band-h">
-            <h2>Your team</h2>
+            <h2>Your engineers</h2>
             <span class="note">People who already know your projects</span>
           </div>
           <div class="team">
@@ -2310,47 +2365,15 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
         <!-- projects -->
         <div class="band">
-          <div class="band-h"><h2>Projects</h2><span class="n">4</span></div>
-          <div class="pgrid">
-            <button class="pc" data-go="projects">
-              <div class="pc-t">Palm Seas</div>
-              <div class="pc-s">3 sessions &middot; last call Tuesday</div>
-              <div class="pc-f">
-                <div class="av" style="background:#00875A">SJ</div>
-                <span class="pill turn">Quote ready</span>
-              </div>
-            </button>
-            <button class="pc" data-go="projects">
-              <div class="pc-t">Epicmail</div>
-              <div class="pc-s">2 sessions &middot; last call 19 Sep</div>
-              <div class="pc-f">
-                <div class="av" style="background:#2456C8">PN</div>
-                <span class="pill turn">Needs a reply</span>
-              </div>
-            </button>
-            <button class="pc" data-go="projects">
-              <div class="pc-t">TrackFit</div>
-              <div class="pc-s">1 session &middot; last call 17 Sep</div>
-              <div class="pc-f">
-                <div class="av" style="background:#9AA1A6">AD</div>
-                <span class="pill mute">Quiet</span>
-              </div>
-            </button>
-            <button class="pc" data-go="projects">
-              <div class="pc-t">YopBox</div>
-              <div class="pc-s">No sessions yet</div>
-              <div class="pc-f">
-                <span class="pill mute">Not started</span>
-              </div>
-            </button>
-          </div>
+          <div class="band-h"><h2>Projects</h2><span class="n" id="projN">4</span></div>
+          <div class="pgrid" id="projCards"></div>
         </div>
 
         <!-- contracts -->
         <div class="band">
           <div class="band-h"><h2>Contracts</h2><span class="n">2</span></div>
           <div class="pgrid">
-            <button class="pc" data-go="contracts">
+            <button class="pc" data-contract="ship">
               <div class="pc-t">daun &mdash; Ship</div>
               <div class="pc-s">Checkout rebuild &middot; started 2 Sep</div>
               <div class="pc-f">
@@ -2358,9 +2381,9 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
                 <span class="pill contract">In progress</span>
               </div>
             </button>
-            <button class="pc" data-go="contracts">
-              <div class="pc-t">Palm Seas &mdash; Maintain</div>
-              <div class="pc-s">Kept running since June</div>
+            <button class="pc" data-contract="maintain">
+              <div class="pc-t">daun &mdash; Maintain</div>
+              <div class="pc-s">Rolling monthly &middot; renews 1 Oct</div>
               <div class="pc-f">
                 <div class="av" style="background:#2456C8">PN</div>
                 <span class="pill live">Running</span>
@@ -2382,10 +2405,6 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
               <button class="rule-x" title="Remove">&times;</button>
             </div>
             <button class="rule add" id="pfAddRule">+&nbsp; Add a rule</button>
-          </div>
-          <div class="acc-line">
-            Right now engineers can <b>push to 3 repositories</b>, <b>read your Vercel logs</b>, and <b>cannot deploy to production</b>.
-            <button class="lk" data-ptab="pfSettings">Manage access</button>
           </div>
         </div>
 
@@ -2461,6 +2480,23 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   <div class="hp-foot">
     <p>Not here? Two engineers are free — one of them will pick it up.</p>
     <button class="btn solid" style="width:100%">Describe the problem</button>
+  </div>
+</div>
+
+<!-- ================= ADD TO PROJECT ================= -->
+<div class="modal" id="pickModal">
+  <div class="modal-card">
+    <div class="modal-h">
+      <h3 id="pkTitle">Add this session to a project</h3>
+      <p id="pkSub">The session keeps its calls and its summary. Filing it means whoever picks it
+        up next starts from the project's stack notes instead of asking you again.</p>
+    </div>
+    <div class="modal-b" id="pkList"></div>
+    <div class="modal-f">
+      <span class="pk-foot" id="pkFoot">Pick a project, or start a new one</span>
+      <button class="btn" id="pkCancel">Cancel</button>
+      <button class="btn solid" id="pkGo" disabled>Add to project</button>
+    </div>
   </div>
 </div>
 
@@ -2546,8 +2582,10 @@ function show(id){
   document.querySelector('.main').scrollTop=0;
   closeHelp();
 }
+let drPerson=null;
 function openPerson(k){
   const p=PEOPLE[k]; if(!p) return;
+  drPerson=k;
   const a=document.getElementById('drAv');
   a.style.background=p.c; a.setAttribute('data-dot',p.d); paintAvatar(a,p.i);
   document.getElementById('drName').textContent=p.n;
@@ -3075,19 +3113,19 @@ setRail(savedRail);
 /* ================= projects -> sessions -> calls ================= */
 
 const PROJECTS={
-  palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'],
+  palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'], pill:{k:'turn',t:'Quote ready'},
     blurb:'A booking site for a diving school. You are building it; Relay engineers come in when you get stuck and leave once it is working again.',
     stands:'Checkout times out on cold starts. A temporary fix is live, but the underlying design needs rebuilding.',
     waiting:'Satyam has quoted the rebuild at &euro;3,200. Nothing starts until you decide.'},
-  epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'],
+  epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'], pill:{k:'turn',t:'Needs a reply'},
     blurb:'A campaign tool you run for a handful of clients. Small, but it sends real mail, so quiet failures are expensive.',
     stands:'Bounced campaign emails were being dropped silently. Logging is in, so you can see it happening now.',
     waiting:'Priya wants to know whether bounces should retry or just be reported to you. She is holding the quote until you answer.'},
-  trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'],
+  trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'], pill:{k:'mute',t:'Quiet'},
     blurb:'A fitness tracker you took over from another developer. Most of your Relay time here goes on builds and releases rather than features.',
     stands:'The iOS certificate had expired and builds were failing. Arjun regenerated it and showed you how to do it yourself.',
     waiting:'Nothing today. Meera has a kickoff booked for the sync rewrite on Mon 29 Sep.'},
-  yopbox:{n:'YopBox', stack:['Astro','Cloudflare'],
+  yopbox:{n:'YopBox', stack:['Astro','Cloudflare'], pill:{k:'mute',t:'Not started'},
     blurb:'The newest of your projects. Nothing has gone wrong yet, so no engineer has been in.',
     stands:'Nothing has needed an engineer yet.',
     waiting:'Nothing.'}
@@ -3097,14 +3135,25 @@ const PROJECTS={
 const SESSIONS={
   's-checkout':{
     t:'Checkout timing out', proj:'palmseas', who:'sj', state:'open',
-    started:'Tue, 23 Sep', last:'Wed, 24 Sep', grp:'This week',
-    open:['Checkout does too much in one request','No retry handling on failed payments'],
+    started:'Tue, 23 Sep', last:'Wed, 24 Sep', grp:'This week', ago:'2 days ago',
+    sum:'Checkout was timing out for real customers. Satyam traced it to cold starts on your '+
+        'serverless function rather than anything on Stripe’s side, and raised the timeout to '+
+        '30 seconds so checkout works today. On a second call you went through the real fix together: '+
+        'checkout runs inventory, payment and email in one request, and needs to be queued. That '+
+        'rebuild is quoted at €3,200 and you have both agreed it goes in before launch rather '+
+        'than after. Nothing starts until you decide.',
+    msgs:[
+      {a:0,w:'sj',d:'Tue, 23 Sep',t:'17:40',x:'The timeout is live — I watched three real checkouts go through just now. I’ll write the rebuild up tonight.'},
+      {a:0,w:'you',d:'Tue, 23 Sep',t:'19:02',x:'Thanks. Send the quote whenever it’s ready, no rush tonight.'},
+      {a:0,w:'sj',d:'Wed, 24 Sep',t:'09:12',x:'Quote’s in — €3,200 for the queue rebuild. That covers the retry handling too, so it’s one job rather than two.'},
+      {a:1,w:'sj',d:'Wed, 24 Sep',t:'16:02',x:'No pressure on the decision. Nothing gets worse while you think about it — the patch holds fine at your current volume.'},
+      {a:1,w:'you',d:'Wed, 24 Sep',t:'16:20',x:'Understood. Let me get through this week’s bookings and I’ll come back to you.'}
+    ],
     calls:[
       {h:'Getting checkout working again', when:'Tue, 23 Sep', mins:18,
        p:'Traced the timeout to cold starts on the checkout function. Satyam got you unblocked for launch, but flagged that the underlying design needs work.',
        out:[['ok','Raised the function timeout to 30s &mdash; checkout works again today'],
-            ['ok','Added logging around the Stripe call <span class="code">checkout.ts</span>'],
-            ['flag','Checkout does too much in one request &mdash; needs a rebuild']],
+            ['ok','Added logging around the Stripe call <span class="code">checkout.ts</span>']],
        ts:[['00:02','You','Checkout is timing out for real customers. This is live right now.'],
            ['04:30','Satyam','It is not Stripe. Your function has a 10 second ceiling and cold starts are eating most of it.'],
            ['06:12','Satyam','Raising it to 30 seconds. Checkout will work today &mdash; but this is a patch.'],
@@ -3113,8 +3162,7 @@ const SESSIONS={
       {h:'Going through the rebuild', when:'Wed, 24 Sep', mins:6,
        p:'You came back to understand what a rebuild would actually touch before deciding anything.',
        out:[['ok','Walked the queue design and what it replaces'],
-            ['ok','Agreed the queue goes in before launch, not after'],
-            ['flag','No retry handling on failed payments &mdash; still open']],
+            ['ok','Agreed the queue goes in before launch, not after']],
        ts:[['00:03','You','I wanted to go through the rebuild before I sign anything.'],
            ['00:20','Satyam','Good. The queue is the part that actually fixes it &mdash; everything else is tidying.'],
            ['02:48','You','Does it have to be done before launch?'],
@@ -3123,8 +3171,14 @@ const SESSIONS={
 
   's-s3':{
     t:'Why is my S3 bill suddenly &pound;180?', proj:null, who:'ks', state:'done',
-    started:'Wed, 24 Sep', last:'Wed, 24 Sep', grp:'This week',
-    open:[],
+    started:'Wed, 24 Sep', last:'Wed, 24 Sep', grp:'This week', ago:'2 days ago',
+    sum:'A one-off cost question, not tied to any project. Your S3 bill had tripled without you '+
+        'changing anything. Kabir found the bucket had no lifecycle rule, so every version of every '+
+        'image you had ever uploaded was still sitting there being paid for. He applied the rule in '+
+        'the call — old versions now expire after 30 days, and the bill should come down on the next cycle.',
+    msgs:[
+      {a:0,w:'ks',d:'Wed, 24 Sep',t:'11:40',x:'Rule is applied. You won’t see the drop until the next billing cycle — that’s expected, not a sign it didn’t work.'}
+    ],
     calls:[
       {h:'Tracking down the cost', when:'Wed, 24 Sep', mins:9,
        p:'A one-off. Nothing to do with a project &mdash; you just wanted the number explained.',
@@ -3137,13 +3191,21 @@ const SESSIONS={
 
   's-bounce':{
     t:'Epicmail bounce handling', proj:'epicmail', who:'pn', state:'open',
-    started:'Mon, 22 Sep', last:'Mon, 22 Sep', grp:'This week',
-    open:['Decide whether bounces retry or are just reported'],
+    started:'Mon, 22 Sep', last:'Mon, 22 Sep', grp:'This week', ago:'4 days ago',
+    sum:'Some campaign emails were never arriving and there was no record of it anywhere. Priya '+
+        'found that Mailgun had been reporting bounces the whole time and nothing was storing them, '+
+        'so every failure was disappearing silently. Bounce logging is now in and every drop is '+
+        'recorded. Before she can quote the fix she needs one decision from you: should failed '+
+        'sends retry automatically, or just be reported to you?',
+    msgs:[
+      {a:0,w:'pn',d:'Mon, 22 Sep',t:'15:20',x:'Logging is running. I can already see four bounces from Friday’s campaign — all on the same domain, which is usually a block rather than bad addresses.'},
+      {a:0,w:'you',d:'Mon, 22 Sep',t:'18:05',x:'Is that bad?'},
+      {a:0,w:'pn',d:'Mon, 22 Sep',t:'18:14',x:'Not on its own. Tell me whether you want retries and I’ll quote the fix around your answer — it changes how much there is to build.'}
+    ],
     calls:[
       {h:'Finding the dropped emails', when:'Mon, 22 Sep', mins:7,
        p:'Walked through why some campaign emails were silently dropping. Priya set up bounce logging so you can see it happening.',
-       out:[['ok','Bounce logging is in &mdash; every drop is now recorded'],
-            ['flag','Priya needs to know if bounces should retry before she can quote it']],
+       out:[['ok','Bounce logging is in &mdash; every drop is now recorded']],
        ts:[['00:06','You','Some people say they never got the campaign. I have no idea who.'],
            ['01:30','Priya','You are not storing bounces at all. Mailgun is telling you and it is going nowhere.'],
            ['04:10','Priya','Logging them now. Before I quote the fix &mdash; do you want failed ones retried, or just reported to you?']]}
@@ -3151,8 +3213,16 @@ const SESSIONS={
 
   's-webhook':{
     t:'Stripe webhook basics', proj:'palmseas', who:'sj', state:'done',
-    started:'Fri, 19 Sep', last:'Fri, 19 Sep', grp:'Earlier',
-    open:[],
+    started:'Fri, 19 Sep', last:'Fri, 19 Sep', grp:'Earlier', ago:'1 week ago',
+    sum:'Stripe was sending webhooks and your endpoint was rejecting every one as an invalid '+
+        'signature. Nothing was actually broken: your framework parses the body to JSON before '+
+        'you verify, and the signature is computed over the raw bytes, so it could never match. '+
+        'Satyam changed that one route to read the raw body and the signatures verified straight '+
+        'away. He also left you a test endpoint so you can replay events yourself instead of '+
+        'waiting for a real one to come through.',
+    msgs:[
+      {a:0,w:'sj',d:'Fri, 19 Sep',t:'14:15',x:'Test endpoint is live at /stripe/replay. Fire anything at it and you’ll see exactly what Stripe sends, without needing a real booking.'}
+    ],
     calls:[
       {h:'Why the signatures were failing', when:'Fri, 19 Sep', mins:12,
        p:'Not broken code &mdash; a body-parsing order problem that catches almost everyone.',
@@ -3166,14 +3236,22 @@ const SESSIONS={
 
   's-ios':{
     t:'TrackFit build failing on iOS', proj:'trackfit', who:'ad', state:'open',
-    started:'Thu, 17 Sep', last:'Thu, 17 Sep', grp:'Earlier',
-    open:['iOS build breaks again after every dependency update'],
+    started:'Thu, 17 Sep', last:'Thu, 17 Sep', grp:'Earlier', ago:'9 days ago',
+    sum:'The iOS build was failing with an error that told you nothing useful. Arjun found the '+
+        'signing certificate had expired eleven days earlier — that was the whole error. He '+
+        'regenerated it, got a build out, and wrote the steps down so you can do it yourself next '+
+        'time without booking a call. The underlying problem is still open: releases run off your '+
+        'laptop, so this comes back after every dependency update. The real fix is moving releases into CI.',
+    msgs:[
+      {a:0,w:'ad',d:'Thu, 17 Sep',t:'14:30',x:'Steps for regenerating the certificate are saved to your project notes. Takes about four minutes once you’ve done it once.'},
+      {a:0,w:'you',d:'Thu, 17 Sep',t:'15:10',x:'Got it. Do I have to do this every year?'},
+      {a:0,w:'ad',d:'Thu, 17 Sep',t:'15:22',x:'Every twelve months, yes — or never again if we move releases into CI. Worth a session when you have an hour.'}
+    ],
     calls:[
       {h:'Getting a build out', when:'Thu, 17 Sep', mins:24,
        p:'Certificate had expired. Arjun regenerated it and walked you through doing it yourself next time.',
        out:[['ok','Regenerated the signing certificate &mdash; the build went through'],
-            ['ok','Wrote down the steps so you can do it without a call'],
-            ['flag','It breaks again after every dependency update &mdash; the real fix is CI']],
+            ['ok','Wrote down the steps so you can do it without a call']],
        ts:[['00:08','You','The iOS build fails and the error tells me nothing useful.'],
            ['03:20','Arjun','Your signing certificate expired eleven days ago. That is the whole error.'],
            ['11:05','Arjun','Regenerated and building. This will keep happening until releases run in CI rather than off your laptop.']]}
@@ -3181,8 +3259,14 @@ const SESSIONS={
 
   's-pg':{
     t:'Quick Postgres index question', proj:null, who:'pn', state:'done',
-    started:'Mon, 15 Sep', last:'Mon, 15 Sep', grp:'Earlier',
-    open:[],
+    started:'Mon, 15 Sep', last:'Mon, 15 Sep', grp:'Earlier', ago:'11 days ago',
+    sum:'A short question you had been sitting on for about a week: one index per column, or one '+
+        'across both? Priya’s answer was one composite index, in the order your WHERE clause uses '+
+        'the columns — two separate ones would barely have helped here. It was added and measured '+
+        'in the same call: the query went from 1.9 seconds to 40 milliseconds.',
+    msgs:[
+      {a:0,w:'pn',d:'Mon, 15 Sep',t:'10:30',x:'If another query starts crawling, check the order of the WHERE clause first. The same trick usually applies before you need anyone on a call.'}
+    ],
     calls:[
       {h:'Which index to add', when:'Mon, 15 Sep', mins:6,
        p:'Six minutes to answer something that had been bothering you for a week.',
@@ -3195,13 +3279,20 @@ const SESSIONS={
 
   's-firstlook':{
     t:'First look at the codebase', proj:'palmseas', who:'md', state:'done',
-    started:'Fri, 12 Sep', last:'Fri, 12 Sep', grp:'Earlier',
-    open:[],
+    started:'Fri, 12 Sep', last:'Fri, 12 Sep', grp:'Earlier', ago:'2 weeks ago',
+    sum:'The session every later engineer on this project starts from. Most of the codebase was '+
+        'generated — you could read it, but not explain why it was arranged the way it is. Meera '+
+        'read the project end to end and wrote the stack notes that now sit on Palm Seas, so no '+
+        'one has to ask you about the setup again. She flagged one thing worth knowing: checkout '+
+        'and booking share state they should not share. Nothing is broken today, but changing one '+
+        'will eventually break the other.',
+    msgs:[
+      {a:0,w:'md',d:'Fri, 12 Sep',t:'17:05',x:'Stack notes are saved to Palm Seas. Anyone you speak to next reads those before the call — you shouldn’t have to explain the setup twice.'}
+    ],
     calls:[
       {h:'Reading the project end to end', when:'Fri, 12 Sep', mins:31,
        p:'The session every later engineer starts from. Meera read the whole project and wrote the stack notes.',
-       out:[['ok','Read through the project and wrote the stack notes every engineer now starts from'],
-            ['flag','Checkout and booking are tangled together &mdash; changing one will break the other eventually']],
+       out:[['ok','Read through the project and wrote the stack notes every engineer now starts from']],
        ts:[['00:10','You','Most of this was generated. I can read it but I could not tell you why it is arranged this way.'],
            ['02:20','Meera','That is normal and it is fine. Let me go through it and write down what is actually here.'],
            ['16:05','Meera','Checkout and booking share state they should not share. Nothing is broken today, but changing one will break the other eventually.'],
@@ -3210,8 +3301,15 @@ const SESSIONS={
 
   's-deliver':{
     t:'Emails landing in spam', proj:'epicmail', who:'pn', state:'done',
-    started:'Wed, 10 Sep', last:'Wed, 10 Sep', grp:'Earlier',
-    open:[],
+    started:'Wed, 10 Sep', last:'Wed, 10 Sep', grp:'Earlier', ago:'16 days ago',
+    sum:'Everything Epicmail sent was going straight to spam in Gmail. It was not a code problem — '+
+        'the sending domain had no DKIM at all and its SPF record did not include Mailgun, so as '+
+        'far as every inbox provider was concerned you were sending unauthenticated mail. Priya '+
+        'set up SPF, DKIM and DMARC on the domain, and test sends now land in the inbox on all '+
+        'three providers you checked.',
+    msgs:[
+      {a:0,w:'pn',d:'Wed, 10 Sep',t:'12:30',x:'DNS has propagated. I sent tests to Gmail, Outlook and Fastmail — all three landed in the inbox.'}
+    ],
     calls:[
       {h:'Fixing your sending reputation', when:'Wed, 10 Sep', mins:14,
        p:'Deliverability rather than code. Nothing was broken &mdash; the domain was simply never set up to prove who it was.',
@@ -3243,8 +3341,7 @@ function sessRow(k){
   return '<button class="srow" data-session="'+k+'">'+
     '<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
     '<div class="srow-b">'+
-      '<div class="srow-t">'+s.t+
-        (s.open.length?'<span class="pill turn">'+plural(s.open.length,'thing')+' open</span>':'')+'</div>'+
+      '<div class="srow-t">'+s.t+'</div>'+
       '<div class="srow-s">'+
         (s.proj?'<span class="tagp">'+PROJECTS[s.proj].n+'</span>':'<span class="tagp one">One-off</span>')+
         '<span>'+p.n+'</span><span>&middot;</span><span>'+plural(s.calls.length,'call')+'</span>'+
@@ -3253,7 +3350,7 @@ function sessRow(k){
     '</div>'+
     '<span class="srow-r">'+
       '<span class="srow-when">'+s.last+'</span>'+
-      '<span class="btn sm'+(s.open.length?' solid':'')+'" data-continue="'+k+'">Continue the session</span>'+
+      '<span class="btn sm'+(s.state==='open'?' solid':'')+'" data-continue="'+k+'">Continue the session</span>'+
     '</span></button>';
 }
 function renderSessFeed(){
@@ -3286,8 +3383,7 @@ function callHtml(k,c,i,lastOne){
     '<div class="upd-body">'+
       (c.p?'<p>'+c.p+'</p>':'')+
       '<div class="art"><h5>What came out of it</h5><ul>'+
-        c.out.map(o=>'<li><span style="color:var(--'+(o[0]==='flag'?'turn':'live')+')">'+
-          (o[0]==='flag'?'!':'&#10003;')+'</span> '+o[1]+'</li>').join('')+
+        c.out.map(o=>'<li><span style="color:var(--live)">&#10003;</span> '+o[1]+'</li>').join('')+
       '</ul>'+
       (c.ts?'<button class="btn sm" data-ts="ts-'+id+'">Read transcript</button>'+
         '<div class="tscript" id="ts-'+id+'">'+
@@ -3302,13 +3398,49 @@ function callHtml(k,c,i,lastOne){
     '</div></div>';
 }
 
-/* ---------- session detail ---------- */
+/* ---------- session detail: the summary, then the thread you left off in ---------- */
+const SPARK='<svg class="spark" viewBox="0 0 24 24" aria-hidden="true">'+
+  '<path d="M12 2.6l1.85 5.55L19.4 10l-5.55 1.85L12 17.4l-1.85-5.55L4.6 10l5.55-1.85L12 2.6z'+
+  'M18.8 14.4l.8 2.4 2.4.8-2.4.8-.8 2.4-.8-2.4-2.4-.8 2.4-.8.8-2.4z"/></svg>';
+
+const MEAV='<div class="av" style="background:#6D3BD4">RM</div>';
+
 let currentSession=null;
-function renderSession(key,flash){
+
+/* a free message between calls */
+function msgHtml(m){
+  const me=m.w==='you', p=me?null:PEOPLE[m.w];
+  return '<div class="msg'+(me?' me':'')+'">'+
+    (me?MEAV:'<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>')+
+    '<div><div class="bub">'+m.x+'</div><div class="when">'+m.t+'</div></div></div>';
+}
+
+/* the whole session in order: every call, and every message that happened between them */
+function threadHtml(key){
+  const s=SESSIONS[key], n=s.calls.length, msgs=s.msgs||[];
+  let html='', day=null;
+  const mark=d=>{if(!d||d===day) return ''; day=d; return '<div class="sx-daymark">'+d+'</div>'};
+  s.calls.forEach((c,i)=>{
+    html+=mark(c.when)+callHtml(key,c,i,i===n-1);
+    msgs.filter(m=>m.a===i).forEach(m=>{html+=mark(m.d)+msgHtml(m)});
+  });
+  return html;
+}
+
+function sumHtml(s){
+  return '<div class="sx-sum-h">'+SPARK+'<b>SESSION SUMMARY</b>'+
+      '<span class="stamp">'+(s.calls.length
+        ? 'Written by Relay from '+plural(s.calls.length,'call')+' &middot; updated '+s.last
+        : 'Relay writes this when your first call ends')+'</span></div>'+
+    '<div class="shim"><i></i><i></i><i></i></div>'+
+    '<p>'+s.sum+'</p>';
+}
+
+function renderSession(key,mode){
   const s=SESSIONS[key]; if(!s) return;
   currentSession=key;
   const p=PEOPLE[s.who], first=fName(s.who);
-  const n=s.calls.length;
+  const n=s.calls.length, cont=(mode==='continue');
 
   document.getElementById('sessDetail').innerHTML=
     '<div class="sx-h">'+
@@ -3321,15 +3453,17 @@ function renderSession(key,flash){
           '<span>'+sessMins(s)+' min billed</span><span>Started '+s.started+'</span>'+
         '</div>'+
       '</div>'+
-      (s.proj?'':'<button class="btn sm" data-filesess="'+key+'">File under a project</button>')+
+      (s.proj?'':'<button class="btn sm" data-filesess="'+key+'">Add to project</button>')+
     '</div>'+
-    (s.open.length?
-      '<div class="sx-open'+(flash?' flash':'')+'"><h4>Still open from this session</h4>'+
-        s.open.map(o=>'<div class="open-row"><span>'+o+'</span></div>').join('')+
-        '<p class="sx-open-n">Nothing here is lost. '+first+
-        ' has the whole history &mdash; pick it up on the next call.</p></div>':'')+
-    '<div class="day">'+plural(n,'call')+' in this session</div>'+
-    '<div id="sxCalls">'+s.calls.map((c,i)=>callHtml(key,c,i,i===n-1)).join('')+'</div>'+
+    '<div class="sx-sum" id="sxSum">'+sumHtml(s)+'</div>'+
+    '<div class="day">'+(n
+      ? 'Everything in this session &middot; '+plural(n,'call')+' and the messages in between'
+      : 'Nothing in this session yet')+'</div>'+
+    '<div class="sx-thread" id="sxCalls">'+(n?threadHtml(key)
+      :'<div class="pj-empty"><b>No calls yet</b><span>Start the call below. Everything said in '+
+       'it lands here, and Relay writes the summary when it ends.</span></div>')+'</div>'+
+    (n?'<div class="sx-left'+(cont?' here':'')+'" id="sxLeft">'+
+      '<span>You left off here &middot; '+(s.ago||s.last)+'</span></div>':'')+
     '<div class="sx-foot" id="sxFoot">'+
       '<div class="sx-foot-h">'+
         (s.state==='open'?'Carry on where you left off':'Finished &mdash; but you can always reopen it')+
@@ -3346,6 +3480,16 @@ function renderSession(key,flash){
 
   paintIn(document.getElementById('sessDetail'));
   show('session');
+
+  /* "Continue" drops you at the bottom of the thread, ready to type */
+  if(cont) setTimeout(()=>{
+    const l=document.getElementById('sxLeft');
+    if(l) l.scrollIntoView({block:'center'});
+    setTimeout(()=>{
+      const ta=document.querySelector('#sxFoot textarea');
+      if(ta) ta.focus({preventScroll:true});
+    },420);
+  },30);
 }
 
 /* ---------- a call, from inside the session ---------- */
@@ -3401,9 +3545,17 @@ function sessionCall(){
 }
 
 function closeCall(key,mins){
-  const s=SESSIONS[key], first=fName(s.who);
-  s.calls.push({
-    h:'Picked it back up', when:'Just now', mins:mins,
+  const s=SESSIONS[key], first=fName(s.who), firstCall=!s.calls.length;
+  s.calls.push(firstCall?{
+    h:'First look at it', when:'Today', mins:mins,
+    p:'The first call on this. '+first+' read what you wrote before picking up, so you did not start from nothing.',
+    out:[['ok','Went through what is actually happening'],
+         ['ok','Agreed the next step before anything gets built']],
+    ts:[['00:04','You','Thanks for picking this up &mdash; I will show you what I am seeing.'],
+        ['00:21',first,'I read what you wrote, so start wherever you like. I have the gist.'],
+        ['01:10',first,'Right, I can see it. Let me talk you through what is going on before we change anything.']]
+  }:{
+    h:'Picked it back up', when:'Today', mins:mins,
     p:'You reopened this session and '+first+' carried on from the notes above &mdash; no re-explaining.',
     out:[['ok','Went back over where this was left'],
          ['ok','Agreed the next step before anything gets built']],
@@ -3413,12 +3565,54 @@ function closeCall(key,mins){
   });
   s.last='Just now';
   s.grp='This week';
+  s.ago='just now';
   SESS_ORDER=[key].concat(SESS_ORDER.filter(k=>k!==key));
   renderSession(key);
   renderSessFeed();
-  toast('Summary written — this session now has '+plural(s.calls.length,'call'));
-  const calls=document.getElementById('sxCalls');
-  if(calls) calls.lastElementChild.scrollIntoView({block:'center',behavior:'smooth'});
+
+  const thread=document.getElementById('sxCalls');
+  if(thread && thread.lastElementChild)
+    thread.lastElementChild.scrollIntoView({block:'center',behavior:'smooth'});
+
+  /* the summary is rewritten from the whole session, not appended to the old one */
+  const box=document.getElementById('sxSum');
+  if(box){
+    box.classList.add('writing');
+    box.querySelector('.stamp').textContent=
+      'Relay is rewriting this from '+plural(s.calls.length,'call')+'…';
+  }
+
+  setTimeout(()=>{
+    if(currentSession!==key) return;
+    s.sum = s.calls.length===1
+      ? 'You described this in your own words and '+first+' picked it up. On a '+mins+
+        '-minute call you went through what is actually happening and agreed the next step '+
+        'before anything gets built.'
+      : s.sum+' You came back to it on a '+mins+'-minute call with '+first+', went back over '+
+        'where it had been left, and agreed the next step before anything gets built.';
+    rollUpProject(key,mins);
+
+    const b=document.getElementById('sxSum');
+    if(b){
+      b.classList.remove('writing');
+      b.innerHTML=sumHtml(s);
+      b.classList.add('fresh');
+      b.scrollIntoView({block:'center',behavior:'smooth'});
+      setTimeout(()=>b.classList.remove('fresh'),1700);
+    }
+    renderSessFeed();
+    toast('Summary rewritten — this session now reads as '+plural(s.calls.length,'call'));
+  },2100);
+}
+
+/* a session summary changing moves the project summary above it */
+function rollUpProject(key,mins){
+  const s=SESSIONS[key]; if(!s.proj) return;
+  const P=PROJECTS[s.proj], first=fName(s.who);
+  P.stands='&ldquo;'+s.t+'&rdquo; is the live thread here. You and '+first+' picked it back up on a '+
+    mins+'-minute call, went over where it stood and agreed the next step before anything gets built.';
+  P.upd='just now';
+  P.flash=true;
 }
 
 /* ---------- project detail ---------- */
@@ -3434,10 +3628,13 @@ function renderProject(key){
     '<div class="proj-h">'+
       '<div><h1>'+P.n+'</h1>'+
         '<div class="stack">'+P.stack.map(t=>'<span>'+t+'</span>').join('')+'</div></div>'+
-      '<button class="btn go" data-newsess="'+key+'">Get help with this</button>'+
     '</div>'+
-    '<div class="psum">'+
-      '<div class="psum-h">Project summary</div><p>'+P.blurb+'</p>'+
+    '<div class="psum'+(P.flash?' fresh':'')+'">'+
+      '<div class="psum-h">'+SPARK+'<span>PROJECT SUMMARY</span>'+
+        '<span class="stamp">Written by Relay from '+
+        (keys.length?plural(keys.length,'session'):'no sessions yet')+
+        (P.upd?' &middot; updated '+P.upd:'')+'</span></div>'+
+      '<p>'+P.blurb+'</p>'+
       '<div class="psum-grid">'+
         '<div><b>Where it stands</b><span>'+P.stands+'</span></div>'+
         '<div><b>Waiting on you</b><span>'+P.waiting+'</span></div>'+
@@ -3455,7 +3652,293 @@ function renderProject(key){
 
   paintIn(document.getElementById('projDetail'));
   show('project');
+  P.flash=false;
 }
+
+/* ---------- the two project lists, rendered so a new one shows up ---------- */
+function projSub(k){
+  const keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===k);
+  if(!keys.length) return 'No sessions yet';
+  const s=SESSIONS[keys[0]];
+  return plural(keys.length,'session')+' &middot; last call '+s.last+' with '+fName(s.who);
+}
+function projPill(k){
+  const P=PROJECTS[k], keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===k);
+  if(!keys.length) return '<span class="pill mute">Not started</span>';
+  return '<span class="pill '+(P.pill?P.pill.k:'mute')+'">'+(P.pill?P.pill.t:'Quiet')+'</span>';
+}
+function renderProjects(){
+  const keys=Object.keys(PROJECTS);
+  const rows=document.getElementById('projRows');
+  if(rows) rows.innerHTML=keys.map(k=>
+    '<button class="row flat" data-project="'+k+'">'+
+      '<div class="row-main"><div class="row-title">'+PROJECTS[k].n+'</div>'+
+      '<div class="row-sub">'+projSub(k)+'</div></div>'+
+      '<div class="row-side">'+projPill(k)+'</div></button>').join('');
+
+  const cards=document.getElementById('projCards');
+  if(cards){
+    cards.innerHTML=keys.map(k=>{
+      const owners=SESS_ORDER.filter(x=>SESSIONS[x].proj===k);
+      const who=owners.length?PEOPLE[SESSIONS[owners[0]].who]:null;
+      return '<button class="pc" data-project="'+k+'">'+
+        '<div class="pc-t">'+PROJECTS[k].n+'</div>'+
+        '<div class="pc-s">'+projSub(k)+'</div>'+
+        '<div class="pc-f">'+
+          (who?'<div class="av" data-dot="'+who.d+'" style="background:'+who.c+'">'+who.i+'</div>':'')+
+          projPill(k)+
+        '</div></button>';
+    }).join('');
+    paintIn(cards);
+  }
+  const n=document.getElementById('projN');
+  if(n) n.textContent=keys.length;
+}
+
+/* ================= add a session to a project ================= */
+let pkSess=null, pkPick=null, pkNew=false, pkDone=null;
+
+function renderPicker(){
+  document.getElementById('pkList').innerHTML=
+    Object.keys(PROJECTS).map(k=>{
+      const P=PROJECTS[k];
+      return '<button class="pk'+(pkPick===k?' on':'')+'" data-pk="'+k+'">'+
+        '<div class="pk-b"><div class="pk-n">'+P.n+'</div>'+
+        '<div class="pk-s">'+projSub(k)+'</div>'+
+        '<div class="pk-stack">'+P.stack.map(t=>'<span>'+t+'</span>').join('')+'</div></div>'+
+        '<span class="pk-tick">&#10003;</span></button>';
+    }).join('')+
+    (pkNew
+      ? '<div class="pk-form">'+
+          '<label>Project name</label>'+
+          '<input id="pkName" placeholder="e.g. Harbour Booking" autocomplete="off">'+
+          '<div class="fld2"><label>What it is built with &mdash; optional</label>'+
+          '<input id="pkStack" placeholder="Next.js, Postgres, Vercel" autocomplete="off"></div>'+
+          '<div class="hint">Relay writes the project summary from the sessions filed here, so '+
+          'this one starts with the session you are adding. Leave the stack blank and the first '+
+          'engineer in will fill it in for you.</div>'+
+        '</div>'+
+        '<button class="btn sm" data-pknew="off">Pick an existing project instead</button>'
+      : '<button class="pk new" data-pknew="on">'+
+          '<div class="pk-b"><div class="pk-n">+ Create a new project</div>'+
+          '<div class="pk-s">Start one and file this session under it</div></div></button>');
+
+  const go=document.getElementById('pkGo');
+  go.disabled=!(pkPick||pkNew);
+  go.textContent=pkNew?'Create and add':'Add to project';
+  document.getElementById('pkFoot').textContent=pkNew
+    ? 'The session moves across with all of its calls'
+    : 'Pick a project, or start a new one';
+  if(pkNew){const f=document.getElementById('pkName'); if(f) f.focus()}
+}
+
+function openPicker(key,done){
+  pkSess=key; pkPick=null; pkNew=false; pkDone=done||null;
+  document.getElementById('pkTitle').innerHTML=
+    key?'Add &ldquo;'+SESSIONS[key].t+'&rdquo; to a project':'Add this session to a project';
+  renderPicker();
+  document.getElementById('pickModal').classList.add('on');
+}
+function closePicker(){
+  document.getElementById('pickModal').classList.remove('on');
+  pkSess=null; pkPick=null; pkNew=false; pkDone=null;
+}
+
+function pickerConfirm(){
+  const sk=pkSess, s=sk?SESSIONS[sk]:null, made=pkNew, done=pkDone;
+  let key=pkPick;
+
+  if(made){
+    const nameEl=document.getElementById('pkName');
+    const name=(nameEl.value||'').trim();
+    if(!name){nameEl.focus(); toast('Give the project a name first'); return}
+    const stack=(document.getElementById('pkStack').value||'')
+      .split(',').map(t=>t.trim()).filter(Boolean);
+    key='p'+Date.now().toString(36);
+    PROJECTS[key]={
+      n:name,
+      stack:stack.length?stack:['Stack not set yet'],
+      pill:{k:'mute',t:'New'},
+      blurb:'You started this project by filing a session under it. Relay writes this summary '+
+            'from the sessions that land here, so it fills out as engineers come in.',
+      stands:s?'Everything so far sits in &ldquo;'+s.t+'&rdquo;.':'Nothing has needed an engineer yet.',
+      waiting:'Nothing yet.'
+    };
+  }
+
+  if(s) s.proj=key;
+  const P=PROJECTS[key];
+  closePicker();
+
+  renderProjects();
+  renderSessFeed();
+  if(document.querySelector('.screen.on').id==='session' && sk) renderSession(sk);
+  if(done) done(key,P);
+
+  toast(made ? 'Created '+P.n+' — the session moved across with its calls'
+             : 'Filed under '+P.n+' — it picked up the stack notes');
+}
+
+document.addEventListener('click',e=>{
+  const row=e.target.closest('[data-pk]');
+  if(row){e.stopPropagation(); pkPick=row.dataset.pk; pkNew=false; renderPicker(); return}
+
+  const nb=e.target.closest('[data-pknew]');
+  if(nb){e.stopPropagation(); pkNew=nb.dataset.pknew==='on'; pkPick=null; renderPicker(); return}
+
+  if(e.target.closest('#pkCancel')){e.stopPropagation(); closePicker(); return}
+  if(e.target.closest('#pkGo')){e.stopPropagation(); pickerConfirm(); return}
+  if(e.target.id==='pickModal'){closePicker(); return}
+});
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('pickModal').classList.contains('on')) return;
+  if(e.key==='Escape') closePicker();
+  if(e.key==='Enter'&&pkNew){e.preventDefault(); pickerConfirm()}
+});
+
+/* ================= home: describe a problem, get matched ================= */
+const MATCH=[
+  {re:/ios|android|build|app store|expo|react native|certificate/i, w:'ad', s:'React Native and mobile releases'},
+  {re:/mail|email|spam|bounce|smtp|campaign|deliver/i,              w:'pn', s:'Rails and email delivery'},
+  {re:/s3|aws|bill|cost|storage|bucket|pipeline|data/i,             w:'ks', s:'AWS and data pipelines'},
+  {re:/css|design|layout|front.?end|component|figma/i,              w:'md', s:'front-end and design systems'},
+  {re:/.*/,                                                          w:'sj', s:'Next.js, Stripe and checkout'}
+];
+function matchFor(txt){return MATCH.find(m=>m.re.test(txt))}
+
+function findEngineer(btn){
+  const ask=btn.closest('.ask'), ta=ask.querySelector('textarea');
+  const txt=(ta.value||'').trim();
+  if(!txt){ta.focus(); toast('Tell us what is going wrong first — a sentence is enough'); return}
+
+  const m=matchFor(txt), p=PEOPLE[m.w], first=fName(m.w);
+  const field=ask.querySelector('.ask-field'), note=ask.querySelector('.ask-note');
+  const panel=document.createElement('div');
+  panel.className='match';
+  panel.innerHTML='<div class="match-q">'+escHtml(txt)+'</div>'+
+    '<div class="match-w"><span class="dotpulse"></span>'+
+    '<span>Reading what you wrote&hellip;</span></div>';
+  field.replaceWith(panel);
+  if(note) note.remove();
+
+  setTimeout(()=>{
+    const w=panel.querySelector('.match-w span:last-child');
+    if(w) w.textContent='Looking for someone who works in '+m.s+'…';
+  },900);
+
+  setTimeout(()=>{
+    panel.innerHTML='<div class="match-q">'+escHtml(txt)+'</div>'+
+      '<div class="match-hit">'+
+        '<div class="av lg" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+        '<div class="mh-b"><div class="mh-n">'+p.n+'</div>'+
+          '<div class="mh-r">'+p.r+'</div>'+
+          '<div class="mh-k">Works in '+m.s+' &middot; has handled this kind of thing before</div></div>'+
+      '</div>'+
+      '<div class="match-acts"><span class="sp"></span>'+
+        '<button class="btn" data-rematch>Someone else</button>'+
+        '<button class="btn go" data-startmatch="'+m.w+'">Start the call with '+first+'</button>'+
+      '</div>';
+    paintIn(panel);
+    panel.dataset.q=txt;
+    toast('Matched with '+first+' — he is free now');
+  },2100);
+}
+
+/* a match turns into a real session you can call into */
+function sessionFromMatch(who,txt){
+  const first=fName(who);
+  const title=txt.length>52?txt.slice(0,52).replace(/\s+\S*$/,'')+'…':txt;
+  const key='s'+Date.now().toString(36);
+  SESSIONS[key]={
+    t:escHtml(title), proj:null, who:who, state:'open',
+    started:'Today', last:'Just now', grp:'This week', ago:'just now', msgs:[], calls:[],
+    sum:'You described this in your own words and Relay matched you with '+first+
+        '. Nothing has happened yet — Relay writes this summary when your first call ends.'
+  };
+  SESS_ORDER=[key].concat(SESS_ORDER);
+  renderSessFeed();
+  renderSession(key);
+  setTimeout(()=>sessionCall(),400);
+}
+
+/* Home's ask box is hidden in the "returning" demo view — reveal it before focusing */
+function openAsk(){
+  show('home');
+  const vis=()=>[...document.querySelectorAll('#home .ask textarea')].find(t=>t.offsetParent);
+  let ta=vis();
+  if(!ta){
+    document.getElementById('home').dataset.view='assist';
+    document.querySelectorAll('.vs').forEach(v=>v.classList.toggle('on',v.dataset.view==='assist'));
+    ta=vis();
+  }
+  if(ta){ta.scrollIntoView({block:'center'}); ta.focus()}
+}
+
+/* ---------- the buttons that had nothing behind them ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.btn, .story');
+  if(!b) return;
+  const l=b.textContent.trim().replace(/\s+/g,' ');
+
+  if(l==='Find me an engineer'){e.stopPropagation(); findEngineer(b); return}
+
+  if(b.hasAttribute('data-rematch')){
+    e.stopPropagation();
+    const panel=b.closest('.match'), q=panel.dataset.q||'';
+    const pool=['sj','pn','ks','md','ad'].filter(k=>k!==panel.querySelector('[data-startmatch]').dataset.startmatch);
+    const w=pool[Math.floor(Math.random()*pool.length)], p=PEOPLE[w];
+    const av=panel.querySelector('.av');
+    av.style.background=p.c; av.setAttribute('data-dot',p.d); paintAvatar(av,p.i);
+    panel.querySelector('.mh-n').textContent=p.n;
+    panel.querySelector('.mh-r').textContent=p.r;
+    panel.querySelector('.mh-k').textContent='Also covers this — picked up because '+
+      fName(w)+' is free right now';
+    const go=panel.querySelector('[data-startmatch]');
+    go.dataset.startmatch=w; go.textContent='Start the call with '+fName(w);
+    toast('Swapped to '+fName(w));
+    return;
+  }
+
+  const sm=b.closest('[data-startmatch]');
+  if(sm){
+    e.stopPropagation();
+    const panel=sm.closest('.match');
+    sessionFromMatch(sm.dataset.startmatch, panel.dataset.q||'Something is broken');
+    return;
+  }
+
+  /* home stories: "+ New" is the same door as the box below it */
+  if(b.classList.contains('story')&&b.classList.contains('add')){
+    e.stopPropagation();
+    openAsk();
+    toast('Describe what is going wrong — we match you from that');
+    return;
+  }
+
+  /* help panel: the last resort at the bottom */
+  if(l==='Describe the problem'){
+    e.stopPropagation();
+    closeHelp(); openAsk();
+    toast('Tell us what is going wrong and we will put someone on it');
+    return;
+  }
+
+  /* engineer drawer */
+  if(b.closest('.dr-acts')&&drPerson){
+    e.stopPropagation();
+    const k=drPerson, first=fName(k);
+    closeDrawer();
+    if(l==='Start a call'){
+      const mine=SESS_ORDER.filter(x=>SESSIONS[x].who===k);
+      if(mine.length){renderSession(mine[0],'continue'); setTimeout(()=>sessionCall(),400)}
+      else{openAsk(); toast('Describe it here and '+first+' can pick it up')}
+    }else{
+      show('chats');
+      toast('Opening your thread with '+first+' — messages between calls are free');
+    }
+    return;
+  }
+});
 
 /* ---------- wiring ---------- */
 document.addEventListener('click',e=>{
@@ -3471,7 +3954,7 @@ document.addEventListener('click',e=>{
   const cont=e.target.closest('[data-continue]');
   if(cont){
     e.stopPropagation();
-    renderSession(cont.dataset.continue,true);
+    renderSession(cont.dataset.continue,'continue');
     return;
   }
 
@@ -3481,19 +3964,8 @@ document.addEventListener('click',e=>{
   const row=e.target.closest('[data-session]');
   if(row){e.stopPropagation();renderSession(row.dataset.session);return}
 
-  const nf=e.target.closest('[data-newsess]');
-  if(nf){e.stopPropagation();toast('Describe what is wrong and we will match you with someone free');return}
-
   const fs=e.target.closest('[data-filesess]');
-  if(fs){
-    e.stopPropagation();
-    const s=SESSIONS[fs.dataset.filesess];
-    s.proj='trackfit';
-    renderSession(fs.dataset.filesess);
-    renderSessFeed();
-    toast('Filed under TrackFit — it picked up the stack notes');
-    return;
-  }
+  if(fs){e.stopPropagation(); openPicker(fs.dataset.filesess); return}
 
   if(e.target.closest('.sx-call')){e.stopPropagation();sessionCall();return}
 
@@ -3503,17 +3975,32 @@ document.addEventListener('click',e=>{
     const comp=send.closest('.sx-comp'), ta=comp.querySelector('textarea');
     const txt=ta.value.trim();
     if(!txt){ta.focus();return}
-    const first=fName(SESSIONS[currentSession].who);
-    const note=document.createElement('div');
-    note.className='sx-sent';
-    note.innerHTML='<b>&#10003; Sent to '+first+' &mdash; just now</b><br>'+escHtml(txt);
-    comp.parentNode.appendChild(note);
+    const s=SESSIONS[currentSession], first=fName(s.who);
+
+    /* the message joins the session thread — it is there next time you open this */
+    const m={a:s.calls.length-1,w:'you',d:'Today',t:'Just now',x:escHtml(txt)};
+    (s.msgs=s.msgs||[]).push(m);
+    s.ago='just now';
+
+    const thread=document.getElementById('sxCalls');
+    if(thread){
+      const wrap=document.createElement('div');
+      wrap.innerHTML=msgHtml(m);
+      const bub=wrap.firstElementChild;
+      thread.appendChild(bub);
+      paintIn(thread);
+      bub.scrollIntoView({block:'center',behavior:'smooth'});
+    }
+    const left=document.getElementById('sxLeft');
+    if(left) left.querySelector('span').innerHTML='You left off here &middot; just now';
+
     ta.value='';
     toast('Sent to '+first+' — messages between calls are free');
   }
 });
 
 renderSessFeed();
+renderProjects();
 
 /* ================= notifications ================= */
 const nScreen=document.getElementById('notifs');
@@ -3864,10 +4351,13 @@ document.addEventListener('click',e=>{
     if(bar&&!bar.querySelector('.chip-file')&&!bar.querySelector('.staged-hint')) bar.remove();
     return;
   }
-  if(label==='File it'){
+  if(label==='File it'||label==='Add to project'){
     const row=b.closest('.sd-file');
-    if(row){row.innerHTML='&#10003; Filed under <b>TrackFit</b> &mdash; it picked up the stack';row.style.background='var(--live-bg)';row.style.color='var(--live)'}
-    toast('Session filed under TrackFit');
+    if(!row) return;   /* the session-detail button goes through data-filesess instead */
+    openPicker(null,(k,P)=>{
+      row.innerHTML='&#10003; Added to <b>'+P.n+'</b> &mdash; it picked up the stack';
+      row.style.background='var(--live-bg)'; row.style.color='var(--live)';
+    });
     return;
   }
   if(label==='Find someone free'){toast('Describe the problem and we will match you with someone on React Native');return}
