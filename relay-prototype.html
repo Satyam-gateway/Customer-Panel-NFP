@@ -45,9 +45,37 @@ a{color:inherit;text-decoration:none}
 .app{display:grid;grid-template-columns:var(--rail) 1fr;height:100vh;overflow:hidden}
 
 /* ---------- rail ---------- */
+/* four treatments, switchable from the chip row at the bottom of the rail.
+   defaults to sand: warm chrome against the cool content area. */
+.app{
+  /* deep violet — the default */
+  --rail-bg:#2A1259;  --rail-line:#2A1259;  --rail-hr:rgba(255,255,255,.13);
+  --rail-ink:#FFFFFF; --rail-muted:#AC9DD6; --rail-brand:#FFFFFF;
+  --rail-hover:rgba(255,255,255,.08); --rail-on:rgba(255,255,255,.14);
+  --rail-faint:#8778B4;
+}
+.app[data-rail="aubergine"]{
+  --rail-bg:#3C1440;  --rail-line:#3C1440;  --rail-hr:rgba(255,255,255,.13);
+  --rail-ink:#FFFFFF; --rail-muted:#C6A8C9; --rail-brand:#FFFFFF;
+  --rail-hover:rgba(255,255,255,.08); --rail-on:rgba(255,255,255,.14);
+  --rail-faint:#A489A7;
+}
+.app[data-rail="iris"]{
+  --rail-bg:#4A3AA8;  --rail-line:#4A3AA8;  --rail-hr:rgba(255,255,255,.15);
+  --rail-ink:#FFFFFF; --rail-muted:#C3BCEE; --rail-brand:#FFFFFF;
+  --rail-hover:rgba(255,255,255,.09); --rail-on:rgba(255,255,255,.16);
+  --rail-faint:#A49ADC;
+}
+.app[data-rail="lilac"]{
+  --rail-bg:#F1EDFC;  --rail-line:#E1D9F7;  --rail-hr:#E1D9F7;
+  --rail-ink:#1F1638; --rail-muted:#6A5E8C; --rail-brand:#1F1638;
+  --rail-hover:rgba(76,42,160,.055); --rail-on:rgba(76,42,160,.11);
+  --rail-faint:#988CB8;
+}
 .rail{
-  background:var(--card);border-right:1px solid var(--line);
+  background:var(--rail-bg);border-right:1px solid var(--rail-line);
   display:flex;flex-direction:column;padding:20px 12px 12px;gap:2px;overflow-y:auto;
+  transition:background .18s,border-color .18s;
 }
 .brand{display:flex;align-items:center;gap:11px;padding:0 10px 22px}
 .orb{
@@ -55,24 +83,54 @@ a{color:inherit;text-decoration:none}
   background:radial-gradient(circle at 32% 28%, #7BF0BE 0%, #24C98A 38%, #00875A 78%, #006B48 100%);
   box-shadow:0 0 0 1px rgba(0,135,90,.18), 0 3px 12px rgba(0,135,90,.32);
 }
-.brand-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.01em}
+.brand-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--rail-brand)}
 .nav-item{
   display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--r-sm);
-  color:var(--muted);font-weight:500;width:100%;text-align:left;transition:background .12s,color .12s;
+  color:var(--rail-muted);font-weight:500;width:100%;text-align:left;transition:background .12s,color .12s;
 }
-.nav-item:hover{background:var(--line-soft);color:var(--ink)}
-.nav-item.on{background:var(--line-soft);color:var(--ink);font-weight:600}
-.nav-item .ico{width:17px;flex:none;text-align:center;font-size:14px;opacity:.85}
+.nav-item:hover{background:var(--rail-hover);color:var(--rail-ink)}
+.nav-item{position:relative}
+.nav-item.on{background:var(--rail-on);color:var(--rail-ink);font-weight:600}
+.nav-item.on::before{
+  content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+  width:3px;height:19px;border-radius:0 3px 3px 0;background:currentColor;
+}
+.nav-item .ico{width:20px;height:20px;flex:none;display:grid;place-items:center}
+.nav-item .ico svg{width:20px;height:20px;display:block;overflow:visible}
+.nav-item .ico .b,.nav-item .ico .d{
+  fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;
+  transition:fill-opacity .14s,stroke-width .14s;
+}
+.nav-item .ico .b{fill:currentColor;fill-opacity:0}
+.nav-item:hover .ico .b{fill-opacity:.12}
+.nav-item.on .ico .b{fill-opacity:.24;stroke-width:1.95}
 .nav-item .count{
   margin-left:auto;font-size:11px;font-weight:700;min-width:19px;height:19px;
   border-radius:10px;display:grid;place-items:center;padding:0 6px;
 }
 .count.turn{background:var(--turn-bg);color:var(--turn)}
 .count.moving{background:var(--moving-bg);color:var(--moving)}
+/* badges keep their meaning on the dark violets */
+.app:not([data-rail="lilac"]) .count.turn{background:rgba(245,158,11,.22);color:#F7C27D}
+.app:not([data-rail="lilac"]) .count.moving{background:rgba(147,180,255,.22);color:#B6CBFF}
+.app:not([data-rail="lilac"]) .orb{box-shadow:0 0 0 1px rgba(255,255,255,.18), 0 3px 14px rgba(0,135,90,.40)}
+.app[data-rail="lilac"] .count.turn{background:var(--turn-bg);color:var(--turn)}
+.app[data-rail="lilac"] .count.moving{background:var(--moving-bg);color:var(--moving)}
+
+/* demo-only: switch the rail treatment */
+.railswitch{display:flex;align-items:center;gap:7px;padding:10px 10px 2px;margin-top:2px}
+.railswitch .rs-l{font-size:10.5px;font-weight:700;color:var(--rail-faint);
+  letter-spacing:.04em;text-transform:uppercase;margin-right:auto}
+.rs{width:17px;height:17px;border-radius:50%;flex:none;cursor:pointer;
+  border:1px solid rgba(20,24,26,.16);transition:transform .12s,box-shadow .12s}
+.app:not([data-rail="lilac"]) .rs{border-color:rgba(255,255,255,.24)}
+.rs:hover{transform:scale(1.12)}
+.rs.on{box-shadow:0 0 0 2px var(--rail-bg), 0 0 0 3.5px var(--live)}
+
 .rail-gap{flex:1}
-.rail hr{border:none;border-top:1px solid var(--line);margin:10px 4px}
+.rail hr{border:none;border-top:1px solid var(--rail-hr);margin:10px 4px}
 .me{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-sm);width:100%}
-.me:hover{background:var(--line-soft)}
+.me:hover{background:var(--rail-hover)}
 .av{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:11px;color:#fff;position:relative}
 .av.lg{width:44px;height:44px;font-size:15px}
 .av.xl{width:64px;height:64px;font-size:21px}
@@ -161,7 +219,9 @@ a{color:inherit;text-decoration:none}
 .srow-b{flex:1;min-width:0}
 .srow-t{font-size:14px;font-weight:600;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
 .srow-s{font-size:12.5px;color:var(--faint);margin-top:4px;display:flex;align-items:center;gap:7px}
+.srow-r{display:flex;align-items:center;gap:13px;flex:none}
 .srow-when{font-size:12px;color:var(--faint);flex:none}
+.srow-r .btn{flex:none}
 .tagp{font-size:11px;font-weight:700;background:var(--line-soft);color:var(--muted);
   border-radius:5px;padding:2px 7px;flex:none}
 .tagp.one{background:none;border:1px dashed var(--line);color:var(--faint)}
@@ -460,8 +520,8 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .av[data-dot="live"]::after{background:var(--live)}
 .av[data-dot="busy"]::after{background:var(--turn)}
 .av[data-dot="off"]::after{background:var(--faint)}
-.me-name{font-weight:600;font-size:13px}
-.me-sub{font-size:11.5px;color:var(--faint)}
+.me-name{font-weight:600;font-size:13px;color:var(--rail-ink)}
+.me-sub{font-size:11.5px;color:var(--rail-faint)}
 
 /* ---------- main ---------- */
 .main{overflow-y:auto;position:relative}
@@ -820,6 +880,108 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .hp-foot{border-top:1px solid var(--line);padding-top:14px}
 .hp-foot p{font-size:12.5px;color:var(--muted);margin-bottom:10px}
 
+/* ---------- profile ---------- */
+.av.xxl{width:86px;height:86px;font-size:28px}
+.av.xxl[data-dot]::after{width:17px;height:17px;border-width:3px}
+.me.on{background:var(--rail-on)}
+
+.pf-tabs{display:flex;gap:7px;align-items:center;margin:-6px 0 20px;
+  padding-bottom:15px;border-bottom:1px solid var(--line)}
+.pf-tab{font-size:13px;font-weight:600;color:var(--muted);padding:6px 14px;
+  border-radius:999px;transition:background .12s,color .12s}
+.pf-tab:hover{background:var(--line-soft);color:var(--ink)}
+.pf-tab.on{background:var(--ink);color:#fff}
+.pf-panel{display:none}
+.pf-panel.on{display:block}
+
+.pf-vis{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);
+  background:var(--line-soft);border-radius:var(--r-sm);padding:9px 13px;margin-bottom:28px}
+.pf-vis b{color:var(--ink);font-weight:600}
+.pf-vis svg{width:15px;height:15px;stroke:var(--faint);fill:none;stroke-width:1.7;flex:none}
+
+/* identity */
+.pf-id{display:flex;gap:24px;margin-bottom:36px}
+.pf-name{font-family:"Bricolage Grotesque",sans-serif;font-size:29px;font-weight:600;letter-spacing:-.02em}
+.pf-role{font-size:14.5px;color:var(--muted);margin-top:3px}
+.pf-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--faint);margin-top:10px}
+.pf-meta i{font-style:normal;color:var(--line)}
+.pf-bio{font-size:14.5px;line-height:1.65;margin-top:15px;max-width:60ch}
+.pf-acts{display:flex;gap:8px;margin-top:17px;align-items:center}
+.pf-st{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+  border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px 5px 9px}
+.pf-st:hover{background:var(--line-soft)}
+.pf-st .e{font-size:13px;line-height:1}
+
+/* your team */
+.team{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:9px}
+.tm{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:14px 15px;display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  transition:border-color .12s,box-shadow .12s,transform .12s}
+.tm:hover{box-shadow:var(--shadow);transform:translateY(-1px);border-color:#CFD5D6}
+.tm-n{font-weight:600;font-size:14px}
+.tm-s{font-size:12.5px;color:var(--muted);margin-top:2px}
+.tm-k{font-size:12px;color:var(--faint);margin-top:7px;line-height:1.45}
+.team-more{font-size:13px;color:var(--muted);margin-top:12px}
+.team-more b{font-weight:600;color:var(--ink)}
+
+/* project + contract cards */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:9px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:15px 16px;text-align:left;width:100%;
+  transition:border-color .12s,box-shadow .12s,transform .12s}
+.pc:hover{box-shadow:var(--shadow);transform:translateY(-1px);border-color:#CFD5D6}
+.pc-t{font-weight:600;font-size:14.5px;letter-spacing:-.005em}
+.pc-s{font-size:12.5px;color:var(--muted);margin-top:4px}
+.pc-f{display:flex;align-items:center;gap:8px;margin-top:14px}
+.pc-f .av{width:22px;height:22px;font-size:9px}
+.pc-f .pill{margin-left:auto}
+
+/* ground rules */
+.rules{display:flex;flex-direction:column;gap:7px}
+.rule{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:12px 14px}
+.rule-i{width:22px;height:22px;border-radius:6px;background:var(--stop-bg);color:var(--stop);
+  display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+.rule-t{font-size:13.5px;flex:1}
+.rule-x{color:var(--faint);font-size:16px;line-height:1;padding:3px 7px;border-radius:4px;flex:none}
+.rule-x:hover{background:var(--stop-bg);color:var(--stop)}
+.rule.add{border-style:dashed;color:var(--muted);font-size:13.5px;font-weight:600;
+  justify-content:flex-start;gap:9px;cursor:pointer}
+.rule.add:hover{border-color:var(--muted);color:var(--ink)}
+.rule-new{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--ink);border-radius:var(--r-md);padding:11px 12px 11px 14px}
+.rule-new input{flex:1;min-width:0;font:inherit;font-size:13.5px;color:var(--ink);
+  border:none;outline:none;background:none}
+.rule-new input::placeholder{color:var(--faint)}
+
+/* inline editing */
+.editable{border-radius:5px;transition:background .12s,box-shadow .12s}
+.editable[contenteditable="true"]{background:var(--card);padding:2px 7px;margin:0 -7px;
+  box-shadow:inset 0 0 0 1px var(--line)}
+.editable[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1.5px var(--ink);outline:none}
+.acc-line{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12.5px;
+  color:var(--muted);margin-top:13px}
+.acc-line b{color:var(--ink);font-weight:600}
+.acc-line .lk{color:var(--moving);font-weight:600}
+.acc-line .lk:hover{text-decoration:underline}
+
+.xp.four{grid-template-columns:repeat(4,1fr)}
+
+/* settings */
+.fld{display:flex;align-items:center;gap:18px;padding:13px 0;border-top:1px solid var(--line-soft)}
+.fld:first-child{border-top:none}
+.fld-l{font-size:13.5px;font-weight:600;width:170px;flex:none}
+.fld-v{font-size:13.5px;color:var(--muted);flex:1}
+.conn{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:13px 15px;margin-bottom:7px}
+.conn-i{width:30px;height:30px;border-radius:7px;background:var(--line-soft);display:grid;
+  place-items:center;font-size:11px;font-weight:700;color:var(--muted);flex:none}
+.conn-n{font-weight:600;font-size:13.5px}
+.conn-s{font-size:12.5px;color:var(--faint);margin-top:1px}
+.conn-b{margin-left:auto;display:flex;gap:7px;flex:none}
+.conn[data-state="on"] .conn-s::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--live);display:inline-block;margin-right:7px;vertical-align:1px}
+
 .empty{text-align:center;padding:60px 20px;color:var(--faint)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -832,19 +994,27 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   <nav class="rail">
     <div class="brand"><div class="orb"></div><div class="brand-name">Relay</div></div>
 
-    <button class="nav-item on" data-go="home"><span class="ico">◈</span>Home</button>
-    <button class="nav-item" data-go="sessions"><span class="ico">☎</span>Sessions</button>
-    <button class="nav-item" data-go="projects"><span class="ico">▣</span>Projects</button>
-    <button class="nav-item" data-go="chats"><span class="ico">✉</span>Chats<span class="count moving">2</span></button>
-    <button class="nav-item" data-go="notifs"><span class="ico">◉</span>Notifications<span class="count turn" id="nCount">3</span></button>
-    <button class="nav-item" data-go="contracts"><span class="ico">◫</span>Contracts<span class="count turn">1</span></button>
+    <button class="nav-item on" data-go="home"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M3.6 10.4 12 3.6l8.4 6.8v9a1.6 1.6 0 0 1-1.6 1.6h-3.6v-5.8H8.8V21H5.2a1.6 1.6 0 0 1-1.6-1.6z"/></svg></span>Home</button>
+    <button class="nav-item" data-go="sessions"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M21.4 16.9v2.8a2 2 0 0 1-2.2 2 19.6 19.6 0 0 1-8.5-3 19.3 19.3 0 0 1-5.9-5.9 19.6 19.6 0 0 1-3-8.6 2 2 0 0 1 2-2.2h2.8a2 2 0 0 1 2 1.7c.13.95.36 1.88.7 2.77a2 2 0 0 1-.45 2.1L7.7 9.8a15.8 15.8 0 0 0 5.9 5.9l1.2-1.2a2 2 0 0 1 2.1-.45c.89.34 1.82.57 2.77.7a2 2 0 0 1 1.73 2.03z"/></svg></span>Sessions</button>
+    <button class="nav-item" data-go="projects"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M12 3.2 3.4 8.1 12 13l8.6-4.9z"/><path class="d" d="M3.4 12.4 12 17.3l8.6-4.9M3.4 16.2 12 21.1l8.6-4.9"/></svg></span>Projects</button>
+    <button class="nav-item" data-go="chats"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M20.8 11.6a8.4 8.4 0 0 1-8.9 8.4 9.4 9.4 0 0 1-4.1-.95L3.2 20.8l1.35-4.6a8.4 8.4 0 0 1-.95-4.6 8.4 8.4 0 0 1 8.9-8.4 8.4 8.4 0 0 1 8.3 8.4z"/></svg></span>Chats<span class="count moving">2</span></button>
+    <button class="nav-item" data-go="notifs"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M18.4 8.6a6.4 6.4 0 1 0-12.8 0c0 6.5-2.6 8.4-2.6 8.4h18s-2.6-1.9-2.6-8.4z"/><path class="d" d="M13.9 20.4a2.2 2.2 0 0 1-3.8 0"/></svg></span>Notifications<span class="count turn" id="nCount">3</span></button>
+    <button class="nav-item" data-go="contracts"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M14.2 2.6H7.4a2 2 0 0 0-2 2v14.8a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V7z"/><path class="d" d="M14.2 2.6V7h4.4M9 13.4h6M9 17h4"/></svg></span>Contracts<span class="count turn">1</span></button>
 
     <div class="rail-gap"></div>
     <hr>
-    <button class="me">
+    <button class="me" data-go="profile">
       <div class="av" data-dot="live" style="background:#6D3BD4">RM</div>
       <div><div class="me-name">Rohan Mehta</div><div class="me-sub" id="meSub">34.8 minutes used</div></div>
     </button>
+
+    <div class="railswitch" title="Demo only — not part of the product">
+      <span class="rs-l">Rail</span>
+      <button class="rs on" data-rail="violet"    style="background:#2A1259" title="Deep violet"></button>
+      <button class="rs"    data-rail="aubergine" style="background:#3C1440" title="Aubergine"></button>
+      <button class="rs"    data-rail="iris"      style="background:#4A3AA8" title="Iris"></button>
+      <button class="rs"    data-rail="lilac"     style="background:#F1EDFC" title="Lilac"></button>
+    </div>
   </nav>
 
   <!-- ================= MAIN ================= -->
@@ -2052,6 +2222,227 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
       <div id="projDetail"></div>
     </section>
 
+    <!-- ============ PROFILE ============ -->
+    <section class="screen" id="profile">
+
+      <div class="pf-tabs">
+        <button class="pf-tab on" data-ptab="pfProfile">Profile</button>
+        <button class="pf-tab" data-ptab="pfSettings">Settings</button>
+      </div>
+
+      <!-- ---------- PROFILE TAB ---------- -->
+      <div class="pf-panel on" id="pfProfile">
+
+        <div class="pf-vis">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.8 12S5.4 5.2 12 5.2 22.2 12 22.2 12 18.6 18.8 12 18.8 1.8 12 1.8 12z"/><circle cx="12" cy="12" r="3.1"/></svg>
+          <span><b>This is what your engineers see.</b></span>
+        </div>
+
+        <div class="pf-id">
+          <div class="av xxl" data-dot="live" style="background:#6D3BD4">RM</div>
+          <div>
+            <div class="pf-name editable ed-id">Rohan Mehta</div>
+            <div class="pf-role editable ed-id">Founder &middot; Palm Seas, daun, TrackFit</div>
+            <div class="pf-meta">
+              <span>10:42 local &middot; Bengaluru</span><i>&bull;</i>
+              <span>With Relay since March 2026</span><i>&bull;</i>
+              <span>Usually replies within a couple of hours</span>
+            </div>
+            <p class="pf-bio editable ed-id">Not an engineer, but I have watched enough builds to know what I am looking at. I care more about whether the thing still works on a Sunday than how it was written. If I go quiet I am probably on a flight.</p>
+            <div class="pf-acts">
+              <button class="pf-st" id="pfStatus"><span class="e">&#128994;</span>Online</button>
+              <button class="btn sm" id="pfEdit">Edit profile</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- usage -->
+        <div class="band">
+          <div class="xp four">
+            <div class="xp-c"><div class="xp-n">34.8</div><div class="xp-l">minutes used</div></div>
+            <div class="xp-c"><div class="xp-n">9</div><div class="xp-l">sessions</div></div>
+            <div class="xp-c"><div class="xp-n">4</div><div class="xp-l">projects</div></div>
+            <div class="xp-c"><div class="xp-n">12 Mar</div><div class="xp-l">first call</div></div>
+          </div>
+        </div>
+
+        <!-- your team -->
+        <div class="band">
+          <div class="band-h">
+            <h2>Your team</h2>
+            <span class="note">People who already know your projects</span>
+          </div>
+          <div class="team">
+            <button class="tm" data-person="sj">
+              <div class="av lg" data-dot="live" style="background:#00875A">SJ</div>
+              <div>
+                <div class="tm-n">Satyam Jha</div>
+                <div class="tm-s">12 sessions together</div>
+                <div class="tm-k">Knows Palm Seas, daun and TrackFit. On your daun contract now.</div>
+              </div>
+            </button>
+            <button class="tm" data-person="pn">
+              <div class="av lg" data-dot="live" style="background:#2456C8">PN</div>
+              <div>
+                <div class="tm-n">Priya Nair</div>
+                <div class="tm-s">7 sessions together</div>
+                <div class="tm-k">Knows Epicmail and your deploy setup. First call in April.</div>
+              </div>
+            </button>
+            <button class="tm" data-person="md">
+              <div class="av lg" data-dot="busy" style="background:#B45309">MI</div>
+              <div>
+                <div class="tm-n">Meera Iyer</div>
+                <div class="tm-s">4 sessions together</div>
+                <div class="tm-k">Rebuilt the Palm Seas checkout screens in July.</div>
+              </div>
+            </button>
+            <button class="tm" data-person="ad">
+              <div class="av lg" data-dot="off" style="background:#9AA1A6">AD</div>
+              <div>
+                <div class="tm-n">Arjun Desai</div>
+                <div class="tm-s">2 sessions together</div>
+                <div class="tm-k">The TrackFit app. Away until Friday.</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- projects -->
+        <div class="band">
+          <div class="band-h"><h2>Projects</h2><span class="n">4</span></div>
+          <div class="pgrid">
+            <button class="pc" data-go="projects">
+              <div class="pc-t">Palm Seas</div>
+              <div class="pc-s">3 sessions &middot; last call Tuesday</div>
+              <div class="pc-f">
+                <div class="av" style="background:#00875A">SJ</div>
+                <span class="pill turn">Quote ready</span>
+              </div>
+            </button>
+            <button class="pc" data-go="projects">
+              <div class="pc-t">Epicmail</div>
+              <div class="pc-s">2 sessions &middot; last call 19 Sep</div>
+              <div class="pc-f">
+                <div class="av" style="background:#2456C8">PN</div>
+                <span class="pill turn">Needs a reply</span>
+              </div>
+            </button>
+            <button class="pc" data-go="projects">
+              <div class="pc-t">TrackFit</div>
+              <div class="pc-s">1 session &middot; last call 17 Sep</div>
+              <div class="pc-f">
+                <div class="av" style="background:#9AA1A6">AD</div>
+                <span class="pill mute">Quiet</span>
+              </div>
+            </button>
+            <button class="pc" data-go="projects">
+              <div class="pc-t">YopBox</div>
+              <div class="pc-s">No sessions yet</div>
+              <div class="pc-f">
+                <span class="pill mute">Not started</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- contracts -->
+        <div class="band">
+          <div class="band-h"><h2>Contracts</h2><span class="n">2</span></div>
+          <div class="pgrid">
+            <button class="pc" data-go="contracts">
+              <div class="pc-t">daun &mdash; Ship</div>
+              <div class="pc-s">Checkout rebuild &middot; started 2 Sep</div>
+              <div class="pc-f">
+                <div class="av" style="background:#00875A">SJ</div>
+                <span class="pill contract">In progress</span>
+              </div>
+            </button>
+            <button class="pc" data-go="contracts">
+              <div class="pc-t">Palm Seas &mdash; Maintain</div>
+              <div class="pc-s">Kept running since June</div>
+              <div class="pc-f">
+                <div class="av" style="background:#2456C8">PN</div>
+                <span class="pill live">Running</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- ground rules -->
+        <div class="band">
+          <div class="band-h">
+            <h2>Ground rules</h2>
+            <span class="note">Shown to every engineer before they start</span>
+          </div>
+          <div class="rules" id="pfRules">
+            <div class="rule">
+              <div class="rule-i">!</div>
+              <div class="rule-t">Never deploy to production without telling me first.</div>
+              <button class="rule-x" title="Remove">&times;</button>
+            </div>
+            <button class="rule add" id="pfAddRule">+&nbsp; Add a rule</button>
+          </div>
+          <div class="acc-line">
+            Right now engineers can <b>push to 3 repositories</b>, <b>read your Vercel logs</b>, and <b>cannot deploy to production</b>.
+            <button class="lk" data-ptab="pfSettings">Manage access</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ---------- SETTINGS TAB ---------- -->
+      <div class="pf-panel" id="pfSettings">
+
+        <div class="band">
+          <div class="band-h"><h2>Account</h2></div>
+          <div class="fld"><div class="fld-l">Name</div><div class="fld-v editable">Rohan Mehta</div><button class="btn sm" data-edit>Change</button></div>
+          <div class="fld"><div class="fld-l">Email</div><div class="fld-v editable">rohan@palmseas.co</div><button class="btn sm" data-edit>Change</button></div>
+          <div class="fld"><div class="fld-l">Photo</div><div class="fld-v">Uploaded</div><button class="btn sm" data-photo>Replace</button></div>
+          <div class="fld"><div class="fld-l">Time zone</div><div class="fld-v editable">India Standard Time &middot; UTC+5:30</div><button class="btn sm" data-edit>Change</button></div>
+          <div class="fld"><div class="fld-l">Language</div><div class="fld-v editable">English</div><button class="btn sm" data-edit>Change</button></div>
+        </div>
+
+        <div class="band">
+          <div class="band-h">
+            <h2>Connectors</h2>
+            <span class="note">What engineers can reach</span>
+          </div>
+          <div class="conn" data-conn="GitHub" data-state="on">
+            <div class="conn-i">GH</div>
+            <div><div class="conn-n">GitHub</div><div class="conn-s">3 repositories &middot; push access &middot; connected 14 March</div></div>
+            <div class="conn-b">
+              <button class="btn sm" data-manage>Manage</button>
+              <button class="btn sm" data-connect>Connect&nbsp;+</button>
+            </div>
+          </div>
+          <div class="conn" data-conn="Vercel" data-state="on">
+            <div class="conn-i">VC</div>
+            <div><div class="conn-n">Vercel</div><div class="conn-s">Read logs and preview deploys &middot; production deploys blocked</div></div>
+            <div class="conn-b">
+              <button class="btn sm" data-manage>Manage</button>
+              <button class="btn sm" data-connect>Connect&nbsp;+</button>
+            </div>
+          </div>
+          <div class="conn" data-conn="AWS" data-state="off">
+            <div class="conn-i">AWS</div>
+            <div><div class="conn-n">AWS</div><div class="conn-s">Not connected</div></div>
+            <div class="conn-b">
+              <button class="btn sm" data-connect>Connect&nbsp;+</button>
+            </div>
+          </div>
+          <div class="conn" data-conn="Linear" data-state="off">
+            <div class="conn-i">LN</div>
+            <div><div class="conn-n">Linear</div><div class="conn-s">Not connected</div></div>
+            <div class="conn-b">
+              <button class="btn sm" data-connect>Connect&nbsp;+</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -2151,6 +2542,7 @@ function show(id){
     const p=document.querySelector('.nav-item[data-go="'+PARENT_NAV[id]+'"]');
     if(p) p.classList.add('on');
   }
+  document.querySelector('.me').classList.toggle('on',id==='profile');
   document.querySelector('.main').scrollTop=0;
   closeHelp();
 }
@@ -2665,6 +3057,21 @@ document.addEventListener('click',e=>{
   if(l==='Ask Priya what it would break') return once('Asked Priya — she will reply in the thread');
 });
 
+/* ---------- demo: rail treatment ---------- */
+const APP=document.querySelector('.app');
+function setRail(name){
+  APP.dataset.rail=name;
+  document.querySelectorAll('.rs').forEach(b=>b.classList.toggle('on',b.dataset.rail===name));
+  try{localStorage.setItem('relayRail',name)}catch(err){}
+}
+document.querySelectorAll('.rs').forEach(b=>{
+  b.addEventListener('click',e=>{e.stopPropagation();setRail(b.dataset.rail)});
+});
+const RAILS=['violet','aubergine','iris','lilac'];
+let savedRail='violet';
+try{const v=localStorage.getItem('relayRail'); if(RAILS.indexOf(v)>-1) savedRail=v}catch(err){}
+setRail(savedRail);
+
 /* ================= projects -> sessions -> calls ================= */
 
 const PROJECTS={
@@ -2844,7 +3251,10 @@ function sessRow(k){
         '<span>&middot;</span><span>'+sessMins(s)+' min</span>'+
       '</div>'+
     '</div>'+
-    '<span class="srow-when">'+s.last+'</span></button>';
+    '<span class="srow-r">'+
+      '<span class="srow-when">'+s.last+'</span>'+
+      '<span class="btn sm'+(s.open.length?' solid':'')+'" data-continue="'+k+'">Continue the session</span>'+
+    '</span></button>';
 }
 function renderSessFeed(){
   const keys=sessKeys(sFilter);
@@ -3465,6 +3875,128 @@ document.addEventListener('click',e=>{
   if(label==='Reschedule'){toast('Sent Satyam three new times');return}
   if(label==='Something is off'){toast('Flagged — Satyam will correct the notes');return}
   if(label==='Open'){toast('Opening attachment');return}
+});
+
+/* ================= PROFILE ================= */
+
+const STATUS=[
+  {e:'🟢',t:'Online',        d:'live'},
+  {e:'🟠',t:'In a meeting',  d:'busy'},
+  {e:'🌴',t:'Away',          d:'off'}
+];
+let statusI=0;
+
+function pfTab(id){
+  document.querySelectorAll('.pf-panel').forEach(p=>p.classList.toggle('on',p.id===id));
+  document.querySelectorAll('.pf-tab').forEach(t=>t.classList.toggle('on',t.dataset.ptab===id));
+  document.querySelector('.main').scrollTop=0;
+}
+
+document.addEventListener('click',e=>{
+  /* profile / settings tabs, and anything that deep-links to one */
+  const pt=e.target.closest('[data-ptab]');
+  if(pt){e.stopPropagation();show('profile');pfTab(pt.dataset.ptab);return}
+
+  /* presence, discord style */
+  const st=e.target.closest('#pfStatus');
+  if(st){
+    e.stopPropagation();
+    statusI=(statusI+1)%STATUS.length;
+    const s=STATUS[statusI];
+    st.innerHTML='<span class="e">'+s.e+'</span>'+s.t;
+    document.querySelectorAll('#profile .av.xxl, .me .av').forEach(a=>a.setAttribute('data-dot',s.d));
+    return;
+  }
+
+  /* ---- editing your own profile ---- */
+  const ed=e.target.closest('#pfEdit');
+  if(ed){
+    e.stopPropagation();
+    const parts=document.querySelectorAll('#pfProfile .ed-id');
+    const opening=ed.textContent.trim()==='Edit profile';
+    parts.forEach(p=>p.contentEditable=opening);
+    ed.textContent=opening?'Save':'Edit profile';
+    ed.classList.toggle('solid',opening);
+    if(opening){parts[0].focus();document.getSelection().selectAllChildren(parts[0]);document.getSelection().collapseToEnd()}
+    else toast('Profile updated — this is what engineers see from now on');
+    return;
+  }
+
+  /* ---- account fields ---- */
+  const fe=e.target.closest('[data-edit]');
+  if(fe){
+    e.stopPropagation();
+    const v=fe.closest('.fld').querySelector('.fld-v');
+    const opening=fe.textContent.trim()==='Change';
+    v.contentEditable=opening;
+    fe.textContent=opening?'Save':'Change';
+    fe.classList.toggle('solid',opening);
+    if(opening){v.focus();document.getSelection().selectAllChildren(v);document.getSelection().collapseToEnd()}
+    else toast(fe.closest('.fld').querySelector('.fld-l').textContent+' updated');
+    return;
+  }
+  if(e.target.closest('[data-photo]')){e.stopPropagation();toast('Pick a new photo — square images work best');return}
+
+  /* ---- connectors ---- */
+  const cn=e.target.closest('[data-connect]');
+  if(cn){
+    e.stopPropagation();
+    const row=cn.closest('.conn'), name=row.dataset.conn;
+    if(row.dataset.state==='off'){
+      row.dataset.state='on';
+      row.querySelector('.conn-s').textContent='Connected just now · engineers can read, not deploy';
+      const m=document.createElement('button');
+      m.className='btn sm';
+      m.textContent='Manage';
+      m.setAttribute('data-manage','');
+      cn.before(m);
+      toast(name+' connected — engineers can reach it from their next session');
+    }else{
+      toast('Add another '+name+' account');
+    }
+    return;
+  }
+  const mg=e.target.closest('[data-manage]');
+  if(mg){e.stopPropagation();toast('Choose what engineers can reach on '+mg.closest('.conn').dataset.conn);return}
+
+  /* ---- ground rules ---- */
+  const rx=e.target.closest('.rule-x');
+  if(rx){e.stopPropagation();rx.closest('.rule').remove();toast('Rule removed — engineers see the change immediately');return}
+
+  const add=e.target.closest('#pfAddRule');
+  if(add){
+    e.stopPropagation();
+    if(document.querySelector('.rule-new')) return;
+    const box=document.createElement('div');
+    box.className='rule-new';
+    box.innerHTML='<div class="rule-i">!</div>'+
+      '<input maxlength="140" placeholder="Type a rule every engineer should follow">'+
+      '<button class="btn sm solid" data-rule-save>Save</button>';
+    add.before(box);
+    add.style.display='none';
+    const input=box.querySelector('input');
+    const close=()=>{box.remove();add.style.display=''};
+    const commit=()=>{
+      const text=input.value.trim();
+      if(!text){close();return}
+      const r=document.createElement('div');
+      r.className='rule';
+      r.innerHTML='<div class="rule-i">!</div><div class="rule-t"></div>'+
+                  '<button class="rule-x" title="Remove">&times;</button>';
+      r.querySelector('.rule-t').textContent=text;
+      box.before(r);
+      close();
+      toast('Rule saved — engineers see it before they start');
+    };
+    box.querySelector('[data-rule-save]').addEventListener('click',ev=>{ev.stopPropagation();commit()});
+    input.addEventListener('keydown',ev=>{
+      ev.stopPropagation();
+      if(ev.key==='Enter'){ev.preventDefault();commit()}
+      if(ev.key==='Escape'){close()}
+    });
+    input.focus();
+    return;
+  }
 });
 </script>
 </body>
