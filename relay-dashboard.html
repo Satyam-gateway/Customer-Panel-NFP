@@ -309,15 +309,40 @@ a{color:inherit;text-decoration:none}
    containing block, so the bubble scrolls with the thing it points at and needs
    no scroll handler to keep up. */
 .coach{
-  --glide:cubic-bezier(.32,.72,.24,1);
+  /* Almost no acceleration at the start and a very long tail: the bubble is
+     crossing most of the page between stops, and a curve that arrives quickly
+     and then stops reads as a throw. This one reads as a glide. */
+  --glide:cubic-bezier(.3,.86,.2,1);
   position:absolute;left:0;top:0;z-index:38;width:250px;
   /* it points at a button — it must never eat the click it is asking for */
   pointer-events:none;
   opacity:0;
-  transition:transform .74s var(--glide),opacity .34s var(--ease);
+  transition:transform .92s var(--glide),opacity .34s var(--ease);
 }
 .coach[hidden]{display:none}
 .coach.on{opacity:1}
+
+/* First appearance is the one move that is not a move — the bubble is already
+   standing at its first stop, so there is nowhere to travel from. It arrives by
+   growing out of the point of its own nub, which is resting on the box the
+   sentence is about, rather than simply resolving out of nothing at full size.
+   The scale is on the inner box, never the outer one, because the outer one's
+   transform *is* its position on the page. It lands on exactly 1, so by the
+   time the words are worth reading they are back on the pixel grid and sharp. */
+.coach.intro .coach-in{
+  animation:coachIn calc(.62s * var(--speed)) cubic-bezier(.22,1.24,.36,1) both;
+}
+@keyframes coachIn{
+  from{transform:scale(.84)}
+  to  {transform:none}
+}
+/* The nub sits outside the inner box, so it does not grow with it — it waits
+   for the box to reach full size, which is the only size it was measured
+   against, and then fades on. */
+.coach.intro .ca{
+  animation:coachNub calc(.26s * var(--speed)) var(--ease) calc(.34s * var(--speed)) both;
+}
+@keyframes coachNub{from{opacity:0}to{opacity:1}}
 /* The deep green of the button it is pointing at, not a neutral black. A black
    tooltip is the browser talking; this is Relay talking, and it should sound
    like the same voice as the one green thing on the page. Still the darkest
@@ -328,6 +353,11 @@ a{color:inherit;text-decoration:none}
   color:#fff;border-radius:14px;padding:11px 15px 13px;
   border:1px solid rgba(255,255,255,.10);
   box-shadow:0 16px 36px -12px rgba(2,60,40,.46),0 2px 6px rgba(2,60,40,.20);
+  /* The four sentences are not the same length, so the box is not the same
+     height at every stop, and it used to change size in a single frame halfway
+     through the journey. Nothing else on screen jumped; this did. JS hands it
+     the two heights to walk between — see coachMorph — and this is the walk. */
+  transition:height .5s var(--glide);
 }
 .coach-tx{
   font-size:13px;line-height:1.45;font-weight:500;letter-spacing:-.004em;margin:0;
@@ -455,12 +485,21 @@ a{color:inherit;text-decoration:none}
    button would win over its hover lift and kill the press feedback. */
 .cta-ring{
   position:relative;display:inline-flex;border-radius:999px;margin-left:auto;
-  animation:ctaBreathe calc(2.7s * var(--speed)) ease-in-out infinite;
 }
-/* The button breathes. One slow swell, the same beat as the green dot in the
-   logo — on a page where nothing else moves, the only living thing is the thing
-   you are meant to press. */
-@keyframes ctaBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.032)}}
+/* The button breathes — but not by scaling. A scale transform makes the browser
+   draw the label once and then resample it every frame, and at 1.032 that lands
+   the text between pixels: the whole button goes soft, which is exactly what it
+   must not look like. So the swell moved off the glyphs and onto the light. The
+   light underneath is the only thing that changes size now; the button itself
+   pulses its shadow, which repaints rather than resamples and stays razor sharp. */
+@keyframes ctaBreathe{
+  0%,100%{box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+                     0 10px 24px -6px rgba(var(--accent-rgb),.45),
+                     0 2px 5px rgba(20,24,26,.10)}
+  50%    {box-shadow:0 1px 0 rgba(255,255,255,.28) inset,
+                     0 15px 32px -6px rgba(var(--accent-rgb),.62),
+                     0 2px 5px rgba(20,24,26,.10)}
+}
 
 /* a pool of green light under it, swelling on the same beat. Back inside the
    footer the reach has to stay under the row's 16px padding — the button sits
@@ -487,9 +526,10 @@ a{color:inherit;text-decoration:none}
 }
 /* Once the pointer is on it, it stops asking. Everything settles at rest size
    rather than freezing mid-breath, so the hover lift starts from a known place. */
-.cta-ring:hover{animation:none;transform:none}
 .cta-ring:hover .halo{animation:none;opacity:.8;transform:none}
 .cta-ring:hover::before,.cta-ring:hover::after{animation:none;opacity:0}
+/* and the breath has to stop too, or it would keep overwriting the hover shadow */
+.cta-ring:hover .golive{animation:none}
 
 .golive{
   display:inline-flex;align-items:center;gap:11px;
@@ -501,6 +541,7 @@ a{color:inherit;text-decoration:none}
              0 10px 24px -6px rgba(var(--accent-rgb),.45),
              0 2px 5px rgba(20,24,26,.10);
   transition:transform .22s var(--spring),box-shadow .22s var(--ease),filter .2s var(--ease);
+  animation:ctaBreathe calc(2.7s * var(--speed)) ease-in-out infinite;
 }
 /* Hover lifts and throws more light underneath rather than brightening the fill —
    brightening green is exactly what would push the label below contrast. */
@@ -920,6 +961,19 @@ a{color:inherit;text-decoration:none}
 .welcome.out .wl-scrim{animation:wlFade calc(.22s * var(--speed)) var(--ease) reverse both}
 @keyframes wlOut{to{opacity:0;transform:translateY(8px) scale(.985)}}
 
+/* The card lands, and then fills itself in from the top down — greeting first,
+   then what it is for, then what it wants from you. Reading order and arrival
+   order are the same thing, so nobody is answering a question that has not
+   finished appearing. Same trick as the page: --d is the piece's place in the
+   queue, set in JS, so adding a question to the card needs no new CSS. */
+.wl-card > *{
+  animation:wlRise calc(.44s * var(--speed)) var(--ease) both;
+  animation-delay:calc((var(--d,0) * 1ms + 160ms) * var(--speed));
+}
+@keyframes wlRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* on the way out the card goes as one piece, so the children hold where they are */
+.welcome.out .wl-card > *{animation:none}
+
 .wl-x{
   position:absolute;top:16px;right:18px;width:28px;height:28px;border-radius:50%;
   color:var(--faint);font-size:13px;line-height:1;
@@ -1055,15 +1109,29 @@ a{color:inherit;text-decoration:none}
 /* counts that change should be seen to change */
 .bump{animation:pop calc(.45s * var(--speed)) var(--spring) 1}
 
-/* first paint: the page assembles instead of appearing all at once */
-.rise{animation:riseIn calc(.62s * var(--speed)) var(--ease) both}
-.rise-1{animation-delay:calc(60ms * var(--speed))}
-.rise-2{animation-delay:calc(150ms * var(--speed))}
-.rise-3{animation-delay:calc(260ms * var(--speed))}
-.rail .nav-item.rise{animation-delay:calc((var(--n) * 55ms + 120ms) * var(--speed))}
-.starters-lead.rise{animation-delay:calc(330ms * var(--speed))}
-.starters .starter.rise{animation-delay:calc((var(--n) * 70ms + 380ms) * var(--speed))}
-.altcall.rise{animation-delay:calc(680ms * var(--speed))}
+/* The page assembles instead of appearing all at once, and it assembles downward:
+   every piece waits its turn by how far down the screen it sits, so the eye is
+   led from the greeting to the box to the things under the box. The order is not
+   written here — JS sorts the pieces by their position and hands each one its
+   place in the queue as --d, because a delay hard-coded per selector stops being
+   top-to-bottom the moment the layout reflows into one column on a phone. */
+.rise{
+  animation:pageRise calc(.82s * var(--speed)) cubic-bezier(.18,.86,.28,1) both;
+  animation-delay:calc(var(--d,0) * 1ms * var(--speed));
+}
+/* Its own keyframe rather than the shared riseIn, so this can be tuned for a long
+   sweep without disturbing the panels that use riseIn for a single appearance.
+   It runs well over the 58ms between one piece and the next, which is the whole
+   point: at any moment a dozen pieces are mid-flight, so the eye reads one
+   continuous wave coming down the page rather than thirteen separate arrivals. */
+@keyframes pageRise{
+  from{opacity:0;transform:translateY(26px)}
+  to  {opacity:1;transform:none}
+}
+/* Held back until it is that piece's turn. Without this the page would be fully
+   drawn during the welcome and then re-enter from nothing behind it, which reads
+   as a flicker rather than an arrival. */
+.hold{opacity:0}
 
 @media (max-width:920px){
   .app{grid-template-columns:1fr}
@@ -1117,8 +1185,8 @@ a{color:inherit;text-decoration:none}
   /* the rings and the breath go; the pool of light stays, because it is what
      makes the button the brightest thing on the page without moving */
   .cta-ring::before,.cta-ring::after{display:none}
-  .cta-ring{animation:none;transform:none}
   .cta-ring .halo{animation:none;opacity:.8;transform:none}
+  .golive{animation:none}
   /* the bubble stops touring and simply stands by the box with the one
      instruction that matters — the words are the point, the walk was the sugar */
   .coach{transition:opacity .001ms !important}
@@ -1954,16 +2022,29 @@ function boot(){
   // every so often, somebody's day changes — presence is a live thing
   if(!REDUCED) setInterval(tickPresence, 9000);
 
-  stageEntrance();
-
   hero.classList.add('idle','focused');
-  runGhost();
 
-  /* Two openings, and only one of them happens. With the welcome up, focusing a
-     box behind a scrim and starting a tour of a screen nobody can reach would be
-     talking to an empty room — both wait for it to close. */
-  if(welcomeDue()) setTimeout(openWelcome, 420 * SPEED);
-  else             startHome();
+  /* Before anything is drawn: work out the order the page will arrive in, and
+     hold it there. */
+  markEntrance();
+  markWelcome();
+
+  /* Two openings, and only one of them happens. There is no sense assembling a
+     page behind a scrim — nobody watches an animation they cannot see, and a
+     page that finished arriving while it was hidden has no arrival left to show
+     when the scrim goes. So with the welcome due, the welcome goes first, alone,
+     and the dashboard waits its turn behind it. */
+  if(welcomeDue()) setTimeout(openWelcome, 220 * SPEED);
+  else             revealDashboard();
+}
+
+/* The page comes down, and only once it has settled does it start asking for
+   anything. Everything here is deliberately behind the sweep: the cursor lands
+   in a box that has stopped moving, the placeholder types into a box that is
+   already there, and the coach waits longer still. */
+function revealDashboard(){
+  const sweep = stageEntrance() * SPEED;
+  setTimeout(startHome, sweep);
 }
 
 /* The cursor starts in the box. There is one thing to do on this screen and
@@ -1972,11 +2053,13 @@ function startHome(){
   /* .focus() only fires a focus event when the document itself has focus —
      if the window is in the background the class has to be set by hand. */
   askText.focus({preventScroll:true});
+  runGhost();
   runNudge();
-  /* The card animates itself in. The bubble waits for that to finish before it
-     measures anything — a rect read mid-entrance is a rect of somewhere the
-     card is not going to stay. */
-  setTimeout(coachStart, 1100 * SPEED);
+  /* And last of all, the bubble. It is the loudest thing on the screen and the
+     only one that moves on its own, so it does not get to speak over the page
+     arriving — it waits out the ghost's first line, long enough that somebody
+     who already knows what they came to type never sees it at all. */
+  setTimeout(coachStart, 1700 * SPEED);
 }
 
 /* ============================================================
@@ -2000,12 +2083,20 @@ function openWelcome(){
   setTimeout(() => wlName.focus({preventScroll:true}), 320 * SPEED);
 }
 
+const WL_OUT = 240;   /* how long the card takes to leave */
+
 function closeWelcome(){
   if(!wlOpen) return;
   wlOpen = false;
   welcome.classList.add('out');
-  setTimeout(() => { welcome.hidden = true; }, 240 * SPEED);
-  startHome();
+  setTimeout(() => { welcome.hidden = true; }, WL_OUT * SPEED);
+  /* Nothing starts arriving until the card has actually gone. Overlapping the two
+     looked like the right idea and was not: the card covers the middle of the
+     screen and the top of the sweep is under it, so the first four pieces — the
+     whole rail, and nearly the greeting — used to land behind it and never be
+     seen. What was left read as the page appearing and then a few stragglers
+     moving, which is the opposite of a sweep. So it waits, and then it is whole. */
+  setTimeout(revealDashboard, WL_OUT * SPEED);
 }
 
 /* One answer per question. Pressing the chosen one again takes it back — the
@@ -2215,6 +2306,7 @@ const COACH_TIP = 8;
    without parking on top of everything between, so it stays out at the edge. */
 const COACH_INTRUDE = 80;
 let coachAt = 0, coachTimer = null, coachHop = null, coachHide = null, coachOver = false;
+let coachHt = null, coachIntro = null;
 
 /* Used only once the margins have run out. Put the bubble on the first side of
    the target that actually fits, starting from the one the stop asked for. This
@@ -2309,6 +2401,15 @@ function coachPlace(stop, instant){
      side === 'left'   ? `left:${cw - 8}px;top:${off}px` :
                          `left:-5px;top:${off}px`) + `;background:${nub}`;
 
+  /* The entrance grows the bubble out of the nub's point, so it has to be told
+     where on the box that point is — which is only known here, after the nub
+     has been placed. */
+  const oa = (off + 6.5) + 'px';
+  coachIn.style.transformOrigin =
+    side === 'bottom' ? `${oa} 0`    :
+    side === 'top'    ? `${oa} 100%` :
+    side === 'left'   ? `100% ${oa}` : `0 ${oa}`;
+
   /* The first placement must not be a journey from the top-left corner, so the
      travel transition is switched off, the move is forced through with a
      reflow, and it is switched back on again — all in one go. Doing this on a
@@ -2329,26 +2430,56 @@ function coachPaint(i){
   coachDot.forEach((d, n) => d.classList.toggle('on', n === i));
 }
 
+/* Walk the box from the height it had to the height the new sentence needs.
+   The order matters and is not the obvious one: the text is swapped and the
+   bubble is *placed* first, at the new text's true height, because placement
+   measures the box and must never measure one that is mid-flight — the nub
+   would be put on the wrong spot for the rest of the journey. Only then is the
+   height wound back and released. It is handed back to auto at the end so a
+   later reflow is never fought by a stale pixel value. */
+function coachMorph(h0){
+  clearTimeout(coachHt);
+  if(REDUCED) return;
+  const h1 = coachIn.offsetHeight;
+  if(!h0 || h0 === h1) return;
+  coachIn.style.height = h0 + 'px';
+  void coachIn.offsetWidth;
+  coachIn.style.height = h1 + 'px';
+  coachHt = setTimeout(() => { coachIn.style.height = ''; }, 560 * SPEED);
+}
+
 function coachGo(i, instant){
   coachAt = i;
   if(instant){
+    clearTimeout(coachHt);
+    coachIn.style.height = '';
     coachPaint(i);
     /* a dismissal from a moment ago still has its hide pending — cancel it, or
        it lands 360ms from now and takes this bubble down with it */
     clearTimeout(coachHide);
+    /* off before the placement below, because the forced reflow inside it is
+       what re-arms the entrance if the bubble has been dismissed and called
+       back — an animation only restarts across a reflow with the class gone */
+    coach.classList.remove('intro');
     coach.hidden = false;
     coachPlace(COACH_STOPS[i], true);
     coach.classList.remove('moving');
-    coach.classList.add('on');   /* the reflow above is what makes this fade */
+    coach.classList.add('intro', 'on');   /* that reflow is what makes these run */
+    clearTimeout(coachIntro);
+    coachIntro = setTimeout(() => coach.classList.remove('intro'), 1000 * SPEED);
     return;
   }
   /* words out, then travel with the text hidden, then words back in */
   coach.classList.add('moving');
   clearTimeout(coachHop);
   coachHop = setTimeout(() => {
+    const h0 = coachIn.offsetHeight;
     coachPaint(i);
     coachPlace(COACH_STOPS[i]);
-    coachHop = setTimeout(() => coach.classList.remove('moving'), 560 * SPEED);
+    coachMorph(h0);
+    /* the words come back as it settles, not after it has stopped — held to the
+       same three-quarters of the journey the shorter glide used */
+    coachHop = setTimeout(() => coach.classList.remove('moving'), 700 * SPEED);
   }, 180 * SPEED);
 }
 
@@ -2365,8 +2496,10 @@ function coachStart(){
 function coachStop(){
   if(coachTimer && coachTimer !== -1) clearInterval(coachTimer);
   clearTimeout(coachHop);
+  clearTimeout(coachIntro);
+  clearTimeout(coachHt);
   coachTimer = null;
-  coach.classList.remove('on');
+  coach.classList.remove('on', 'intro');
   /* let it fade before it leaves the layout */
   clearTimeout(coachHide);
   coachHide = setTimeout(() => { if(!coachTimer) coach.hidden = true; }, 360);
@@ -2399,20 +2532,53 @@ function bump(el){
   el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
 }
 
-/* first paint: let the page assemble rather than land all at once */
-function stageEntrance(){
+/* ============================================================
+   ENTRANCE — the page arrives top to bottom, once, when it is its turn
+   ============================================================ */
+const RISE_STEP = 58;    /* ms between one piece and the next */
+const RISE_RUN  = 820;   /* how long a single piece takes, matching .rise */
+let REVEAL = [];
+
+/* Runs before the first paint. It does two things and neither of them is visible:
+   works out what order the pieces should arrive in, and hides them until then.
+   Sorting by where things actually are, rather than by the order they appear in
+   the markup, is what keeps this honest — the rail is a column on a desktop and
+   a strip across the top on a phone, and in both cases this sweeps down the
+   screen the way somebody reads it. Ties go left to right. */
+function markEntrance(){
   if(REDUCED) return;
-  const h = document.querySelector('#home .page-h');
-  if(h) h.classList.add('rise','rise-1');
-  hero.classList.add('rise','rise-2');
-  document.querySelectorAll('.rail .nav-item').forEach((el,i)=>{
-    el.style.setProperty('--n', i); el.classList.add('rise');
-  });
-  document.getElementById('startersLead').classList.add('rise');
-  document.querySelectorAll('.starters .starter').forEach((el,i)=>{
-    el.style.setProperty('--n', i); el.classList.add('rise');
-  });
-  document.getElementById('altcall').classList.add('rise');
+  const els = [
+    ...document.querySelectorAll('.rail .nav-item'),
+    document.querySelector('#home .page-h'),
+    hero,
+    document.getElementById('startersLead'),
+    ...document.querySelectorAll('.starters .starter'),
+    document.getElementById('altcall'),
+  ].filter(Boolean);
+
+  els.map(el => ({ el, r: el.getBoundingClientRect() }))
+     .sort((a, b) => (a.r.top - b.r.top) || (a.r.left - b.r.left))
+     .forEach((o, i) => {
+       o.el.style.setProperty('--d', i * RISE_STEP);
+       o.el.classList.add('hold');
+     });
+
+  REVEAL = els;
+}
+
+/* and this is the turn. Returns how long the whole sweep takes, so whatever
+   comes next can wait for the page to finish settling instead of guessing. */
+function stageEntrance(){
+  if(REDUCED || !REVEAL.length) return 0;
+  REVEAL.forEach(el => { el.classList.remove('hold'); el.classList.add('rise'); });
+  return (REVEAL.length - 1) * RISE_STEP + RISE_RUN;
+}
+
+/* The same queue, for the welcome's insides. */
+function markWelcome(){
+  if(REDUCED) return;
+  [...document.querySelector('.wl-card').children]
+    .forEach((el, i) => el.style.setProperty('--d', i * 46));
 }
 
 document.getElementById('starters').addEventListener('click', e=>{
