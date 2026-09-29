@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relay — describe it, and someone joins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F8F8;
+  --card:#FFFFFF;
+  --ink:#14181A;
+  --muted:#697077;
+  --faint:#9AA1A6;
+  --line:#E3E7E8;
+  --line-soft:#EFF2F2;
+
+  --live:#00875A;      --live-bg:#DCF5EA;   --live-soft:#EDFBF4;
+  --turn:#B45309;      --turn-bg:#FDF0D5;
+  /* darker twins, for text sitting on the tints — the bright hues fail AA there */
+  --live-ink:#006B48;  --turn-ink:#9C4A07;
+  --stop:#C0322B;      --stop-bg:#FBE2E0;
+
+  /* One accent, and it is the green the product is named for. Everything that
+     is live, pressable, or about a call speaks in it; everything structural
+     stays grey. Two accents was the problem — a lavender band above a green
+     button read as two products stapled together.
+     --accent is the darkened twin used for text and icons; --accent-lift is the
+     bright live green, which is only ever a fill behind white. */
+  --accent:#046A4A;      /* 6.6:1 on white — safe as text and as a fill       */
+  --accent-lift:#00875A; /* the live green; fills and gradients, never text   */
+  --accent-deep:#02543A; /* hover, and text sitting on the tints              */
+  --accent-bg:#E4F4EC;
+  --accent-soft:#F4FAF8;
+  --accent-line:#CBE7DA;
+  --accent-rgb:0,135,90; /* for the glows, which need an alpha               */
+
+  --rail:244px;
+  --r-sm:7px; --r-md:11px; --r-lg:16px; --r-xl:22px;
+  --shadow:0 1px 2px rgba(20,24,26,.05), 0 4px 16px rgba(20,24,26,.04);
+  --shadow-lift:0 10px 34px rgba(20,24,26,.10);
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --spring:cubic-bezier(.2,1.5,.4,1);
+  --speed:1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:"Bricolage Grotesque","Public Sans",sans-serif;letter-spacing:-.022em;line-height:1.14}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px}
+
+/* ============================================================
+   SHELL
+   ============================================================ */
+.app{display:grid;grid-template-columns:var(--rail) 1fr;height:100vh;overflow:hidden}
+
+.rail{
+  background:var(--card);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:20px 12px 12px;gap:2px;
+  /* overflow-y alone makes the x axis compute to auto, which draws a stray
+     horizontal scrollbar under the nav. Pin x closed. */
+  overflow-x:hidden;overflow-y:auto;
+}
+.brand{display:flex;align-items:center;gap:11px;padding:0 10px 24px}
+.brand-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17.5px;letter-spacing:-.015em}
+
+/* the green dot — the brand's whole promise, so it is the only thing that breathes */
+.orb{
+  width:30px;height:30px;border-radius:50%;flex:none;position:relative;
+  background:radial-gradient(circle at 32% 28%, #7BF0BE 0%, #24C98A 38%, #00875A 78%, #006B48 100%);
+  box-shadow:0 0 0 1px rgba(0,135,90,.18), 0 3px 12px rgba(0,135,90,.32);
+}
+.orb::after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  box-shadow:0 0 0 2px rgba(0,135,90,.45);
+  animation:orbPulse calc(2.8s * var(--speed)) var(--ease) infinite;
+}
+@keyframes orbPulse{
+  0%{transform:scale(1);opacity:.65}
+  70%{transform:scale(1.85);opacity:0}
+  100%{transform:scale(1.85);opacity:0}
+}
+
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--r-sm);
+  color:var(--muted);font-weight:500;width:100%;text-align:left;
+  transition:background .14s var(--ease),color .14s var(--ease);
+}
+.nav-item:hover{background:var(--line-soft);color:var(--ink)}
+.nav-item.on{background:var(--line-soft);color:var(--ink);font-weight:600}
+.nav-item .ico{width:17px;flex:none;text-align:center;font-size:14px;opacity:.85}
+.nav-item .count{
+  margin-left:auto;font-size:11px;font-weight:700;min-width:19px;height:19px;
+  border-radius:10px;display:grid;place-items:center;padding:0 6px;
+}
+.count.turn{background:var(--turn-bg);color:var(--turn-ink)}
+/* A plain count is not a status — it goes grey, so the one coloured badge in
+   the rail is the one that is actually waiting on you. */
+.count.moving{background:var(--line-soft);color:var(--muted)}
+.rail-gap{flex:1}
+.rail hr{border:none;border-top:1px solid var(--line);margin:10px 4px;width:100%}
+.me{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-sm);width:100%;text-align:left}
+.me:hover{background:var(--line-soft)}
+.me-name{font-weight:600;font-size:13px}
+.me-sub{font-size:11.5px;color:var(--faint)}
+
+/* rail: a live count, so the rail itself says someone is there */
+.rail-live{
+  display:flex;align-items:center;gap:8px;margin:2px 4px 8px;padding:9px 10px;
+  background:var(--live-soft);border:1px solid rgba(0,135,90,.16);border-radius:var(--r-sm);
+}
+.rail-live b{font-size:12px;font-weight:700;color:var(--live-ink)}
+.rail-live span{font-size:11.5px;color:var(--muted)}
+.tinydot{width:7px;height:7px;border-radius:50%;background:var(--live);flex:none;position:relative}
+.tinydot::after{
+  content:"";position:absolute;inset:0;border-radius:50%;background:var(--live);
+  animation:tinyPulse calc(2.2s * var(--speed)) var(--ease) infinite;
+}
+@keyframes tinyPulse{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(2.6);opacity:0}}
+
+/* ============================================================
+   AVATARS
+   ============================================================ */
+.av{
+  width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-weight:700;font-size:11px;color:#fff;position:relative;overflow:visible;
+}
+.av.md{width:38px;height:38px;font-size:13px}
+.av.lg{width:52px;height:52px;font-size:16px}
+.av.xl{width:76px;height:76px;font-size:24px}
+.av-img{position:absolute;inset:0;border-radius:50%;overflow:hidden;line-height:0}
+.av-img svg,.av-img img{width:100%;height:100%;display:block;object-fit:cover}
+.av[data-dot]::after{
+  content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;
+  border:2px solid var(--card);z-index:2;
+}
+.av.lg[data-dot]::after,.av.xl[data-dot]::after{width:15px;height:15px;border-width:3px}
+.av[data-dot="live"]::after{background:var(--live)}
+.av[data-dot="busy"]::after{background:var(--turn)}
+.av[data-dot="off"]::after{background:var(--faint)}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main{overflow-y:auto;position:relative}
+.screen{display:none;padding:34px 40px 120px;max-width:1080px;margin:0 auto}
+.screen.on{display:block}
+.page-h{margin-bottom:26px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.page-h h1{font-size:30px;font-weight:600}
+.page-h p{color:var(--muted);margin-top:5px;font-size:14.5px}
+
+.btn{
+  padding:8px 14px;border-radius:var(--r-sm);font-weight:600;font-size:13px;
+  border:1px solid var(--line);background:var(--card);
+  transition:background .14s var(--ease),border-color .14s var(--ease),transform .14s var(--spring);
+}
+.btn:hover{background:var(--line-soft)}
+.btn:active{transform:scale(.97)}
+.btn.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.solid:hover{background:#000}
+.btn.sm{padding:5px 11px;font-size:12.5px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--line-soft);color:var(--ink)}
+
+.pill{
+  font-size:11.5px;font-weight:600;padding:2.5px 9px;border-radius:20px;
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.pill.live{background:var(--live-bg);color:var(--live-ink)}
+.pill.turn{background:var(--turn-bg);color:var(--turn-ink)}
+.pill.moving,
+.pill.contract{background:var(--accent-bg);color:var(--accent-deep)}
+.pill.mute{background:var(--line-soft);color:var(--muted)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+
+/* ============================================================
+   HOME — the one job: describe it, someone joins
+   ============================================================ */
+.hero{
+  position:relative;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
+  box-shadow:0 2px 6px rgba(16,24,28,.05),0 14px 40px -14px rgba(16,24,28,.17);
+  overflow:hidden;
+  transition:box-shadow .3s var(--ease),border-color .3s var(--ease);
+}
+/* the greeting is a salutation, not the headline — the ask owns that */
+#home .page-h{margin-bottom:20px}
+#home .page-h h1{font-size:23px;font-weight:600}
+#home .page-h p{font-size:13.5px}
+.hero.focused{
+  border-color:var(--accent-line);
+  box-shadow:0 2px 6px rgba(16,24,28,.05),0 24px 60px -18px rgba(var(--accent-rgb),.26);
+}
+
+/* a slow wash behind the hero — reads as "someone is awake in there" */
+.hero::before{
+  content:"";position:absolute;left:50%;top:-180px;width:620px;height:340px;
+  transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center, rgba(var(--accent-rgb),.09), rgba(var(--accent-rgb),0) 68%);
+  animation:wash calc(7s * var(--speed)) ease-in-out infinite;
+}
+@keyframes wash{0%,100%{opacity:.55;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.12)}}
+
+/* The band stays neutral so the one green thing on the screen is the dot that
+   means "a person is free" — the whole idea of the product, and nothing else. */
+.hero-tag{
+  position:relative;display:flex;align-items:center;gap:8px;
+  background:var(--accent-soft);color:var(--ink);border-bottom:1px solid var(--line-soft);
+  font-weight:600;font-size:12.5px;padding:11px 40px;letter-spacing:-.005em;
+}
+.hero-tag .who{color:var(--muted);font-weight:500;margin-left:auto;font-size:11.5px}
+
+/* ---- the face at the end of the band ----
+   A row of four heads is a directory, and a directory invites you to read it.
+   One face that keeps changing says the same thing the number to its left
+   says — there are more of us than fit here — and asks for nothing. The
+   chevron is there for the one reader who does want the directory. */
+.facepile{position:relative;display:flex;align-items:center;margin-left:auto}
+.facepile[hidden]{display:none}
+.fp-btn{
+  display:flex;align-items:center;gap:9px;padding:3px 9px 3px 3px;border-radius:999px;
+  border:1px solid transparent;background:transparent;
+  transition:background .2s var(--ease),border-color .2s var(--ease);
+}
+.fp-btn:hover,.facepile.open .fp-btn{background:var(--card);border-color:var(--accent-line)}
+
+/* The window the faces turn through. Fixed size, because a swap that changes
+   the band's height would shove the whole page down twice every three seconds. */
+.fp-stage{position:relative;width:30px;height:30px;flex:none}
+.fp-stage .av{
+  position:absolute;inset:0;width:100%;height:100%;font-size:11px;
+  box-shadow:0 0 0 2px var(--card),0 2px 6px rgba(20,24,26,.14);
+}
+/* The one leaving rises out; the one arriving comes up from underneath. Both
+   travel the same way, so it reads as a reel turning rather than a dissolve
+   between two unrelated pictures. */
+.fp-stage .av.out{animation:fpOut calc(.52s * var(--speed)) var(--ease) forwards}
+.fp-stage .av.in {animation:fpIn  calc(.52s * var(--speed)) var(--ease) backwards}
+@keyframes fpOut{to  {opacity:0;transform:translateY(-10px) scale(.9)}}
+@keyframes fpIn {from{opacity:0;transform:translateY(10px)  scale(.9)}}
+
+/* The name is left-aligned in a fixed box for the same reason — "Priya" and
+   "Satyam" are different widths and the chevron must not shuffle. */
+.fp-name{
+  font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;
+  width:56px;overflow:hidden;text-overflow:ellipsis;
+}
+.fp-name.swap{animation:fpName calc(.52s * var(--speed)) var(--ease)}
+@keyframes fpName{0%{opacity:0;transform:translateY(5px)}55%,100%{opacity:1;transform:none}}
+.fp-cv{width:12px;height:12px;flex:none;color:var(--faint);transition:transform .24s var(--ease)}
+.facepile.open .fp-cv{transform:rotate(180deg)}
+
+/* ---- the full list ---- */
+.fp-menu{
+  position:absolute;top:calc(100% + 9px);right:0;z-index:70;width:320px;
+  max-height:min(62vh,380px);overflow:auto;padding:6px;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 20px 48px -16px rgba(20,24,26,.30),0 2px 8px rgba(20,24,26,.07);
+  opacity:0;transform:translateY(-7px) scale(.97);transform-origin:100% 0;
+  pointer-events:none;
+  transition:opacity .2s var(--ease),transform .2s var(--ease);
+}
+.facepile.open .fp-menu{opacity:1;transform:none;pointer-events:auto}
+.fp-head{
+  font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);padding:9px 12px 7px;
+}
+.fp-row{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:8px 10px;border-radius:11px;text-align:left;
+  transition:background .16s var(--ease);
+}
+.fp-row:hover{background:var(--accent-soft)}
+.fp-row .av{width:34px;height:34px;font-size:11.5px;flex:none}
+.fp-row .t{min-width:0;flex:1}
+.fp-row .t b{
+  display:block;font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.005em;
+}
+.fp-row .t i{
+  display:block;font-style:normal;font-size:11.5px;color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.fp-st{flex:none;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.fp-st.free{background:var(--live-bg);color:var(--live-ink)}
+.fp-st.busy{background:var(--turn-bg);color:var(--turn-ink)}
+.fp-st.away{background:var(--line-soft);color:var(--muted)}
+
+/* ============================================================
+   The coach — one bubble that walks you round the screen
+   ============================================================
+   It runs only while the box is still empty. The moment there is a word in
+   there the person has understood the screen, and a bubble still explaining
+   it is talking over them — so it leaves, and does not come back.
+   One bubble that travels, not three that blink on and off: the eye follows a
+   thing that moves, and following it is the whole lesson. */
+/* It hangs off the main column rather than the card, because its best home is
+   the empty page margin beside the card — pointing in at the thing it is talking
+   about instead of sitting on top of it. The card has overflow:hidden, so living
+   inside it made that impossible. The main column is both the scroller and a
+   containing block, so the bubble scrolls with the thing it points at and needs
+   no scroll handler to keep up. */
+.coach{
+  --glide:cubic-bezier(.32,.72,.24,1);
+  position:absolute;left:0;top:0;z-index:38;width:250px;
+  /* it points at a button — it must never eat the click it is asking for */
+  pointer-events:none;
+  opacity:0;
+  transition:transform .74s var(--glide),opacity .34s var(--ease);
+}
+.coach[hidden]{display:none}
+.coach.on{opacity:1}
+/* The deep green of the button it is pointing at, not a neutral black. A black
+   tooltip is the browser talking; this is Relay talking, and it should sound
+   like the same voice as the one green thing on the page. Still the darkest
+   surface here, so it reads as laid over the paper rather than part of it. */
+.coach-in{
+  position:relative;
+  background:linear-gradient(180deg,var(--accent),var(--accent-deep));
+  color:#fff;border-radius:14px;padding:11px 15px 13px;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 16px 36px -12px rgba(2,60,40,.46),0 2px 6px rgba(2,60,40,.20);
+}
+.coach-tx{
+  font-size:13px;line-height:1.45;font-weight:500;letter-spacing:-.004em;margin:0;
+  transition:opacity .17s var(--ease),transform .17s var(--ease);
+}
+/* The words leave before the bubble does and arrive after it lands, so you
+   never read a sentence that is sliding across the screen. */
+.coach.moving .coach-tx{opacity:0;transform:translateY(6px)}
+
+.coach-dots{display:flex;gap:5px;margin-bottom:8px}
+.coach-dots i{
+  width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.32);
+  transition:background .34s var(--ease),transform .34s var(--ease);
+}
+/* white now the bubble is green — green on green would not read as a step */
+.coach-dots i.on{background:#fff;transform:scale(1.3)}
+
+/* The nub is a square turned 45°, parked half under the bubble so only the
+   point shows. JS puts it on whichever edge faces the thing being pointed at,
+   which is why it fades out for the journey — a nub crawling round the
+   perimeter mid-flight looks like a bug.
+   The bubble is a gradient, so the nub is also told which end of it it is
+   sitting on — one flat green on all four edges shows as a seam. */
+.coach .ca{
+  position:absolute;width:13px;height:13px;background:var(--accent-deep);border-radius:3px;
+  transform:rotate(45deg);transition:opacity .2s var(--ease);
+}
+.coach.moving .ca{opacity:0}
+
+.ask{position:relative;padding:44px 40px 36px}
+.ask h2{font-size:40px;line-height:1.1;letter-spacing:-.02em;margin:0 0 12px}
+.ask-lede{color:var(--muted);font-size:16px;line-height:1.6;margin:0 0 26px;max-width:56ch}
+
+/* The composer. Resting it is a quiet recessed panel; focused it lifts off the
+   card, turns white, and picks up a soft ink-blue halo. Every part of that
+   moves on the same curve and the same 260ms, which is what makes it feel
+   like one object rather than four properties changing at once. */
+.ask-field{
+  position:relative;
+  border:1.5px solid var(--line);border-radius:20px;overflow:hidden;
+  background:linear-gradient(180deg,#FBFBFD,#F5F6F9);
+  box-shadow:inset 0 1px 2px rgba(20,24,26,.035);
+  transition:border-color .26s var(--ease),background .26s var(--ease),
+             box-shadow .26s var(--ease),transform .26s var(--ease);
+}
+.hero.focused .ask-field{
+  border-color:var(--accent-line);
+  background:linear-gradient(180deg,#fff,#fff);
+  transform:translateY(-1px);
+  box-shadow:0 0 0 4px rgba(var(--accent-rgb),.10),
+             0 18px 40px -20px rgba(var(--accent-rgb),.45),
+             inset 0 1px 0 #fff;
+}
+/* a hairline of accent along the top edge, drawn only when the box is live */
+.ask-field::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--accent-lift),transparent);
+  opacity:0;transform:scaleX(.4);transform-origin:50% 50%;
+  transition:opacity .3s var(--ease),transform .5s var(--ease);
+}
+.hero.focused .ask-field::before{opacity:.75;transform:scaleX(1)}
+
+.ask-field textarea{
+  width:100%;border:0;background:none;resize:none;font:inherit;font-size:19px;line-height:1.55;
+  color:var(--ink);padding:26px 26px 10px;outline:none;display:block;min-height:152px;
+  caret-color:var(--accent);
+}
+.ask-field textarea::placeholder{color:var(--faint)}
+
+.staged{display:flex;flex-wrap:wrap;gap:7px;padding:8px 16px 0}
+.staged:empty{display:none}
+.chip-file{
+  display:inline-flex;align-items:center;gap:7px;background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 5px;font-size:12px;
+  animation:chipIn calc(.34s * var(--speed)) var(--spring) both;
+}
+@keyframes chipIn{from{opacity:0;transform:scale(.8) translateY(6px)}to{opacity:1;transform:none}}
+.cf-ico{
+  font-size:9.5px;font-weight:700;letter-spacing:.02em;padding:3px 6px;border-radius:999px;
+  background:var(--accent-bg);color:var(--accent-deep);
+}
+.cf-ico.log{background:var(--line-soft);color:var(--muted)}
+.cf-name{color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-x{color:var(--faint);font-size:15px;line-height:1;padding:0 5px 2px}
+.cf-x:hover{color:var(--ink)}
+
+/* The tools sit on their own footer, divided by a hairline. That one line is
+   what turns a bordered textarea into something that reads as a composer. */
+.ask-tools{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;flex-wrap:wrap;
+  border-top:1px solid var(--line-soft);background:rgba(255,255,255,.45);
+  transition:border-color .26s var(--ease),background .26s var(--ease);
+}
+.hero.focused .ask-tools{border-top-color:#E7F2EC;background:#FBFDFC}
+.tool{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card);font-size:13.5px;font-weight:600;color:var(--muted);
+  transition:background .2s var(--ease),color .2s var(--ease),
+             border-color .2s var(--ease),transform .2s var(--ease);
+}
+.tool:hover{
+  background:var(--accent-bg);color:var(--accent-deep);border-color:var(--accent-line);
+  transform:translateY(-1px);
+}
+.tool:active{transform:translateY(0) scale(.98)}
+.tool .g{font-size:14px;opacity:.75}
+
+/* One click, that's it. It is the green dot the whole product is named for, so
+   it carries the accent at full strength while everything around it holds the
+   same hue at a whisper — that is what keeps one screen instead of two.
+   The gradient runs dark-to-darker on purpose: green is a bright hue, and a
+   lighter top edge would drop the white label under 4.5:1. #00875A is 4.55:1
+   and #046A4A is 6.6:1, so every pixel behind the text clears AA. */
+
+/* The button lives in the composer's footer, at the far right end of the row —
+   where the send button on a message box always is, and where the eye already
+   goes after typing. margin-left:auto is what pushes it past the two optional
+   tools, so the row reads left-to-right as "extras … the thing you came for".
+   There is no label underneath it. A caption explaining a button is a sign the
+   button is not doing its own explaining; everything that was in that caption
+   is now in the movement and the phone icon. */
+/* All the movement lives on this wrapper rather than on .golive itself, for two
+   reasons: .golive clips (it carries the sweep of light across its face, and a
+   ring that goes outward cannot be clipped), and an animated transform on the
+   button would win over its hover lift and kill the press feedback. */
+.cta-ring{
+  position:relative;display:inline-flex;border-radius:999px;margin-left:auto;
+  animation:ctaBreathe calc(2.7s * var(--speed)) ease-in-out infinite;
+}
+/* The button breathes. One slow swell, the same beat as the green dot in the
+   logo — on a page where nothing else moves, the only living thing is the thing
+   you are meant to press. */
+@keyframes ctaBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.032)}}
+
+/* a pool of green light under it, swelling on the same beat. Back inside the
+   footer the reach has to stay under the row's 16px padding — the button sits
+   13.7px from the composer's right border, so anything wider bleeds across it. */
+.cta-ring .halo{
+  position:absolute;inset:-11px;border-radius:999px;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(var(--accent-rgb),.30),rgba(var(--accent-rgb),0));
+  animation:ctaGlow calc(2.7s * var(--speed)) ease-in-out infinite;
+}
+@keyframes ctaGlow{
+  0%,100%{opacity:.45;transform:scale(.92)}
+  50%    {opacity:1;  transform:scale(1.06)}
+}
+/* and two rings going out from its edge, the way a phone rings */
+.cta-ring::before,.cta-ring::after{
+  content:"";position:absolute;inset:0;border-radius:999px;pointer-events:none;
+  border:2px solid var(--accent-lift);opacity:0;
+  animation:ctaRing calc(2.7s * var(--speed)) var(--ease) infinite;
+}
+.cta-ring::after{animation-delay:calc(.9s * var(--speed))}
+@keyframes ctaRing{
+  0%       {opacity:.55; transform:scale(1)}
+  70%,100% {opacity:0;   transform:scale(1.11)}
+}
+/* Once the pointer is on it, it stops asking. Everything settles at rest size
+   rather than freezing mid-breath, so the hover lift starts from a known place. */
+.cta-ring:hover{animation:none;transform:none}
+.cta-ring:hover .halo{animation:none;opacity:.8;transform:none}
+.cta-ring:hover::before,.cta-ring:hover::after{animation:none;opacity:0}
+
+.golive{
+  display:inline-flex;align-items:center;gap:11px;
+  background:linear-gradient(180deg,var(--accent-lift),var(--accent));
+  color:#fff;border:1px solid var(--accent);
+  border-radius:999px;padding:14px 26px 14px 20px;font-weight:700;font-size:16px;
+  letter-spacing:-.005em;
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+             0 10px 24px -6px rgba(var(--accent-rgb),.45),
+             0 2px 5px rgba(20,24,26,.10);
+  transition:transform .22s var(--spring),box-shadow .22s var(--ease),filter .2s var(--ease);
+}
+/* Hover lifts and throws more light underneath rather than brightening the fill —
+   brightening green is exactly what would push the label below contrast. */
+.golive:hover{
+  transform:translateY(-2px);
+  box-shadow:0 1px 0 rgba(255,255,255,.32) inset,
+             0 16px 32px -8px rgba(var(--accent-rgb),.55),
+             0 3px 7px rgba(20,24,26,.12);
+}
+.golive:active{transform:translateY(0) scale(.98);filter:brightness(.94)}
+
+/* the handset, with the two ring arcs going out from it on a loop */
+.golive .gd{
+  width:19px;height:19px;flex:none;display:block;color:#fff;
+}
+.golive .gd svg{width:100%;height:100%;display:block;overflow:visible}
+.golive .gd .arc{transform-origin:9px 13px;animation:ringOut calc(2.4s * var(--speed)) var(--ease) infinite}
+.golive .gd .arc2{animation-delay:calc(.18s * var(--speed))}
+/* each arc swells out from the handset and fades, like a call going through */
+@keyframes ringOut{
+  0%       {opacity:0;   transform:scale(.72)}
+  22%      {opacity:.95; transform:scale(1)}
+  55%,100% {opacity:0;   transform:scale(1.28)}
+}
+/* the handset itself gives one small shake at the top of each ring */
+.golive .gd .body{transform-origin:12px 12px;animation:ringShake calc(2.4s * var(--speed)) var(--ease) infinite}
+@keyframes ringShake{
+  0%,8%,20%,100%{transform:rotate(0)}
+  12%           {transform:rotate(-7deg)}
+  16%           {transform:rotate(5deg)}
+}
+
+/* starter phrasings — the real fix for "I don't know how to describe it" */
+/* Four chips with no label are four orphan buttons; one line above them turns
+   the same four into an offer. */
+.starters-lead{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:-.005em;margin:22px 0 10px}
+.starters{display:flex;gap:9px;flex-wrap:wrap}
+.starter{
+  font-size:13.5px;color:var(--muted);background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:9px 16px;
+  transition:border-color .14s var(--ease),color .14s var(--ease),background .14s var(--ease);
+}
+.starter:hover{border-color:var(--accent-line);color:var(--accent-deep);background:var(--accent-bg)}
+
+/* The other door. Someone who cannot put it in words at all should not be stuck
+   on this screen — the rule above says plainly that this is a different way out,
+   and the button is the same green as the main one but hollow, so it reads as the
+   quieter of the two rather than a second thing fighting for the same click. */
+.altcall{
+  display:flex;align-items:center;gap:13px;flex-wrap:wrap;
+  margin-top:18px;padding-top:17px;border-top:1px solid var(--line);
+}
+.callnow{
+  display:inline-flex;align-items:center;gap:8px;flex:none;
+  font-size:13.5px;font-weight:600;color:var(--accent-deep);letter-spacing:-.006em;
+  background:var(--accent-bg);border:1px solid var(--accent-line);
+  border-radius:999px;padding:9px 18px 9px 15px;
+  transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease);
+}
+.callnow svg{width:15px;height:15px;flex:none}
+.callnow:hover{background:var(--accent-soft);border-color:var(--accent);transform:translateY(-1px)}
+.callnow:active{transform:translateY(0)}
+/* the handset gives one small shake on hover — the gesture of a phone ringing */
+.callnow:hover svg{animation:ringShake calc(1.5s * var(--speed)) var(--ease) 1}
+/* and the note beside it answers the question the button raises: if I did not
+   write anything down, what does the engineer arrive knowing? */
+.altcall .alt-note{font-size:12.5px;color:var(--muted);line-height:1.5}
+
+/* ---------- people strip ---------- */
+.sec{margin-top:36px}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.sec-h h3{font-size:16.5px;font-weight:600}
+.sec-h .note{margin-left:auto;font-size:12.5px;color:var(--muted)}
+
+.people{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:10px;
+}
+.person{
+  position:relative;display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 13px;overflow:hidden;
+  transition:border-color .16s var(--ease),box-shadow .16s var(--ease),transform .16s var(--ease);
+}
+.person:hover{border-color:#CFD5D6;box-shadow:var(--shadow);transform:translateY(-2px)}
+.person-main{min-width:0;flex:1}
+.person b{display:block;font-size:13.5px;font-weight:600}
+.person .does{display:block;font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person .state{font-size:11.5px;margin-top:5px;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.person .state.free{color:var(--live-ink)}
+.person .state.busy{color:var(--turn-ink)}
+.person .state.away{color:var(--muted)}
+
+/* availability ring — encodes state, not decoration */
+.ringwrap{position:relative;width:52px;height:52px;flex:none;display:grid;place-items:center}
+.ringwrap .ring{
+  position:absolute;inset:0;border-radius:50%;padding:2.5px;
+}
+.ringwrap.free .ring{
+  background:conic-gradient(from 0deg,#00875A,#68E3B4,#00875A);
+  animation:spin calc(5.5s * var(--speed)) linear infinite;
+}
+.ringwrap.busy .ring{background:conic-gradient(from 210deg,#B45309 0deg 180deg,#E8E8E8 180deg 360deg)}
+.ringwrap.away .ring{background:repeating-conic-gradient(var(--line) 0deg 12deg,transparent 12deg 24deg)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ringwrap .av{width:100%;height:100%;font-size:16px;box-shadow:0 0 0 2.5px var(--card)}
+.ringwrap.away .av-img{filter:grayscale(.9);opacity:.72}
+.ringwrap.busy .av-img{filter:grayscale(.35)}
+
+
+/* people arriving — staggered, and this is information: it is presence landing */
+.person.arrive{animation:arrive calc(.52s * var(--speed)) var(--spring) both;animation-delay:calc(var(--i,0) * 75ms * var(--speed))}
+@keyframes arrive{
+  from{opacity:0;transform:translateY(14px) scale(.94)}
+  to{opacity:1;transform:none}
+}
+/* someone who has just become free gets a one-off green sweep */
+.person.justfree::after{
+  content:"";position:absolute;inset:0;border-radius:var(--r-md);pointer-events:none;
+  background:linear-gradient(100deg,transparent 20%,rgba(0,135,90,.16) 48%,transparent 76%);
+  animation:sweep calc(1.05s * var(--speed)) var(--ease) 1;
+}
+@keyframes sweep{from{transform:translateX(-102%)}to{transform:translateX(102%)}}
+.newflag{
+  position:absolute;top:9px;right:9px;font-size:10px;font-weight:700;letter-spacing:.01em;
+  background:var(--live-bg);color:var(--live-ink);border-radius:999px;padding:2px 8px;
+  animation:chipIn calc(.4s * var(--speed)) var(--spring) both;
+}
+
+/* ============================================================
+   STAGE 2 — matching (replaces the ask box in place)
+   ============================================================ */
+.stage{display:none}
+.stage.on{display:block}
+
+.match{padding:34px 24px 30px;position:relative;text-align:center}
+.match h2{font-size:23px;margin-bottom:7px}
+.match .said{
+  max-width:56ch;margin:0 auto 26px;color:var(--muted);font-size:14px;line-height:1.6;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 16px;text-align:left;
+}
+.match .said b{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px}
+
+/* radar: rings go out, faces come in */
+.radar{position:relative;width:300px;height:300px;margin:0 auto 6px}
+.radar .core{
+  position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;
+  border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 32% 28%, #7BF0BE 0%, #24C98A 38%, #00875A 78%, #006B48 100%);
+  box-shadow:0 6px 26px rgba(0,135,90,.34);z-index:3;
+}
+.radar .core span{font-size:26px;color:#fff;line-height:1}
+.radar .wave{
+  position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;
+  border-radius:50%;border:1.5px solid rgba(0,135,90,.5);
+  animation:radar calc(2.6s * var(--speed)) var(--ease) infinite;
+}
+.radar .wave:nth-child(2){animation-delay:calc(.65s * var(--speed))}
+.radar .wave:nth-child(3){animation-delay:calc(1.3s * var(--speed))}
+.radar .wave:nth-child(4){animation-delay:calc(1.95s * var(--speed))}
+@keyframes radar{
+  0%{transform:scale(1);opacity:.75}
+  100%{transform:scale(3.9);opacity:0}
+}
+/* candidate faces drift inward toward the dot */
+.radar .cand{
+  position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;z-index:2;
+  animation:drawIn calc(2.4s * var(--speed)) var(--ease) infinite;
+}
+@keyframes drawIn{
+  0%{transform:translate(var(--x),var(--y)) scale(.72);opacity:0}
+  22%{opacity:1}
+  72%{opacity:1}
+  100%{transform:translate(calc(var(--x) * .12),calc(var(--y) * .12)) scale(.5);opacity:0}
+}
+.radar .cand .av{width:44px;height:44px;box-shadow:0 0 0 2px #fff,0 3px 10px rgba(20,24,26,.12)}
+
+.steps{display:flex;flex-direction:column;gap:9px;max-width:330px;margin:14px auto 0;text-align:left}
+.step{
+  display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);
+  opacity:.4;transition:opacity .3s var(--ease),color .3s var(--ease);
+}
+.step .tick{
+  width:19px;height:19px;border-radius:50%;flex:none;display:grid;place-items:center;
+  border:1.5px solid var(--line);font-size:11px;color:transparent;
+  transition:background .26s var(--ease),border-color .26s var(--ease),color .26s var(--ease);
+}
+.step.doing{opacity:1;color:var(--ink)}
+.step.doing .tick{border-color:var(--accent);border-right-color:transparent;animation:spin calc(.85s * var(--speed)) linear infinite}
+.step.done{opacity:1;color:var(--muted)}
+.step.done .tick{background:var(--accent);border-color:var(--accent);color:#fff;animation:none;transform:scale(1)}
+.step.done .tick{animation:pop calc(.34s * var(--speed)) var(--spring)}
+@keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.22)}100%{transform:scale(1)}}
+
+/* ============================================================
+   STAGE 3 — matched
+   ============================================================ */
+.matched{padding:30px 24px 26px;text-align:center;animation:riseIn calc(.5s * var(--speed)) var(--spring) both}
+@keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.matched .found{
+  font-size:12px;font-weight:700;color:var(--accent-deep);margin-bottom:14px;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.matched .bigav{position:relative;width:96px;height:96px;margin:0 auto 14px;display:grid;place-items:center}
+.matched .bigav .ring{
+  position:absolute;inset:0;border-radius:50%;padding:3px;
+  background:conic-gradient(from 0deg,var(--accent),#6ED8AE,var(--accent));
+  animation:spin calc(5s * var(--speed)) linear infinite;
+}
+.matched .bigav .av{width:100%;height:100%;box-shadow:0 0 0 3px var(--card)}
+.matched h2{font-size:25px;margin-bottom:5px}
+.matched .does{color:var(--muted);font-size:14px;margin-bottom:3px}
+.matched .hist{color:var(--muted);font-size:13px}
+
+.brief{
+  max-width:430px;margin:22px auto 0;text-align:left;
+  background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:var(--r-md);padding:15px 17px;
+}
+.brief h4{font-size:12.5px;font-weight:700;color:var(--accent-deep);margin-bottom:9px}
+.brief li{
+  list-style:none;font-size:13px;color:#1F4E3D;display:flex;gap:9px;padding:3.5px 0;
+  animation:riseIn calc(.42s * var(--speed)) var(--ease) both;
+}
+.brief li:nth-child(1){animation-delay:calc(.08s * var(--speed))}
+.brief li:nth-child(2){animation-delay:calc(.2s * var(--speed))}
+.brief li:nth-child(3){animation-delay:calc(.32s * var(--speed))}
+.brief li::before{content:"✓";font-weight:700;flex:none}
+
+.matched-acts{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.btn.join{
+  background:linear-gradient(180deg,var(--accent-lift),var(--accent));
+  color:#fff;border-color:var(--accent);padding:11px 22px;font-size:14.5px;
+  box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 5px 16px -4px rgba(var(--accent-rgb),.44);
+  transition:filter .2s var(--ease),transform .22s var(--spring),box-shadow .22s var(--ease);
+}
+.btn.join:hover{filter:brightness(1.07);transform:translateY(-1.5px);
+  box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 10px 24px -6px rgba(var(--accent-rgb),.5)}
+.btn.join:active{transform:translateY(0) scale(.98);filter:brightness(.97)}
+
+/* ============================================================
+   STAGE 4 — in the call
+   ============================================================ */
+.incall{padding:22px;animation:riseIn calc(.45s * var(--speed)) var(--spring) both}
+.tiles{display:grid;grid-template-columns:1fr 208px;gap:12px;margin-bottom:16px;align-items:start}
+.tile{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;background:#12201B;
+  aspect-ratio:4/3;display:grid;place-items:center;
+}
+.tile.me-tile{background:#1B2123;aspect-ratio:1/1}
+.side{display:flex;flex-direction:column;gap:12px}
+.notecard{
+  flex:1;display:flex;flex-direction:column;gap:5px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:var(--r-md);padding:13px 14px;
+}
+.notecard b{font-size:12.5px;font-weight:700;color:var(--accent-deep)}
+.notecard>span:last-child{font-size:12px;color:var(--muted);line-height:1.55}
+.tile img{width:100%;height:100%;object-fit:cover;object-position:center 26%;display:block}
+.tile .fallback{color:#9FE7C8;font-size:13px}
+.tile .nameplate{
+  position:absolute;left:11px;bottom:11px;display:flex;align-items:center;gap:8px;
+  background:rgba(8,20,16,.62);backdrop-filter:blur(6px);
+  color:#fff;font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;
+}
+.tile .speaking{
+  position:absolute;inset:0;border-radius:var(--r-lg);pointer-events:none;
+  box-shadow:inset 0 0 0 2.5px rgba(0,135,90,.9);
+  animation:speak calc(1.5s * var(--speed)) var(--ease) infinite;
+}
+@keyframes speak{0%,100%{opacity:.35}50%{opacity:1}}
+.wave{display:inline-flex;align-items:flex-end;gap:2px;height:12px}
+.wave i{width:2.5px;border-radius:2px;background:currentColor;animation:w calc(.95s * var(--speed)) ease-in-out infinite}
+.wave i:nth-child(1){height:5px;animation-delay:0s}
+.wave i:nth-child(2){height:11px;animation-delay:.12s}
+.wave i:nth-child(3){height:7px;animation-delay:.24s}
+.wave i:nth-child(4){height:12px;animation-delay:.36s}
+.wave i:nth-child(5){height:6px;animation-delay:.48s}
+@keyframes w{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+
+.callbar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:11px 14px;
+}
+.callbar .timer{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.callbar .free-note{font-size:12px;color:var(--muted)}
+.cbtns{margin-left:auto;display:flex;gap:8px}
+.cbtn{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;
+  background:var(--card);border:1px solid var(--line);color:var(--muted);
+  transition:background .14s var(--ease),color .14s var(--ease);
+}
+.cbtn:hover{background:var(--line-soft);color:var(--ink)}
+.cbtn.off{background:var(--stop-bg);color:var(--stop);border-color:rgba(192,50,43,.25)}
+.cbtn.end{width:auto;padding:0 18px;border-radius:999px;background:var(--stop);color:#fff;border-color:var(--stop);font-weight:600;font-size:13px}
+.cbtn.end:hover{background:#A52922;color:#fff}
+
+/* ============================================================
+   STAGE 5 — after the call
+   ============================================================ */
+.after{padding:26px 24px 24px;animation:riseIn calc(.45s * var(--speed)) var(--spring) both}
+.after h2{font-size:22px;margin-bottom:6px}
+.after .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px}
+.outcome{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.out{
+  display:flex;gap:12px;align-items:flex-start;background:var(--card);
+  border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r-md);padding:13px 15px;
+}
+.out.open{border-left-color:var(--turn)}
+.out .mark{font-size:14px;line-height:1.3;flex:none;color:var(--accent)}
+.out.open .mark{color:var(--turn)}
+.out-main{flex:1;min-width:0}
+.out-main b{display:block;font-size:13.5px;font-weight:600;margin-bottom:2px}
+.out-main span{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* ============================================================
+   OTHER SCREENS (kept light — Home is the deliverable)
+   ============================================================ */
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  border-left-width:3px;padding:14px 16px;display:flex;align-items:center;gap:14px;
+  width:100%;text-align:left;transition:box-shadow .14s var(--ease),transform .14s var(--ease);
+}
+.row:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+/* Two colours on this list, not four. Amber is the one that wants you; green is
+   work already moving. A blue rule and a purple rule were drawing a distinction
+   the row's own words ("60%", "Healthy") already make, at the cost of a screen
+   that looked like it came from three different products. */
+.row.turn{border-left-color:var(--turn)}
+.row.moving,
+.row.contract{border-left-color:var(--accent-lift)}
+.row.flat{border-left-color:var(--line)}
+.row-main{flex:1;min-width:0}
+.row-title{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row-sub{color:var(--muted);font-size:13px;margin-top:3px}
+.row-side{display:flex;align-items:center;gap:10px;flex:none}
+.money{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:17px}
+.band{margin-bottom:28px}
+.band-h{display:flex;align-items:baseline;gap:9px;margin-bottom:11px}
+.band-h h2{font-size:16px;font-weight:600}
+.band-h .n{font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:9px;background:var(--line-soft);color:var(--muted)}
+.meter{display:flex;gap:3px;align-items:center}
+.meter i{width:18px;height:5px;border-radius:3px;background:var(--line);display:block}
+.meter i.f{background:var(--accent-lift)}
+.meter b{font-size:12px;color:var(--muted);font-weight:600;margin-left:6px}
+
+/* ============================================================
+   DRAWER — the person behind the dot
+   ============================================================ */
+.scrim{
+  position:fixed;inset:0;background:rgba(20,24,26,.32);opacity:0;pointer-events:none;
+  transition:opacity .24s var(--ease);z-index:40;
+}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;width:392px;max-width:92vw;height:100vh;background:var(--card);
+  border-left:1px solid var(--line);z-index:50;transform:translateX(102%);
+  transition:transform .32s var(--ease);overflow-y:auto;padding:24px 24px 60px;
+}
+.drawer.on{transform:none}
+.drawer-x{position:absolute;top:16px;right:16px;font-size:20px;color:var(--faint);line-height:1;padding:4px 8px}
+.drawer-x:hover{color:var(--ink)}
+.dr-top{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:6px}
+.dr-name{font-family:"Bricolage Grotesque",sans-serif;font-size:22px;font-weight:600}
+.dr-role{font-size:13.5px;color:var(--muted);margin-top:2px}
+.dr-sec{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.dr-sec h4{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:9px}
+.dr-sec p{font-size:13.5px;line-height:1.65;color:var(--ink)}
+.dr-sec .quiet{color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tags span{font-size:12px;font-weight:600;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 11px}
+.dr-acts{display:flex;gap:9px;margin-top:20px}
+
+/* ============================================================
+   HELP
+   ============================================================ */
+.fab{
+  position:fixed;right:26px;bottom:26px;z-index:35;
+  display:flex;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;
+  background:var(--ink);color:#fff;font-weight:600;font-size:13.5px;box-shadow:var(--shadow-lift);
+  transition:transform .16s var(--spring);
+}
+.fab:hover{transform:translateY(-2px)}
+.helppanel{
+  position:fixed;right:26px;bottom:82px;width:312px;z-index:36;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lift);padding:16px;display:none;
+}
+.helppanel.on{display:block;animation:riseIn calc(.26s * var(--speed)) var(--ease) both}
+.helppanel h4{font-size:13.5px;font-weight:600;margin-bottom:10px}
+.hp{display:block;width:100%;text-align:left;font-size:13px;color:var(--muted);
+  padding:9px 11px;border-radius:var(--r-sm);}
+.hp:hover{background:var(--line-soft);color:var(--ink)}
+
+/* ============================================================
+   WELCOME — the one interruption, and it is on the way in
+   ============================================================
+   Everything else on this page avoids covering the box. This covers it on
+   purpose and only once: it is the handshake, and it is over before the person
+   has anything they need the box for. So it is allowed the scrim, the middle of
+   the screen, and the biggest type on the page. */
+.welcome{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:24px}
+.welcome[hidden]{display:none}
+.wl-scrim{
+  position:absolute;inset:0;background:rgba(14,22,19,.42);backdrop-filter:blur(3px);
+  animation:wlFade calc(.3s * var(--speed)) var(--ease) both;
+}
+@keyframes wlFade{from{opacity:0}to{opacity:1}}
+.wl-card{
+  position:relative;z-index:1;width:min(452px,100%);max-height:calc(100vh - 48px);overflow-y:auto;
+  background:var(--card);border-radius:26px;padding:34px 36px 26px;text-align:center;
+  box-shadow:0 34px 90px -24px rgba(10,30,24,.42),0 3px 10px rgba(20,24,26,.08);
+  /* lands rather than appears — the same spring the rest of the page uses */
+  animation:wlIn calc(.42s * var(--speed)) var(--spring) both;
+}
+@keyframes wlIn{from{opacity:0;transform:translateY(22px) scale(.965)}to{opacity:1;transform:none}}
+.welcome.out .wl-card{animation:wlOut calc(.2s * var(--speed)) var(--ease) both}
+.welcome.out .wl-scrim{animation:wlFade calc(.22s * var(--speed)) var(--ease) reverse both}
+@keyframes wlOut{to{opacity:0;transform:translateY(8px) scale(.985)}}
+
+.wl-x{
+  position:absolute;top:16px;right:18px;width:28px;height:28px;border-radius:50%;
+  color:var(--faint);font-size:13px;line-height:1;
+  transition:background .14s var(--ease),color .14s var(--ease);
+}
+.wl-x:hover{background:var(--line-soft);color:var(--ink)}
+
+.wl-orb{width:46px;height:46px;margin:2px auto 16px;display:block}
+.wl-card h2{
+  font-family:'Bricolage Grotesque',system-ui,sans-serif;
+  font-size:27px;line-height:1.16;letter-spacing:-.022em;font-weight:700;margin:0 0 9px;
+}
+.wl-sub{font-size:13.5px;line-height:1.55;color:var(--muted);margin:0 auto 22px;max-width:352px}
+
+/* the photo row — left-aligned, because from here down it is a form and a form
+   that wanders back and forth across the centre line is hard to fill in */
+.wl-photo{
+  display:flex;align-items:center;gap:15px;text-align:left;
+  padding:14px;margin-bottom:20px;border-radius:16px;background:var(--paper);
+}
+.wl-drop{
+  width:54px;height:54px;flex:none;border-radius:50%;
+  border:1.6px dashed var(--line);color:var(--faint);background:var(--card);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease);
+}
+.wl-drop svg{width:21px;height:21px}
+.wl-drop:hover{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+.wl-photo-tx b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.006em;margin-bottom:2px}
+.wl-photo-tx span{display:block;font-size:12.5px;line-height:1.45;color:var(--muted)}
+
+.wl-l{
+  display:block;text-align:left;font-size:12.5px;font-weight:600;
+  letter-spacing:-.005em;margin:0 0 8px;
+}
+.wl-in{
+  width:100%;font:inherit;font-size:14.5px;color:var(--ink);
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:12px 14px;outline:none;margin-bottom:20px;
+  transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
+}
+.wl-in:focus{border-color:var(--accent-line);box-shadow:0 0 0 3.5px rgba(var(--accent-rgb),.11)}
+
+.wl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.wl-chip{
+  font-size:13px;color:var(--muted);background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:8px 14px;
+  transition:border-color .14s var(--ease),color .14s var(--ease),
+             background .14s var(--ease),transform .14s var(--spring);
+}
+.wl-chip:hover{border-color:var(--accent-line);color:var(--accent-deep)}
+/* chosen reads as filled, not merely outlined — at a glance you can see how far
+   down the card you have got without reading any of it */
+.wl-chip.on{
+  background:var(--accent-bg);border-color:var(--accent);color:var(--accent-deep);
+  font-weight:600;transform:scale(1.03);
+}
+
+.wl-go{
+  width:100%;font-size:15.5px;font-weight:700;letter-spacing:-.006em;color:#fff;
+  background:linear-gradient(180deg,var(--accent-lift),var(--accent));
+  border:1px solid var(--accent);border-radius:999px;padding:14px 22px;margin-top:2px;
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+             0 10px 24px -8px rgba(var(--accent-rgb),.45);
+  transition:transform .2s var(--spring),box-shadow .2s var(--ease),filter .18s var(--ease);
+}
+.wl-go:hover{transform:translateY(-1.5px);filter:brightness(1.04);
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,0 14px 30px -8px rgba(var(--accent-rgb),.5)}
+.wl-go:active{transform:translateY(0)}
+.wl-skip{
+  display:block;margin:4px auto 0;padding:11px 14px;
+  font-size:13px;color:var(--muted);border-radius:8px;
+  transition:color .14s var(--ease)}
+.wl-skip:hover{color:var(--ink)}
+
+/* On a phone the whole card has to clear the fold, or the Continue button is
+   something you have to go looking for. Everything loses a few pixels. */
+@media (max-width:560px){
+  .welcome{padding:12px;align-items:flex-end}
+  .wl-card{padding:24px 20px 16px;border-radius:22px}
+  .wl-orb{width:38px;height:38px;margin-bottom:12px}
+  .wl-card h2{font-size:22px}
+  .wl-sub{font-size:13px;margin-bottom:16px}
+  .wl-photo{padding:11px;margin-bottom:15px;gap:12px}
+  .wl-drop{width:46px;height:46px}
+  .wl-in{padding:11px 13px;margin-bottom:15px}
+  .wl-chips{gap:7px;margin-bottom:15px}
+  .wl-chip{font-size:12.5px;padding:7px 12px}
+  .wl-go{padding:13px 20px}
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+/* ============================================================
+   ATTENTION — the box is where you start, so say so
+   ============================================================ */
+
+/* A ring that rip1ples out of the empty field and fades — not a glow that sits
+   there breathing. It stops for good on the first keystroke, so it is a prompt
+   to begin rather than permanent decoration. The keyframe has to restate the
+   focus shadow, because an animated box-shadow replaces the whole property. */
+@keyframes askBeacon{
+  0%  {box-shadow:0 0 0 0 rgba(var(--accent-rgb),.20),
+                  0 18px 40px -20px rgba(var(--accent-rgb),.45), inset 0 1px 0 #fff}
+  70%,
+  100%{box-shadow:0 0 0 13px rgba(var(--accent-rgb),0),
+                  0 18px 40px -20px rgba(var(--accent-rgb),.45), inset 0 1px 0 #fff}
+}
+.hero.idle .ask-field{animation:askBeacon calc(2.8s * var(--speed)) var(--ease) infinite}
+
+/* the suggestion typing itself out behind the caret */
+.field-wrap{position:relative}
+.ghost{
+  position:absolute;inset:26px 26px auto 26px;pointer-events:none;
+  font-size:19px;line-height:1.55;color:var(--faint);white-space:pre-wrap;
+}
+.ghost .bar{
+  display:inline-block;width:2px;height:1.05em;margin-left:1px;vertical-align:-3px;border-radius:1px;
+  background:var(--accent);opacity:.6;animation:caret calc(1.05s * var(--speed)) steps(1) infinite;
+}
+@keyframes caret{0%,50%{opacity:.6}51%,100%{opacity:0}}
+
+/* after a while with nothing typed, the button catches the light once */
+.golive{position:relative;overflow:hidden}
+.golive::after{
+  content:"";position:absolute;top:0;bottom:0;width:38%;left:-45%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);
+}
+.golive.nudge::after{animation:shine calc(.95s * var(--speed)) var(--ease) 1}
+@keyframes shine{to{left:118%}}
+
+/* counts that change should be seen to change */
+.bump{animation:pop calc(.45s * var(--speed)) var(--spring) 1}
+
+/* first paint: the page assembles instead of appearing all at once */
+.rise{animation:riseIn calc(.62s * var(--speed)) var(--ease) both}
+.rise-1{animation-delay:calc(60ms * var(--speed))}
+.rise-2{animation-delay:calc(150ms * var(--speed))}
+.rise-3{animation-delay:calc(260ms * var(--speed))}
+.rail .nav-item.rise{animation-delay:calc((var(--n) * 55ms + 120ms) * var(--speed))}
+.starters-lead.rise{animation-delay:calc(330ms * var(--speed))}
+.starters .starter.rise{animation-delay:calc((var(--n) * 70ms + 380ms) * var(--speed))}
+.altcall.rise{animation-delay:calc(680ms * var(--speed))}
+
+@media (max-width:920px){
+  .app{grid-template-columns:1fr}
+  .rail{
+    flex-direction:row;align-items:center;gap:4px;overflow-x:auto;
+    border-right:none;border-bottom:1px solid var(--line);padding:10px 12px;
+  }
+  .rail .brand{padding:0 12px 0 4px}
+  .rail-gap,.rail hr,.rail-live,.me>div{display:none}
+  .nav-item{width:auto;white-space:nowrap}
+  .screen{padding:24px 18px 120px}
+  .ask{padding:26px 20px 24px}
+  .ask h2{font-size:28px}
+  .ask-lede{font-size:15px;margin-bottom:20px}
+  .ask-field{border-radius:16px}
+  .ask-field textarea{font-size:17px;min-height:130px;padding:18px 18px 8px}
+  .ghost{inset:18px 18px auto 18px;font-size:17px}   /* must track the textarea padding exactly */
+  .hero-tag{padding:10px 20px}
+  .hero-tag .who{display:none}   /* one signal per band; "free right now" is the one */
+  /* the name goes before the face does — the face is the part that carries */
+  .fp-name{display:none}
+  .fp-btn{gap:5px;padding:3px 6px 3px 3px}
+  .fp-menu{width:min(300px,calc(100vw - 40px))}
+  /* On a phone the row runs out of width, so the button wraps onto its own line
+     under the two tools and takes the whole of it — still the last thing in the
+     footer, just stacked instead of side by side. The extra top margin is for
+     the glow, which reaches 14px past the button on every side. */
+  .cta-ring{width:100%;margin-top:14px}
+  .golive{width:100%;justify-content:center;padding:15px 22px;font-size:16.5px}
+  .tiles{grid-template-columns:1fr}
+  .tile.me-tile{display:none}
+  .side{flex-direction:row}
+  .fab{right:16px;bottom:16px}
+  .helppanel{right:16px;left:16px;width:auto;bottom:72px}
+}
+
+/* ============================================================
+   REDUCED MOTION — keep every state reachable, drop the movement
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .radar .wave,.orb::after,.tinydot::after,.hero::before{display:none}
+  .hero.idle .ask-field{animation:none}
+  .ghost .bar,.golive::after{display:none}
+  /* the ring stops, but the icon still has to read as a phone call */
+  .golive .gd .arc{animation:none;opacity:1;transform:none}
+  .golive .gd .body{animation:none;transform:none}
+  /* the rings and the breath go; the pool of light stays, because it is what
+     makes the button the brightest thing on the page without moving */
+  .cta-ring::before,.cta-ring::after{display:none}
+  .cta-ring{animation:none;transform:none}
+  .cta-ring .halo{animation:none;opacity:.8;transform:none}
+  /* the bubble stops touring and simply stands by the box with the one
+     instruction that matters — the words are the point, the walk was the sugar */
+  .coach{transition:opacity .001ms !important}
+  .coach-dots{display:none}
+  .radar .cand{opacity:1;transform:translate(var(--x),var(--y))}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===================== RAIL ===================== -->
+  <nav class="rail">
+    <div class="brand"><div class="orb"></div><div class="brand-name">Relay</div></div>
+
+    <div class="rail-live">
+      <span class="tinydot"></span>
+      <b id="railCount">4 free</b>
+      <span>right now</span>
+    </div>
+
+    <button class="nav-item on" data-go="home"><span class="ico">◈</span>Get help</button>
+    <button class="nav-item" data-go="contracts"><span class="ico">◫</span>Bigger jobs<span class="count turn">1</span></button>
+    <button class="nav-item" data-go="calls"><span class="ico">☎</span>Past calls</button>
+    <button class="nav-item" data-go="people"><span class="ico">☺</span>Your people<span class="count moving">2</span></button>
+    <button class="nav-item" data-go="projects"><span class="ico">▣</span>Your things</button>
+
+    <div class="rail-gap"></div>
+    <hr>
+    <button class="me">
+      <div class="av" data-dot="live" style="background:#6D3BD4">RM</div>
+      <div><div class="me-name">Rohan Mehta</div><div class="me-sub">34.8 minutes used</div></div>
+    </button>
+  </nav>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+
+    <!-- The coach. It hangs off the main column rather than the card, so that on
+         a wide screen it can stand in the empty margin beside the card and point
+         in at what it is describing. Inside the card, which clips its overflow,
+         it could only ever cover the thing it was talking about. -->
+    <div class="coach" id="coach" hidden aria-hidden="true">
+      <i class="ca" id="coachArrow"></i>
+      <div class="coach-in" id="coachIn">
+        <div class="coach-dots" id="coachDots"><i></i><i></i><i></i><i></i></div>
+        <p class="coach-tx" id="coachTx"></p>
+      </div>
+    </div>
+
+    <!-- ============ HOME — one job ============ -->
+    <section class="screen on" id="home">
+
+      <div class="page-h">
+        <div>
+          <h1>Good morning, Rohan</h1>
+          <p>Thursday, 25 September</p>
+        </div>
+      </div>
+
+      <div class="hero" id="hero">
+
+        <div class="hero-tag" id="heroTag">
+          <span class="tinydot"></span>
+          <span id="heroTagText">Someone is free right now</span>
+          <!-- empty on the ask screen — the band carries one signal, and "someone is
+               free right now" is the one. The later stages fill this in. -->
+          <span class="who" id="heroTagWho"></span>
+
+          <!-- One face at a time, turning over on its own. The chevron opens the
+               whole room for anyone who wants it. Both halves are one button, so
+               the face is as clickable as the arrow — people aim at the picture. -->
+          <div class="facepile" id="facePile">
+            <button class="fp-btn" id="fpBtn" aria-haspopup="true" aria-expanded="false">
+              <span class="fp-stage" id="fpStage"></span>
+              <span class="fp-name" id="fpName"></span>
+              <svg class="fp-cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fp-menu" id="fpMenu"></div>
+          </div>
+        </div>
+
+        <!-- ---- stage 1: ask ---- -->
+        <div class="stage on" id="stAsk">
+          <div class="ask">
+            <h2>What are you stuck on?</h2>
+            <p class="ask-lede">Say it the way you would say it out loud. You do not have to make it
+              sound technical &mdash; that is the engineer's job, not yours.</p>
+
+            <div class="ask-field" id="askField">
+              <div class="field-wrap">
+                <!-- focus is set in boot() rather than by the autofocus attribute, so the
+             highlight classes go on at the same moment the cursor lands -->
+        <textarea id="askText" rows="3"
+                  placeholder="My payment page keeps timing out and I have no idea why..."></textarea>
+                <div class="ghost" id="ghost" aria-hidden="true"></div>
+              </div>
+              <div class="staged" id="staged"></div>
+              <div class="ask-tools">
+                <button class="tool" id="attach"><span class="g">&#128206;</span>Add a screenshot</button>
+                <button class="tool" id="talk"><span class="g">&#127908;</span>Say it out loud</button>
+
+                <!-- ---- the one button the product is about ----
+                     It sits at the end of the composer's footer, where a send
+                     button always is. The two tools to its left are quiet
+                     outlines; this one is filled, and it breathes with rings
+                     going out from it the way a phone rings, so the three never
+                     read as buttons of equal weight.
+                     The movement is the whole prompt — there is no caption. -->
+                <span class="cta-ring">
+                  <i class="halo" aria-hidden="true"></i>
+                  <button class="golive" id="goBtn"><span class="gd" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="body" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/><path class="arc arc1" d="M15.05 5A5 5 0 0 1 19 8.95"/><path class="arc arc2" d="M15.05 1A9 9 0 0 1 23 8.94"/></svg></span>Get me someone</button>
+                </span>
+              </div>
+            </div>
+
+            <p class="starters-lead" id="startersLead">Not sure how to put it? Try one of these</p>
+            <div class="starters" id="starters">
+              <button class="starter">My site stopped working</button>
+              <button class="starter">Something broke after I made a change</button>
+              <button class="starter">I do not understand this error message</button>
+              <button class="starter">I am stuck halfway through building something</button>
+            </div>
+
+            <!-- The way out for someone who would rather just talk. It skips the
+                 box entirely, so everything downstream has to stop claiming the
+                 engineer has read what they wrote. -->
+            <div class="altcall" id="altcall">
+              <button class="callnow" id="callNowBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Just call someone now
+              </button>
+              <span class="alt-note">Skip the writing — tell them on the call instead</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- stage 2: matching ---- -->
+        <div class="stage" id="stMatch">
+          <div class="match">
+            <h2>Finding the right person</h2>
+            <div class="said" id="saidBox"><b>What you said</b><span id="saidText"></span></div>
+
+            <div class="radar" id="radar">
+              <div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div>
+              <div class="core"><span>&#9679;</span></div>
+            </div>
+
+            <div class="steps">
+              <div class="step" id="s1"><span class="tick">&#10003;</span><span id="s1Tx">Reading what you wrote</span></div>
+              <div class="step" id="s2"><span class="tick">&#10003;</span>Looking for someone who has fixed this before</div>
+              <div class="step" id="s3"><span class="tick">&#10003;</span>Checking who is free to talk now</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- stage 3: matched ---- -->
+        <div class="stage" id="stFound">
+          <div class="matched">
+            <div class="found"><span class="tinydot"></span>Found someone</div>
+
+            <div class="bigav">
+              <span class="ring"></span>
+              <div class="av xl" data-dot="live" style="background:#00875A">SJ</div>
+            </div>
+
+            <h2>Satyam is ready to join you</h2>
+            <p class="does">Payments and checkout</p>
+            <p class="hist">He has been on 12 calls with you and knows Palm Seas</p>
+
+            <div class="brief">
+              <h4>Before joining, Satyam has read</h4>
+              <ul>
+                <li id="briefRead">What you just wrote, and the screenshot you added</li>
+                <li>Notes from your last three calls</li>
+                <li>How your payment page is set up</li>
+              </ul>
+            </div>
+
+            <div class="matched-acts">
+              <button class="btn join" id="joinBtn">Start the call</button>
+              <button class="btn" id="otherBtn">Someone else, please</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- stage 4: in the call ---- -->
+        <div class="stage" id="stCall">
+          <div class="incall">
+            <div class="tiles">
+              <div class="tile">
+                <img id="callImg" alt="" src="https://randomuser.me/api/portraits/men/32.jpg">
+                <span class="speaking"></span>
+                <span class="nameplate">
+                  <span class="wave"><i></i><i></i><i></i><i></i><i></i></span>
+                  Satyam Jha
+                </span>
+              </div>
+              <div class="side">
+                <div class="tile me-tile">
+                  <img id="meImg" alt="" src="https://randomuser.me/api/portraits/men/86.jpg">
+                  <span class="nameplate">You</span>
+                </div>
+                <div class="notecard">
+                  <span class="tinydot"></span>
+                  <b>You do not need to take notes</b>
+                  <span>Relay writes this call up in plain words the moment it ends, and keeps it
+                    with the rest of your things.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="callbar">
+              <span class="tinydot"></span>
+              <span class="timer" id="timer">00:00</span>
+              <span class="free-note" id="freeNote">Free for another 10:00</span>
+              <div class="cbtns">
+                <button class="cbtn" id="micBtn" title="Mute">&#127908;</button>
+                <button class="cbtn" id="camBtn" title="Camera off">&#128247;</button>
+                <button class="cbtn" title="Share your screen">&#9744;</button>
+                <button class="cbtn end" id="endBtn">End call</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- stage 5: after ---- -->
+        <div class="stage" id="stAfter">
+          <div class="after">
+            <h2>That is fixed</h2>
+            <p class="sub" id="afterSub">18 minutes with Satyam &middot; written up for you, in plain words</p>
+
+            <div class="outcome">
+              <div class="out">
+                <span class="mark">&#10003;</span>
+                <div class="out-main">
+                  <b>Your payment page no longer times out</b>
+                  <span>It was asking your database for everything at once. Satyam changed it to ask
+                    once and remember the answer. He tested it twice while you watched.</span>
+                </div>
+              </div>
+              <div class="out">
+                <span class="mark">&#10003;</span>
+                <div class="out-main">
+                  <b>You can undo this if it misbehaves</b>
+                  <span>Satyam left the old version in place. Ask any engineer to switch it back.</span>
+                </div>
+              </div>
+              <div class="out open">
+                <span class="mark">&#9679;</span>
+                <div class="out-main">
+                  <b>One thing is still open</b>
+                  <span>When a payment fails, nothing tries it again. That is a bigger piece of work
+                    than a call &mdash; Satyam can quote you a fixed price for it.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="matched-acts" style="justify-content:flex-start">
+              <button class="btn solid" data-go="contracts">Ask Satyam for a price</button>
+              <button class="btn" id="againBtn">Something else came up</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /hero -->
+
+
+    </section>
+
+    <!-- ============ BIGGER JOBS ============ -->
+    <section class="screen" id="contracts">
+      <div class="page-h">
+        <div>
+          <h1>Bigger jobs</h1>
+          <p>Work that is too big for a call. One engineer takes it on, at a fixed price.</p>
+        </div>
+      </div>
+
+      <div class="band">
+        <div class="band-h"><h2>Waiting on you</h2><span class="n">1</span></div>
+        <div class="rows">
+          <button class="row turn" data-person="sj">
+            <div class="av md" data-dot="live" style="background:#00875A">SJ</div>
+            <div class="row-main">
+              <div class="row-title">Satyam has priced the Palm Seas rebuild <span class="pill turn">Your turn</span></div>
+              <div class="row-sub">Rebuilding your checkout so the timeouts stop for good &middot; about 3 weeks</div>
+            </div>
+            <div class="row-side"><span class="money">&euro;3,200</span><span class="btn sm solid">Look at it</span></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="band">
+        <div class="band-h"><h2>Happening now</h2><span class="n">2</span></div>
+        <div class="rows">
+          <button class="row moving" data-person="sj">
+            <div class="av md" data-dot="live" style="background:#00875A">SJ</div>
+            <div class="row-main">
+              <div class="row-title">daun &mdash; building the payments part</div>
+              <div class="row-sub">Satyam is on it today &middot; next thing you will see: Friday 2 October</div>
+            </div>
+            <div class="row-side"><span class="meter"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><b>60%</b></span></div>
+          </button>
+          <button class="row contract" data-person="pn">
+            <div class="av md" data-dot="live" style="background:#2456C8">PN</div>
+            <div class="row-main">
+              <div class="row-title">daun &mdash; keeping it running <span class="pill live"><span class="dot"></span>Healthy</span></div>
+              <div class="row-sub">Priya checks on it daily &middot; nothing needs you</div>
+            </div>
+            <div class="row-side"><span class="money">&euro;2,500</span></div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PAST CALLS ============ -->
+    <section class="screen" id="calls">
+      <div class="page-h">
+        <div>
+          <h1>Past calls</h1>
+          <p>Every call is written up in plain words, so you can come back to it later.</p>
+        </div>
+      </div>
+      <div class="rows">
+        <button class="row flat" data-person="sj">
+          <div class="av md" data-dot="live" style="background:#00875A">SJ</div>
+          <div class="row-main">
+            <div class="row-title">Fixed the checkout timeout</div>
+            <div class="row-sub">With Satyam &middot; Tuesday &middot; 18 minutes &middot; one thing left open</div>
+          </div>
+          <div class="row-side"><span class="pill mute">Written up</span></div>
+        </button>
+        <button class="row flat" data-person="pn">
+          <div class="av md" data-dot="live" style="background:#2456C8">PN</div>
+          <div class="row-main">
+            <div class="row-title">Emails were going to spam</div>
+            <div class="row-sub">With Priya &middot; 19 September &middot; 24 minutes</div>
+          </div>
+          <div class="row-side"><span class="pill mute">Written up</span></div>
+        </button>
+        <button class="row flat" data-person="ad">
+          <div class="av md" data-dot="off" style="background:#9AA1A6">AD</div>
+          <div class="row-main">
+            <div class="row-title">App would not build after an update</div>
+            <div class="row-sub">With Arjun &middot; 17 September &middot; 31 minutes &middot; one thing left open</div>
+          </div>
+          <div class="row-side"><span class="pill mute">Written up</span></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ YOUR PEOPLE ============ -->
+    <section class="screen" id="people-screen">
+      <div class="page-h">
+        <div>
+          <h1>Your people</h1>
+          <p>Everyone you can reach today. The ones who already know your work get asked first.</p>
+        </div>
+      </div>
+      <div class="people" id="people2"></div>
+    </section>
+
+    <!-- ============ YOUR THINGS ============ -->
+    <section class="screen" id="projects">
+      <div class="page-h">
+        <div>
+          <h1>Your things</h1>
+          <p>Everything you have asked us about, so nobody makes you explain it twice.</p>
+        </div>
+      </div>
+      <div class="rows">
+        <button class="row live">
+          <div class="row-main">
+            <div class="row-title">Palm Seas <span class="pill turn">A price is waiting for you</span></div>
+            <div class="row-sub">Your shop &middot; 9 calls &middot; Satyam and Meera know this one</div>
+          </div>
+        </button>
+        <button class="row contract">
+          <div class="row-main">
+            <div class="row-title">daun <span class="pill contract">Being built for you</span></div>
+            <div class="row-sub">Your booking site &middot; 6 calls &middot; Satyam is building, Priya is looking after it</div>
+          </div>
+        </button>
+        <button class="row flat">
+          <div class="row-main">
+            <div class="row-title">Epicmail</div>
+            <div class="row-sub">Your newsletter &middot; 3 calls &middot; Priya knows this one</div>
+          </div>
+        </button>
+        <button class="row flat">
+          <div class="row-main">
+            <div class="row-title">TrackFit</div>
+            <div class="row-sub">Your phone app &middot; 2 calls &middot; nothing happening right now</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== DRAWER ===================== -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="About this engineer">
+  <button class="drawer-x" id="drawerX" aria-label="Close">&times;</button>
+  <div class="dr-top">
+    <div class="av xl" id="drAv" data-dot="live" style="background:#00875A">SJ</div>
+    <div>
+      <div class="dr-name" id="drName">Satyam Jha</div>
+      <div class="dr-role" id="drRole">Payments and checkout</div>
+    </div>
+  </div>
+
+  <div class="dr-sec">
+    <h4>With you</h4>
+    <p id="drHist">12 calls with you. Built your payments work. Knows Palm Seas and daun.</p>
+  </div>
+
+  <div class="dr-sec">
+    <h4>Good at</h4>
+    <div class="tags" id="drTags"></div>
+  </div>
+
+  <div class="dr-sec">
+    <!-- one drawer serves all eight people, so the heading cannot assume a gender -->
+    <h4>In their own words</h4>
+    <p class="quiet" id="drBio">Payments and checkout, mostly. I like the boring parts that have to not break at 2am.</p>
+  </div>
+
+  <div class="dr-sec">
+    <h4>Off the clock</h4>
+    <p class="quiet" id="drHobby">Makes filter coffee, badly.</p>
+  </div>
+
+  <div class="dr-acts">
+    <button class="btn join" id="drCall">Ask for this person</button>
+    <button class="btn" id="drMsg">Send a message</button>
+  </div>
+</aside>
+
+<!-- ===================== HELP ===================== -->
+<div class="helppanel" id="helpPanel">
+  <h4>What do you need?</h4>
+  <button class="hp">I do not know how to describe my problem</button>
+  <button class="hp">Is this going to cost me anything?</button>
+  <button class="hp">How fast will someone actually answer?</button>
+  <button class="hp">I would rather someone just built it for me</button>
+</div>
+<button class="fab" id="helpFab"><span>?</span>Help</button>
+
+<!-- ===================== WELCOME =====================
+     The first thing anyone sees. It asks two things and takes no answer as an
+     answer — every control here can be walked past, because somebody who came
+     in stuck should be allowed to stay stuck for another four seconds and get
+     to the box. The green dot at the top is the same dot as the one in the
+     corner: the thing you press when you need a person. -->
+<div class="welcome" id="welcome" hidden>
+  <div class="wl-scrim" id="wlScrim"></div>
+  <div class="wl-card" role="dialog" aria-modal="true" aria-labelledby="wlTitle">
+    <button class="wl-x" id="wlX" aria-label="Close">&#10005;</button>
+
+    <span class="orb wl-orb" aria-hidden="true"></span>
+    <h2 id="wlTitle">Hi Rohan &mdash; welcome to Relay</h2>
+    <p class="wl-sub">When you get stuck, a real engineer joins you on a call. Two
+      questions first, so we know who to wake up. Skip them if you would rather not.</p>
+
+    <div class="wl-photo">
+      <button class="wl-drop" id="wlDrop" aria-label="Add a photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 1 2-2h2l1.5-2h7L17 7h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
+      </button>
+      <div class="wl-photo-tx">
+        <b>Add a photo</b>
+        <span>So the person on the call knows who they are talking to. Optional.</span>
+      </div>
+    </div>
+
+    <label class="wl-l" for="wlName">Your name</label>
+    <input class="wl-in" id="wlName" value="Rohan Mehta" autocomplete="name">
+
+    <!-- Both of these are picked, not typed. The brief was that nothing here
+         should feel like homework, and a person who is already stuck will not
+         write a sentence about their hobbies to get to a help button. -->
+    <p class="wl-l" id="wlDoL">What do you like making?</p>
+    <div class="wl-chips" id="wlDo" role="group" aria-labelledby="wlDoL">
+      <button class="wl-chip">Websites</button>
+      <button class="wl-chip">Apps</button>
+      <button class="wl-chip">Online shops</button>
+      <button class="wl-chip">Little tools for myself</button>
+      <button class="wl-chip">Still working that out</button>
+    </div>
+
+    <p class="wl-l" id="wlWhenL">And when do you usually do it?</p>
+    <div class="wl-chips" id="wlWhen" role="group" aria-labelledby="wlWhenL">
+      <button class="wl-chip">Mornings</button>
+      <button class="wl-chip">Daytime</button>
+      <button class="wl-chip">Evenings</button>
+      <button class="wl-chip">Late at night</button>
+      <button class="wl-chip">Weekends</button>
+    </div>
+
+    <button class="wl-go" id="wlGo">Continue</button>
+    <button class="wl-skip" id="wlSkip">Skip</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Cast — described in plain words, no jargon anywhere
+   ============================================================ */
+const PEOPLE = [
+  {k:'sj', n:'Satyam Jha',    first:'Satyam', c:'#00875A', i:'SJ',
+   does:'Payments and checkout', state:'free', wait:'usually answers in 15 min',
+   hist:'12 calls with you. Built your payments work. Knows Palm Seas and daun.',
+   tags:['Online payments','Shopping carts','Things that must not break'],
+   bio:'Payments and checkout, mostly. I like the boring parts that have to not break at 2am.',
+   hobby:'Makes filter coffee, badly.'},
+
+  {k:'pn', n:'Priya Nair',    first:'Priya',  c:'#2456C8', i:'PN',
+   does:'Keeping things running', state:'free', wait:'usually answers in 8 min',
+   hist:'4 calls with you. Looks after Epicmail day to day.',
+   tags:['Sites going down','Email delivery','Backups'],
+   bio:'I keep things running. Most of my work is invisible, which is rather the point.',
+   hobby:'Long-distance runner. Slowly.'},
+
+  {k:'nh', n:'Nadia Haddad',  first:'Nadia',  c:'#6D3BD4', i:'NH',
+   does:'Logins and accounts', state:'free', wait:'usually answers in 12 min',
+   hist:'No calls with you yet.',
+   tags:['Sign-in problems','Password resets','Keeping data private'],
+   bio:'If people cannot get into your product, nothing else you built matters.',
+   hobby:'Grows chillies on a balcony.'},
+
+  {k:'ks', n:'Kabir Shah',    first:'Kabir',  c:'#14181A', i:'KS',
+   does:'Numbers and reports', state:'free', wait:'usually answers in 20 min',
+   hist:'No calls with you yet.',
+   tags:['Reports that disagree','Big spreadsheets','Slow searches'],
+   bio:'Pipelines, dashboards, and explaining why two numbers that should match do not.',
+   hobby:'Restores old radios.'},
+
+  {k:'mi', n:'Meera Iyer',    first:'Meera',  c:'#B45309', i:'MI',
+   does:'How your site looks', state:'busy', wait:'free again at 3pm',
+   hist:'2 calls with you. Worked on Palm Seas.',
+   tags:['Layouts','Mobile screens','Making things feel finished'],
+   bio:'I make interfaces that do not fight the people using them. Will argue about spacing.',
+   hobby:'Bakes, then gives it all away.'},
+
+  {k:'tb', n:'Tomas Berg',    first:'Tomas',  c:'#00875A', i:'TB',
+   does:'Speed and crashes', state:'busy', wait:'free again around 2:40pm',
+   hist:'No calls with you yet.',
+   tags:['Slow pages','Sudden crashes','Things that break under load'],
+   bio:'I find the one line that is costing you eight seconds.',
+   hobby:'Sea swimming, all year.'},
+
+  {k:'lf', n:'Lena Fischer',  first:'Lena',   c:'#2456C8', i:'LF',
+   does:'Emails and messages', state:'busy', wait:'free again around 3:10pm',
+   hist:'No calls with you yet.',
+   tags:['Emails going to spam','Notifications','Text messages'],
+   bio:'Mostly I work out why your customers never got the email you sent them.',
+   hobby:'Plays in a very loud band.'},
+
+  {k:'ad', n:'Arjun Desai',   first:'Arjun',  c:'#9AA1A6', i:'AD',
+   does:'Phone apps', state:'away', wait:'back on Friday',
+   hist:'1 call with you. Looked at TrackFit.',
+   tags:['iPhone and Android apps','App store submissions'],
+   bio:'I have shipped to both app stores enough times to know where the bodies are buried.',
+   hobby:'Cycles further than is sensible.'}
+];
+const BY_KEY = Object.fromEntries(PEOPLE.map(p=>[p.k,p]));
+
+const STATE_LABEL = {
+  free:'Free right now',
+  busy:'In a call',
+  away:'Away'
+};
+
+/* ============================================================
+   Avatars — photo with a drawn fallback if the network is blocked
+   ============================================================ */
+function face(o){
+  const back  = o.longHair ? `<rect x="${o.hairBackX||16}" y="20" width="${o.hairBackW||32}" height="34" rx="15" fill="${o.hair}"/>` : '';
+  const beard = o.beard ? `<path d="M22.6 28c0 7.2 4.3 11.8 9.4 11.8S41.4 35.2 41.4 28" fill="none" stroke="${o.hair}" stroke-width="3.4" stroke-linecap="round"/>` : '';
+  const curls = o.curly ? `<circle cx="23" cy="18.5" r="5.2" fill="${o.hair}"/><circle cx="32" cy="15.2" r="5.6" fill="${o.hair}"/><circle cx="41" cy="18.5" r="5.2" fill="${o.hair}"/>` : '';
+  const bun   = o.bun ? `<circle cx="32" cy="10.5" r="5" fill="${o.hair}"/>` : '';
+  return `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+<rect width="64" height="64" fill="${o.bg}"/>
+${back}${bun}
+<rect x="28" y="33" width="8" height="12" rx="4" fill="${o.shade}"/>
+<path d="M32 42.5c10.2 0 18.5 7.2 18.5 16.2V64h-37v-5.3c0-9 8.3-16.2 18.5-16.2z" fill="${o.shirt}"/>
+<circle cx="32" cy="24.2" r="13.4" fill="${o.hair}"/>
+${curls}
+<circle cx="32" cy="26.2" r="12.4" fill="${o.skin}"/>
+${beard}
+<circle cx="27.6" cy="25.6" r="1.55" fill="#2A2118"/>
+<circle cx="36.4" cy="25.6" r="1.55" fill="#2A2118"/>
+<path d="M28.9 31.2a4.4 4.4 0 0 0 6.2 0" fill="none" stroke="#2A2118" stroke-width="1.5" stroke-linecap="round"/>
+</svg>`;
+}
+const AVATARS = {
+  SJ:face({bg:'#DCF5EA',skin:'#D9A074',shade:'#BE8459',hair:'#241C14',shirt:'#00875A'}),
+  PN:face({bg:'#EBE3FC',skin:'#C98B63',shade:'#AE744F',hair:'#241C14',shirt:'#6D3BD4',longHair:true}),
+  MI:face({bg:'#DEE8FD',skin:'#E3B089',shade:'#C4926C',hair:'#2E2318',shirt:'#2456C8',bun:true,longHair:true,hairBackX:18,hairBackW:28}),
+  AD:face({bg:'#FDF0D5',skin:'#B87848',shade:'#9C6238',hair:'#241C14',shirt:'#B45309',beard:true}),
+  KS:face({bg:'#E8ECEC',skin:'#D09460',shade:'#B37B4B',hair:'#2A2118',shirt:'#697077',curly:true}),
+  NH:face({bg:'#EBE3FC',skin:'#CE9468',shade:'#B07B52',hair:'#1F1810',shirt:'#6D3BD4',longHair:true}),
+  TB:face({bg:'#DCF5EA',skin:'#EBC49F',shade:'#CFA47D',hair:'#8A6A3C',shirt:'#00875A'}),
+  LF:face({bg:'#DEE8FD',skin:'#EEC9A6',shade:'#D2A57F',hair:'#6B4A22',shirt:'#2456C8',longHair:true,hairBackX:18,hairBackW:28}),
+  RM:face({bg:'#E3E7E8',skin:'#C98B63',shade:'#AE744F',hair:'#241C14',shirt:'#14181A'})
+};
+const PHOTOS = {
+  SJ:"https://randomuser.me/api/portraits/men/32.jpg",
+  PN:"https://randomuser.me/api/portraits/women/44.jpg",
+  MI:"https://randomuser.me/api/portraits/women/68.jpg",
+  AD:"https://randomuser.me/api/portraits/men/75.jpg",
+  KS:"https://randomuser.me/api/portraits/men/11.jpg",
+  NH:"https://randomuser.me/api/portraits/women/26.jpg",
+  TB:"https://randomuser.me/api/portraits/men/46.jpg",
+  LF:"https://randomuser.me/api/portraits/women/57.jpg",
+  RM:"https://randomuser.me/api/portraits/men/86.jpg"
+};
+function paintAvatar(el, initials){
+  const key = (initials || el.dataset.initials || el.textContent || '').trim().toUpperCase();
+  const svg = AVATARS[key], photo = PHOTOS[key];
+  el.textContent = '';
+  if(!svg && !photo){ el.textContent = key; return; }
+  el.dataset.initials = key;
+  const wrap = document.createElement('span');
+  wrap.className = 'av-img';
+  if(photo){
+    const img = document.createElement('img');
+    img.alt = '';
+    img.onerror = () => { wrap.innerHTML = svg || ''; };
+    img.src = photo;
+    wrap.appendChild(img);
+  } else {
+    wrap.innerHTML = svg;
+  }
+  el.appendChild(wrap);
+}
+function paintAll(root){ (root||document).querySelectorAll('.av').forEach(el => paintAvatar(el)); }
+
+/* fall back to the drawn face on the call tiles too */
+[['callImg','SJ'],['meImg','RM']].forEach(([id,key])=>{
+  const img = document.getElementById(id);
+  if(!img) return;
+  img.onerror = () => {
+    const holder = img.parentElement;
+    img.remove();
+    const d = document.createElement('div');
+    d.style.cssText = 'width:100%;height:100%';
+    d.innerHTML = AVATARS[key];
+    d.querySelector('svg').style.cssText = 'width:100%;height:100%';
+    holder.prepend(d);
+  };
+});
+
+/* ============================================================
+   Motion budget
+   ============================================================ */
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SPEED = REDUCED ? 0.18 : 1;          // scales every scripted delay
+document.documentElement.style.setProperty('--speed', REDUCED ? '0.001' : '1');
+const wait = ms => new Promise(r => setTimeout(r, ms * SPEED));
+
+/* ============================================================
+   People strip — they arrive, rather than simply being there
+   ============================================================ */
+const orderOf = { free:0, busy:1, away:2 };
+
+function personCard(p, idx, opts){
+  opts = opts || {};
+  const el = document.createElement('button');
+  el.className = 'person' + (opts.arrive ? ' arrive' : '') + (opts.justFree ? ' justfree' : '');
+  el.style.setProperty('--i', idx);
+  el.dataset.person = p.k;
+  el.setAttribute('aria-label', p.n + ' — ' + p.does + ' — ' + STATE_LABEL[p.state]);
+  el.innerHTML =
+    '<span class="ringwrap ' + p.state + '">' +
+      '<span class="ring"></span>' +
+      '<span class="av" data-dot="' + (p.state==='free'?'live':p.state==='busy'?'busy':'off') + '" ' +
+            'style="background:' + p.c + '" data-initials="' + p.i + '"></span>' +
+    '</span>' +
+    '<span class="person-main">' +
+      '<b>' + p.first + '</b>' +
+      '<span class="does">' + p.does + '</span>' +
+      '<span class="state ' + p.state + '">' + STATE_LABEL[p.state] + ' &middot; ' + p.wait + '</span>' +
+    '</span>' +
+    (opts.justFree ? '<span class="newflag">just free</span>' : '');
+  paintAll(el);
+  return el;
+}
+
+function renderPeople(list, mount, opts){
+  opts = opts || {};
+  mount.textContent = '';
+  list.slice().sort((a,b)=>orderOf[a.state]-orderOf[b.state])
+      .forEach((p,i)=> mount.appendChild(personCard(p,i,{arrive:opts.arrive})));
+}
+
+/* ---- the home strip ---- */
+const railCount = document.getElementById('railCount');
+
+/* Who has walked in so far. Arrivals are staged, so the counts must agree
+   with what is actually on screen rather than with the whole cast. */
+const ARRIVED = new Set();
+
+
+function freeCount(){ return PEOPLE.filter(p => ARRIVED.has(p.k) && p.state==='free').length; }
+let lastFree = -1;
+function updateCounts(){
+  const n = freeCount();
+  railCount.textContent = n + ' free';
+  const tag = document.getElementById('heroTagText');
+  tag.textContent = n > 1 ? n + ' people are free right now' : 'Someone is free right now';
+  // only when the number moved — a pop on every repaint is just noise
+  if(n !== lastFree && lastFree !== -1){ bump(railCount); bump(tag); }
+  lastFree = n;
+  fpSync();
+}
+
+/* ============================================================
+   The band's face — one person at a time, on a reel
+   ============================================================ */
+const fpWrap  = document.getElementById('facePile');
+const fpBtn   = document.getElementById('fpBtn');
+const fpStage = document.getElementById('fpStage');
+const fpName  = document.getElementById('fpName');
+const fpMenu  = document.getElementById('fpMenu');
+const DOT = s => s === 'free' ? 'live' : s === 'busy' ? 'busy' : 'off';
+let fpTimer = null, fpKey = null;
+
+/* Only people who are free get a turn on the reel. The band's claim is "N are
+   free right now" and the face is the evidence for it — showing someone who is
+   in a call would quietly contradict the sentence next to it. */
+function fpPool(){
+  const here = PEOPLE.filter(p => ARRIVED.has(p.k));
+  const free = here.filter(p => p.state === 'free');
+  return free.length ? free : here;
+}
+
+function fpShow(p, animate){
+  const old = fpStage.querySelector('.av');
+  const el = document.createElement('span');
+  el.className = 'av' + (animate ? ' in' : '');
+  el.style.background = p.c;
+  el.dataset.dot = DOT(p.state);
+  paintAvatar(el, p.i);
+  fpStage.appendChild(el);
+  if(old && animate){ old.classList.add('out'); setTimeout(() => old.remove(), 560 * SPEED); }
+  else if(old){ old.remove(); }
+
+  fpName.textContent = p.first;
+  if(animate){ fpName.classList.remove('swap'); void fpName.offsetWidth; fpName.classList.add('swap'); }
+  fpBtn.setAttribute('aria-label', p.n + ', ' + STATE_LABEL[p.state].toLowerCase() + '. Open the full list.');
+}
+
+function fpStep(animate){
+  const pool = fpPool();
+  if(!pool.length) return;
+  /* Step from whoever is showing rather than from a counter, so that people
+     arriving and leaving mid-reel never make it skip or repeat. */
+  const p = pool[(pool.findIndex(x => x.k === fpKey) + 1) % pool.length];
+  fpKey = p.k;
+  fpShow(p, animate);
+}
+
+function fpStart(){
+  if(fpTimer) return;
+  fpStep(false);
+  if(REDUCED) return;   /* with motion off it is simply one face, standing still */
+  fpTimer = setInterval(() => {
+    /* never swap the face out from under someone reading the open list */
+    if(!fpWrap.classList.contains('open')) fpStep(true);
+  }, 2800 * SPEED);
+}
+function fpStop(){ clearInterval(fpTimer); fpTimer = null; }
+
+/* Somebody's day changed. Keep the dot on the shown face honest, drop them off
+   the reel if they are now busy, and redraw the list if it happens to be open. */
+function fpSync(){
+  if(!fpTimer) return;
+  const p = BY_KEY[fpKey];
+  if(!p || !ARRIVED.has(p.k) || p.state !== 'free'){ fpStep(!REDUCED); }
+  else {
+    const el = fpStage.querySelector('.av');
+    if(el) el.dataset.dot = DOT(p.state);
+  }
+  if(fpWrap.classList.contains('open')) fpMenuRender();
+}
+
+const ST_SHORT = { free:'Free', busy:'In a call', away:'Away' };
+function fpMenuRender(){
+  const rank = { free:0, busy:1, away:2 };
+  const list = PEOPLE.filter(p => ARRIVED.has(p.k))
+                     .sort((a, b) => rank[a.state] - rank[b.state]);
+  const n = list.filter(p => p.state === 'free').length;
+  fpMenu.innerHTML =
+    '<div class="fp-head">' + (n === 1 ? '1 free' : n + ' free') + ' of ' + list.length + '</div>' +
+    list.map(p =>
+      '<button class="fp-row" data-person="' + p.k + '">' +
+        '<span class="av" data-dot="' + DOT(p.state) + '" style="background:' + p.c + '">' + p.i + '</span>' +
+        '<span class="t"><b>' + p.n + '</b><i>' + p.does + '</i></span>' +
+        '<span class="fp-st ' + p.state + '">' + ST_SHORT[p.state] + '</span>' +
+      '</button>').join('');
+  paintAll(fpMenu);
+}
+
+function fpOpen(on){
+  fpWrap.classList.toggle('open', on);
+  fpBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+  if(on) fpMenuRender();
+}
+fpBtn.addEventListener('click', e => { e.stopPropagation(); fpOpen(!fpWrap.classList.contains('open')); });
+/* Anywhere else closes it — including a row, which hands off to the profile
+   drawer, and that wants the band behind it clear. */
+document.addEventListener('click', () => fpOpen(false));
+document.addEventListener('keydown', e => { if(e.key === 'Escape') fpOpen(false); });
+
+/* First paint: only the two people who already know Rohan.
+   The rest walk in over the next few seconds — the room filling up. */
+const SEED = PEOPLE.filter(p => p.k === 'sj' || p.k === 'pn');
+const ARRIVALS = PEOPLE.filter(p => !SEED.includes(p));
+
+function boot(){
+  SEED.forEach(p => ARRIVED.add(p.k));
+  updateCounts();
+  fpStart();
+
+  ARRIVALS.forEach((p, i) => {
+    setTimeout(() => { ARRIVED.add(p.k); updateCounts(); }, (800 + i * 430) * SPEED);
+  });
+
+  // every so often, somebody's day changes — presence is a live thing
+  if(!REDUCED) setInterval(tickPresence, 9000);
+
+  stageEntrance();
+
+  hero.classList.add('idle','focused');
+  runGhost();
+
+  /* Two openings, and only one of them happens. With the welcome up, focusing a
+     box behind a scrim and starting a tour of a screen nobody can reach would be
+     talking to an empty room — both wait for it to close. */
+  if(welcomeDue()) setTimeout(openWelcome, 420 * SPEED);
+  else             startHome();
+}
+
+/* The cursor starts in the box. There is one thing to do on this screen and
+   this is it — nobody should have to hunt for the click target. */
+function startHome(){
+  /* .focus() only fires a focus event when the document itself has focus —
+     if the window is in the background the class has to be set by hand. */
+  askText.focus({preventScroll:true});
+  runNudge();
+  /* The card animates itself in. The bubble waits for that to finish before it
+     measures anything — a rect read mid-entrance is a rect of somewhere the
+     card is not going to stay. */
+  setTimeout(coachStart, 1100 * SPEED);
+}
+
+/* ============================================================
+   WELCOME
+   ============================================================ */
+const welcome = document.getElementById('welcome');
+const wlName  = document.getElementById('wlName');
+
+/* "The first time." This prototype has no account behind it, so every arrival is
+   a first arrival — and a welcome that can only ever be seen once is a welcome
+   nobody can look at twice. It shows on every load here; in the real product
+   this is the line that asks whether the person has been met before. */
+function welcomeDue(){ return true; }
+
+let wlOpen = false;
+function openWelcome(){
+  wlOpen = true;
+  welcome.hidden = false;
+  welcome.classList.remove('out');
+  /* the name, not the photo — it is the only thing here anyone came to change */
+  setTimeout(() => wlName.focus({preventScroll:true}), 320 * SPEED);
+}
+
+function closeWelcome(){
+  if(!wlOpen) return;
+  wlOpen = false;
+  welcome.classList.add('out');
+  setTimeout(() => { welcome.hidden = true; }, 240 * SPEED);
+  startHome();
+}
+
+/* One answer per question. Pressing the chosen one again takes it back — the
+   whole card is skippable, so a question you have answered has to be un-answerable
+   too, or the only way out of a mis-tap is the Skip link. */
+['wlDo','wlWhen'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    const chip = e.target.closest('.wl-chip');
+    if(!chip) return;
+    const was = chip.classList.contains('on');
+    [...e.currentTarget.children].forEach(c => c.classList.remove('on'));
+    chip.classList.toggle('on', !was);
+  });
+});
+
+document.getElementById('wlGo').addEventListener('click', () => {
+  /* The one answer that has somewhere to go. If they changed their name, the
+     page had better be calling them by it a second later, or the question was
+     decoration. */
+  const n = wlName.value.trim();
+  if(n){
+    document.querySelector('.me-name').textContent = n;
+    document.querySelector('#home .page-h h1').textContent = 'Good morning, ' + n.split(' ')[0];
+  }
+  closeWelcome();
+});
+
+document.getElementById('wlSkip').addEventListener('click', closeWelcome);
+document.getElementById('wlX').addEventListener('click', closeWelcome);
+document.getElementById('wlScrim').addEventListener('click', closeWelcome);
+addEventListener('keydown', e => { if(e.key === 'Escape' && wlOpen) closeWelcome(); });
+/* Enter in the name field means "done", not "submit nothing" */
+wlName.addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('wlGo').click(); }
+});
+
+function tickPresence(){
+  if(document.getElementById('home').classList.contains('on') === false) return;
+  if(!document.getElementById('stAsk').classList.contains('on')) return;
+
+  const busy = PEOPLE.filter(p=>ARRIVED.has(p.k) && p.state==='busy');
+  const free = PEOPLE.filter(p=>ARRIVED.has(p.k) && p.state==='free');
+  /* Keep the room hovering around 4 free. Without a pull back toward the middle
+     the walk drifts until everyone is free, which reads as fake. */
+  let toFree;
+  if(free.length <= 2)      toFree = true;
+  else if(free.length >= 5) toFree = false;
+  else                      toFree = Math.random() < 0.5;
+
+  const pool = toFree ? busy : free;
+  if(!pool.length) return;
+  const target = pool[Math.floor(Math.random()*pool.length)];
+  const next = toFree ? 'free' : 'busy';
+
+  target.state = next;
+  target.wait = next === 'free' ? 'usually answers in ' + (8 + Math.floor(Math.random()*4) * 4) + ' min'
+                                : 'free again in about 20 min';
+
+  updateCounts();
+}
+
+/* ============================================================
+   The ask box
+   ============================================================ */
+const hero    = document.getElementById('hero');
+const askText  = document.getElementById('askText');
+const askField = document.getElementById('askField');
+const staged  = document.getElementById('staged');
+
+askText.addEventListener('focus', ()=> hero.classList.add('focused'));
+askText.addEventListener('blur',  ()=> hero.classList.remove('focused'));
+askText.addEventListener('input', ()=>{
+  askText.style.height = 'auto';
+  askText.style.height = Math.max(152, askText.scrollHeight) + 'px';   // matches the CSS floor
+  if(askText.value) startedTyping();
+});
+
+/* ============================================================
+   Attention on the ask box
+   ============================================================ */
+const ghost  = document.getElementById('ghost');
+const goBtn  = document.getElementById('goBtn');
+const callBtn = document.getElementById('callNowBtn');
+let   touched = false, ghostTimer = null, nudgeTimer = null;
+const PLACEHOLDER = askText.placeholder;
+
+/* Real examples, typed out behind the caret. Shows the register we want —
+   plain sentences, no stack names — better than a static placeholder can. */
+const SUGGESTIONS = [
+  'My payment page keeps timing out and I have no idea why',
+  'I changed one file and now the whole site is blank',
+  'Users say they cannot log in, but it works for me',
+  'I am halfway through this and do not know what to do next',
+];
+
+function startedTyping(){
+  if(touched) return;
+  touched = true;
+  hero.classList.remove('idle');
+  clearTimeout(ghostTimer); clearInterval(nudgeTimer);
+  ghost.textContent = '';
+  askText.placeholder = PLACEHOLDER;   // back to the plain hint if they clear the field
+  /* They have understood the screen. A bubble still explaining it is now
+     talking over them, so it goes, and it does not come back. */
+  coachStop();
+}
+
+/* type -> hold -> erase -> next. Only ever runs on an untouched, empty field. */
+function runGhost(){
+  if(REDUCED || touched) return;
+  let si = 0;
+  const bar = '<span class="bar"></span>';
+  const paint = txt => { ghost.innerHTML = txt + bar; };
+
+  function typeIn(){
+    const s = SUGGESTIONS[si]; let i = 0;
+    (function step(){
+      if(touched) return;
+      paint(s.slice(0, ++i));
+      ghostTimer = setTimeout(i < s.length ? step : hold, 34 + Math.random()*36);
+    })();
+  }
+  function hold(){ ghostTimer = setTimeout(eraseOut, 2100); }
+  function eraseOut(){
+    const s = SUGGESTIONS[si]; let i = s.length;
+    (function step(){
+      if(touched) return;
+      paint(s.slice(0, --i));
+      ghostTimer = setTimeout(i > 0 ? step : next, 16);
+    })();
+  }
+  function next(){ si = (si + 1) % SUGGESTIONS.length; ghostTimer = setTimeout(typeIn, 320); }
+
+  askText.placeholder = '';     // the ghost replaces it
+  typeIn();
+}
+
+/* every so often, the button catches the light — only while nothing is typed */
+function runNudge(){
+  if(REDUCED) return;
+  nudgeTimer = setInterval(()=>{
+    if(touched || askText.value) return;
+    goBtn.classList.add('nudge');
+    setTimeout(()=> goBtn.classList.remove('nudge'), 1000 * SPEED);
+  }, 7000);
+}
+
+/* ============================================================
+   The coach — one bubble that walks the screen while the box is empty
+   ============================================================ */
+const coach    = document.getElementById('coach');
+const coachIn  = document.getElementById('coachIn');
+const coachTx  = document.getElementById('coachTx');
+const coachArr = document.getElementById('coachArrow');
+const coachDot = [...document.getElementById('coachDots').children];
+const mainEl   = document.querySelector('.main');
+
+/* Each stop names what it points at, which margin it would rather stand in, and
+   what it says. `at` returns the thing to point at in window coordinates — a
+   function rather than a selector, because the first stop points at the line you
+   type on, which is not an element.
+
+   `gutter` is where it wants to be: the empty page margin on that side of the
+   card, pointing in. `fall` is where it goes instead when the window is too
+   narrow to have a margin — back on top of the card, as it used to be.
+
+   `tip` is the box the arrow has to reach from out there. It is usually the same
+   thing as `at`, but not always: the first stop *aims* at the line you type on
+   and *touches* the field that line is in. Only the margin placement uses it —
+   on the card the bubble is already up against its target. */
+const COACH_STOPS = [
+  { at: () => {
+      const r = askText.getBoundingClientRect();
+      /* not the whole field — the line the caret is on, a little way down so
+         that from the margin it points at the empty part, not the ghost text */
+      return {left:r.left + 18, top:r.top + Math.min(r.height * .42, 62), width:150, height:2};
+    },
+    tip: () => askField.getBoundingClientRect(),
+    gutter:'left', fall:'bottom', text:'Describe your problem here' },
+
+  { at: () => goBtn.getBoundingClientRect(),
+    gutter:'right', fall:'left', text:'Then click here to connect with an engineer' },
+
+  { at: () => fpWrap.getBoundingClientRect(),
+    gutter:'right', fall:'bottom', text:'We match you with an engineer who has worked on your problem' },
+
+  /* Last, and deliberately so: the two ways in, then who you get, and only then
+     the door for somebody who would rather not write any of it down. Offering
+     the shortcut before the person has seen what the long way costs them is
+     just talking them out of the better answer. */
+  { at: () => callBtn.getBoundingClientRect(),
+    gutter:'right', fall:'right', text:'Or come down here if you would rather just talk' },
+];
+
+const COACH_GAP = 13;   /* bubble to target, on the card */
+/* Out in the page margin it stands closer than that. There is nothing between it
+   and the card to be crowded by, and at arm's length the nub reads as a loose
+   arrow rather than as this bubble pointing at that box. */
+const COACH_HUG = 6;
+const COACH_PAD = 12;   /* bubble to the edge of whatever is holding it */
+/* the nub's point sticks out about this far past the bubble, so subtracting it
+   puts the point on the target's edge rather than the bubble's */
+const COACH_TIP = 8;
+/* and how far over the card the bubble will lean to get there. The card's own
+   padding is the gap worth crossing; a target further in than this — the call
+   button, seen from the right-hand margin — is not one the bubble can walk up to
+   without parking on top of everything between, so it stays out at the edge. */
+const COACH_INTRUDE = 80;
+let coachAt = 0, coachTimer = null, coachHop = null, coachHide = null, coachOver = false;
+
+/* Used only once the margins have run out. Put the bubble on the first side of
+   the target that actually fits, starting from the one the stop asked for. This
+   is what makes the arrow turn round on a narrow screen instead of pointing off
+   the edge of the card. */
+const COACH_ORDER = { bottom:['bottom','top','left','right'],
+                      top:   ['top','bottom','right','left'],
+                      /* only the green button falls back to `left`, and when a
+                         phone takes that away the bubble should go above it
+                         rather than below — below is the starter chips, and above
+                         is the box, which is empty for as long as this bubble
+                         exists at all */
+                      left:  ['left','top','right','bottom'],
+                      right: ['right','bottom','left','top'] };
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+function coachPlace(stop, instant){
+  const t = stop.at();
+  if(!t || (!t.width && !t.height)) return false;
+
+  /* Window coordinates throughout, because that is what every rect below is in;
+     the one conversion into the main column's own scrolled coordinates happens
+     at the very end, once. */
+  const card = hero.getBoundingClientRect();
+  const M    = mainEl.getBoundingClientRect();   /* it may not stray over the rail */
+  const cw = coach.offsetWidth, ch = coachIn.offsetHeight;
+  const cx = t.left + t.width / 2, cy = t.top + t.height / 2;
+  const fits = cw + COACH_HUG + COACH_PAD;
+
+  let side = null, x = 0, y = 0, gutter = false;
+
+  /* First choice: the empty margin beside the card. It only exists on a window
+     wide enough for the 1080px content column to stop short of the edges, which
+     is exactly when the bubble has somewhere better to be than on top of the
+     card. `side` still means which side of the target the bubble sits on, so the
+     nub below needs no special case. */
+  if(stop.gutter === 'left'  && card.left - M.left >= fits){
+    side = 'left';  x = card.left - COACH_HUG - cw;  y = cy - ch / 2;
+  } else if(stop.gutter === 'right' && M.right - card.right >= fits){
+    side = 'right'; x = card.right + COACH_HUG;      y = cy - ch / 2;
+  }
+
+  if(side){
+    gutter = true;
+
+    /* Stopping at the card's edge leaves the nub pointing at the card's padding,
+       which is not the thing it means. So the whole bubble leans in until the
+       nub's point is on the box itself — near enough to read as this bubble
+       about that box, and no further than COACH_INTRUDE, which keeps it off
+       anything that is actually written on the card. */
+    const e = (stop.tip || stop.at)();
+    const lean = side === 'left' ? (e.left - cw - COACH_TIP) - x
+                                 : x - (e.left + e.width + COACH_TIP);
+    if(lean > 0 && lean <= COACH_INTRUDE) x += side === 'left' ? lean : -lean;
+
+    /* the margin runs the height of the window, so only the ends need holding */
+    y = clamp(y, M.top + COACH_PAD, Math.max(M.top + COACH_PAD, M.bottom - ch - COACH_PAD));
+  } else {
+    /* No margin. Back on the card, kept inside it, as before. */
+    const room = {
+      top:    (t.top - card.top)               - COACH_GAP - COACH_PAD,
+      bottom: (card.bottom - t.top - t.height) - COACH_GAP - COACH_PAD,
+      left:   (t.left - card.left)             - COACH_GAP - COACH_PAD,
+      right:  (card.right - t.left - t.width)  - COACH_GAP - COACH_PAD,
+    };
+    const need = { top:ch, bottom:ch, left:cw, right:cw };
+    side = (COACH_ORDER[stop.fall] || COACH_ORDER.bottom).find(s => room[s] >= need[s])
+        || stop.fall;
+
+    if(side === 'bottom'){ x = cx - cw / 2;            y = t.top + t.height + COACH_GAP; }
+    if(side === 'top')   { x = cx - cw / 2;            y = t.top - ch - COACH_GAP; }
+    if(side === 'left')  { x = t.left - cw - COACH_GAP; y = cy - ch / 2; }
+    if(side === 'right') { x = t.left + t.width + COACH_GAP; y = cy - ch / 2; }
+
+    x = clamp(x, card.left + COACH_PAD, Math.max(card.left + COACH_PAD, card.right - cw - COACH_PAD));
+    y = clamp(y, card.top  + COACH_PAD, Math.max(card.top  + COACH_PAD, card.bottom - ch - COACH_PAD));
+  }
+
+  /* The bubble may have been pushed along its axis to stay in bounds, so the nub
+     is placed from where the bubble actually landed — it keeps pointing at the
+     target even when the bubble no longer lines up with it. */
+  const vert = side === 'top' || side === 'bottom';
+  const off  = clamp(vert ? cx - x : cy - y, 16, (vert ? cw : ch) - 16) - 6.5;
+  /* and it takes the colour of the end of the gradient it is sitting on */
+  const nub = side === 'bottom' ? 'var(--accent)'
+            : side === 'top'    ? 'var(--accent-deep)'
+                                : '#03603F';
+  coachArr.style.cssText =
+    (side === 'bottom' ? `left:${off}px;top:-5px`        :
+     side === 'top'    ? `left:${off}px;top:${ch - 8}px` :
+     side === 'left'   ? `left:${cw - 8}px;top:${off}px` :
+                         `left:-5px;top:${off}px`) + `;background:${nub}`;
+
+  /* The first placement must not be a journey from the top-left corner, so the
+     travel transition is switched off, the move is forced through with a
+     reflow, and it is switched back on again — all in one go. Doing this on a
+     rAF would be neater and would not survive the tab being in the background,
+     where rAF simply stops and the bubble would never appear at all. */
+  /* out of the window's coordinates and into the column it actually hangs off */
+  const px = x - M.left + mainEl.scrollLeft;
+  const py = y - M.top  + mainEl.scrollTop;
+
+  if(instant) coach.style.transition = 'none';
+  coach.style.transform = `translate3d(${Math.round(px)}px,${Math.round(py)}px,0)`;
+  if(instant){ void coach.offsetWidth; coach.style.transition = ''; }
+  return true;
+}
+
+function coachPaint(i){
+  coachTx.textContent = COACH_STOPS[i].text;
+  coachDot.forEach((d, n) => d.classList.toggle('on', n === i));
+}
+
+function coachGo(i, instant){
+  coachAt = i;
+  if(instant){
+    coachPaint(i);
+    /* a dismissal from a moment ago still has its hide pending — cancel it, or
+       it lands 360ms from now and takes this bubble down with it */
+    clearTimeout(coachHide);
+    coach.hidden = false;
+    coachPlace(COACH_STOPS[i], true);
+    coach.classList.remove('moving');
+    coach.classList.add('on');   /* the reflow above is what makes this fade */
+    return;
+  }
+  /* words out, then travel with the text hidden, then words back in */
+  coach.classList.add('moving');
+  clearTimeout(coachHop);
+  coachHop = setTimeout(() => {
+    coachPaint(i);
+    coachPlace(COACH_STOPS[i]);
+    coachHop = setTimeout(() => coach.classList.remove('moving'), 560 * SPEED);
+  }, 180 * SPEED);
+}
+
+function coachStart(){
+  if(coachTimer || touched || askText.value.trim()) return;
+  coachGo(0, true);
+  if(REDUCED){ coachTimer = -1; return; }   /* one stop, standing still */
+  coachTimer = setInterval(() => {
+    if(coachOver) return;   /* they are reading it — do not move it mid-sentence */
+    coachGo((coachAt + 1) % COACH_STOPS.length);
+  }, 3400 * SPEED);
+}
+
+function coachStop(){
+  if(coachTimer && coachTimer !== -1) clearInterval(coachTimer);
+  clearTimeout(coachHop);
+  coachTimer = null;
+  coach.classList.remove('on');
+  /* let it fade before it leaves the layout */
+  clearTimeout(coachHide);
+  coachHide = setTimeout(() => { if(!coachTimer) coach.hidden = true; }, 360);
+}
+
+/* Hovering the bubble holds it still. Its own pointer-events are off so it
+   cannot block the button it points at, so somebody else has to report this —
+   and now that it stands out in the page margin, that has to be the document
+   rather than the card. */
+document.addEventListener('pointermove', e => {
+  if(!coachTimer || coachTimer === -1) return;
+  const b = coach.getBoundingClientRect();
+  coachOver = e.clientX >= b.left && e.clientX <= b.right &&
+              e.clientY >= b.top  && e.clientY <= b.bottom;
+});
+document.addEventListener('pointerleave', () => { coachOver = false; });
+
+/* The card changes width with the window, and a bubble pinned to stale
+   coordinates would drift off its target. */
+let coachRz = null;
+addEventListener('resize', () => {
+  if(!coachTimer) return;
+  clearTimeout(coachRz);
+  coachRz = setTimeout(() => coachPlace(COACH_STOPS[coachAt], true), 140);
+});
+
+/* a count that changes should be seen to change */
+function bump(el){
+  if(REDUCED || !el) return;
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+}
+
+/* first paint: let the page assemble rather than land all at once */
+function stageEntrance(){
+  if(REDUCED) return;
+  const h = document.querySelector('#home .page-h');
+  if(h) h.classList.add('rise','rise-1');
+  hero.classList.add('rise','rise-2');
+  document.querySelectorAll('.rail .nav-item').forEach((el,i)=>{
+    el.style.setProperty('--n', i); el.classList.add('rise');
+  });
+  document.getElementById('startersLead').classList.add('rise');
+  document.querySelectorAll('.starters .starter').forEach((el,i)=>{
+    el.style.setProperty('--n', i); el.classList.add('rise');
+  });
+  document.getElementById('altcall').classList.add('rise');
+}
+
+document.getElementById('starters').addEventListener('click', e=>{
+  const s = e.target.closest('.starter'); if(!s) return;
+  askText.value = s.textContent.trim() + ' — ';
+  startedTyping();
+  askText.focus();
+  askText.setSelectionRange(askText.value.length, askText.value.length);
+  hero.classList.add('focused');
+});
+
+const DEMO_FILES = [
+  {kind:'PNG', name:'checkout-error.png'},
+  {kind:'LOG', name:'what-the-page-said.txt'},
+  {kind:'PNG', name:'my-screen.png'}
+];
+let dropN = 0;
+document.getElementById('attach').addEventListener('click', ()=>{
+  const f = DEMO_FILES[dropN++ % DEMO_FILES.length];
+  const chip = document.createElement('div');
+  chip.className = 'chip-file';
+  chip.innerHTML = '<span class="cf-ico' + (f.kind==='LOG' ? ' log' : '') + '">' + f.kind + '</span>' +
+                   '<span class="cf-name">' + f.name + '</span>' +
+                   '<button class="cf-x" aria-label="Remove">&times;</button>';
+  staged.appendChild(chip);
+});
+staged.addEventListener('click', e=>{
+  const x = e.target.closest('.cf-x'); if(!x) return;
+  x.closest('.chip-file').remove();
+});
+
+/* hold-to-talk: fills the box as if it were dictated */
+const talk = document.getElementById('talk');
+const DICTATED = 'My payment page keeps timing out and I have no idea why. It started yesterday.';
+let holdTimer = null;
+function startTalk(){
+  talk.innerHTML = '<span class="wave" style="color:var(--accent)"><i></i><i></i><i></i><i></i><i></i></span>Listening…';
+  talk.style.color = 'var(--accent-deep)';
+  talk.style.borderColor = 'rgba(0,135,90,.4)';
+  let i = 0;
+  holdTimer = setInterval(()=>{
+    askText.value = DICTATED.slice(0, i += 2);
+    if(i >= DICTATED.length) stopTalk();
+  }, 26 * SPEED);
+}
+function stopTalk(){
+  clearInterval(holdTimer); holdTimer = null;
+  talk.innerHTML = '<span class="g">&#127908;</span>Say it out loud';
+  talk.style.color = ''; talk.style.borderColor = '';
+}
+talk.addEventListener('pointerdown', startTalk);
+['pointerup','pointerleave','pointercancel'].forEach(ev => talk.addEventListener(ev, ()=>{ if(holdTimer) stopTalk(); }));
+
+/* ============================================================
+   Stages
+   ============================================================ */
+const STAGES = ['stAsk','stMatch','stFound','stCall','stAfter'];
+function stage(id){
+  STAGES.forEach(s => document.getElementById(s).classList.toggle('on', s === id));
+  /* Past the ask screen the band stops being about the room and starts being
+     about your call, so the reel goes with it — a stranger's face turning over
+     while you are waiting on Satyam is noise. */
+  fpWrap.hidden = id !== 'stAsk';
+  if(id !== 'stAsk') fpOpen(false);
+  if(id === 'stAsk'){ fpStart(); return; }
+  fpStop(); coachStop();
+}
+
+const CAND_POSITIONS = [
+  {x:'-118px', y:'-58px', i:'PN'},
+  {x:'112px',  y:'-72px', i:'MI'},
+  {x:'-96px',  y:'74px',  i:'KS'},
+  {x:'104px',  y:'66px',  i:'NH'},
+  {x:'0px',    y:'-124px',i:'TB'},
+  {x:'-6px',   y:'120px', i:'LF'}
+];
+function seedRadar(){
+  const radar = document.getElementById('radar');
+  radar.querySelectorAll('.cand').forEach(c => c.remove());
+  CAND_POSITIONS.forEach((c, n) => {
+    const el = document.createElement('div');
+    el.className = 'cand';
+    el.style.setProperty('--x', c.x);
+    el.style.setProperty('--y', c.y);
+    el.style.animationDelay = (n * 0.34) + 's';
+    el.innerHTML = '<span class="av" data-initials="' + c.i + '"></span>';
+    paintAll(el);
+    radar.appendChild(el);
+  });
+}
+
+/* `blind` is the "just call someone" path: nothing was typed and nothing is going
+   to be. Three things on the way through say or imply they read what you wrote,
+   and with an empty box all three would be putting words in your mouth, so each
+   one is told which of the two journeys this is. */
+const saidBox   = document.getElementById('saidBox');
+const s1Tx      = document.getElementById('s1Tx');
+const briefRead = document.getElementById('briefRead');
+
+async function runMatch(opts){
+  const typed = askText.value.trim();
+  const blind = !typed && !!(opts && opts.blind);
+  const said  = typed || 'My payment page keeps timing out and I have no idea why.';
+
+  saidBox.hidden = blind;
+  if(!blind) document.getElementById('saidText').textContent = said;
+  s1Tx.textContent = blind ? 'Getting you in the queue' : 'Reading what you wrote';
+  briefRead.textContent = blind
+    ? 'That you would rather explain it out loud — he will ask'
+    : 'What you just wrote, and the screenshot you added';
+
+  document.getElementById('heroTagText').textContent = 'Looking for someone now';
+  document.getElementById('heroTagWho').textContent  = 'This usually takes under a minute';
+
+  ['s1','s2','s3'].forEach(id => document.getElementById(id).className = 'step');
+  seedRadar();
+  stage('stMatch');
+  document.querySelector('.main').scrollTop = 0;
+
+  const steps = ['s1','s2','s3'];
+  for(let i = 0; i < steps.length; i++){
+    document.getElementById(steps[i]).className = 'step doing';
+    await wait(i === 1 ? 1500 : 1100);
+    document.getElementById(steps[i]).className = 'step done';
+    await wait(220);
+  }
+  await wait(500);
+
+  document.getElementById('heroTagText').textContent = 'Satyam is ready';
+  document.getElementById('heroTagWho').textContent  = 'He picked this up 9 seconds ago';
+  stage('stFound');
+}
+
+/* wrapped, not passed by reference — otherwise the click event lands in `opts`
+   and the first thing runMatch reads off it is `blind` */
+document.getElementById('goBtn').addEventListener('click', () => runMatch());
+document.getElementById('otherBtn').addEventListener('click', () => runMatch());
+
+document.getElementById('callNowBtn').addEventListener('click', () => {
+  /* They have made their choice about this screen, so the tour stops explaining
+     it — same as if they had started typing. */
+  startedTyping();
+  runMatch({blind:true});
+});
+
+/* ---- the call ---- */
+let callTimer = null, secs = 0;
+function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+document.getElementById('joinBtn').addEventListener('click', ()=>{
+  stage('stCall');
+  document.body.classList.add('in-call');
+  document.getElementById('heroTagText').textContent = 'You are in a call with Satyam';
+  document.getElementById('heroTagWho').textContent  = 'Nobody else can see or hear this';
+  secs = 0;
+  document.getElementById('timer').textContent = '00:00';
+  clearInterval(callTimer);
+  callTimer = setInterval(()=>{
+    secs++;
+    document.getElementById('timer').textContent = fmt(secs);
+    const left = 600 - secs;
+    document.getElementById('freeNote').textContent =
+      left > 0 ? 'Free for another ' + fmt(left) : 'Now billing by the minute';
+  }, 1000);
+});
+
+document.getElementById('micBtn').addEventListener('click', e => e.currentTarget.classList.toggle('off'));
+document.getElementById('camBtn').addEventListener('click', e => e.currentTarget.classList.toggle('off'));
+
+document.getElementById('endBtn').addEventListener('click', ()=>{
+  clearInterval(callTimer);
+  document.body.classList.remove('in-call');
+  /* The write-up should report the call you actually had, not a scripted number. */
+  const mins = Math.max(1, Math.round(secs / 60));
+  document.getElementById('afterSub').textContent =
+    mins + (mins === 1 ? ' minute' : ' minutes') + ' with Satyam · written up for you, in plain words';
+  document.getElementById('heroTagText').textContent = 'That call is done';
+  document.getElementById('heroTagWho').textContent  = 'Satyam wrote it up for you';
+  stage('stAfter');
+});
+
+document.getElementById('againBtn').addEventListener('click', ()=>{
+  askText.value = '';
+  staged.textContent = '';
+  document.getElementById('heroTagWho').textContent = '';
+  updateCounts();
+  stage('stAsk');
+  askText.focus();
+});
+
+/* ============================================================
+   Navigation, drawer, help
+   ============================================================ */
+const SCREEN_ID = { home:'home', contracts:'contracts', calls:'calls', people:'people-screen', projects:'projects' };
+
+function show(go){
+  const id = SCREEN_ID[go] || go;
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('on', n.dataset.go === go));
+  document.querySelector('.main').scrollTop = 0;
+  closeHelp();
+  /* Both stop themselves the moment they are off screen — nothing is gained by
+     animating into a hidden div — so coming back has to wind them up again. */
+  if(id === 'home'){ if(!fpWrap.hidden){ fpStart(); coachStart(); } }
+  else { fpStop(); fpOpen(false); coachStop(); }
+  if(id === 'people-screen'){
+    renderPeople(PEOPLE, document.getElementById('people2'), {arrive:true});
+  }
+}
+
+function openPerson(k){
+  const p = BY_KEY[k]; if(!p) return;
+  const a = document.getElementById('drAv');
+  a.style.background = p.c;
+  a.setAttribute('data-dot', p.state === 'free' ? 'live' : p.state === 'busy' ? 'busy' : 'off');
+  paintAvatar(a, p.i);
+  document.getElementById('drName').textContent  = p.n;
+  document.getElementById('drRole').textContent  = p.does + ' · ' + STATE_LABEL[p.state] + ', ' + p.wait;
+  document.getElementById('drHist').textContent  = p.hist;
+  document.getElementById('drBio').textContent   = p.bio;
+  document.getElementById('drHobby').textContent = p.hobby;
+  document.getElementById('drTags').innerHTML    = p.tags.map(t => '<span>' + t + '</span>').join('');
+  const call = document.getElementById('drCall');
+  call.textContent = p.state === 'free' ? 'Ask for ' + p.first : p.first + ' is not free — ask anyway';
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('scrim').classList.add('on');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('on');
+  document.getElementById('scrim').classList.remove('on');
+}
+function closeHelp(){ document.getElementById('helpPanel').classList.remove('on'); }
+
+document.addEventListener('click', e=>{
+  const person = e.target.closest('[data-person]');
+  if(person){ e.stopPropagation(); openPerson(person.dataset.person); return; }
+  const go = e.target.closest('[data-go]');
+  if(go){ show(go.dataset.go); return; }
+});
+
+document.getElementById('drawerX').addEventListener('click', closeDrawer);
+document.getElementById('scrim').addEventListener('click', closeDrawer);
+document.getElementById('drCall').addEventListener('click', ()=>{ closeDrawer(); show('home'); runMatch(); });
+document.getElementById('drMsg').addEventListener('click', closeDrawer);
+
+document.getElementById('helpFab').addEventListener('click', e=>{
+  e.stopPropagation();
+  document.getElementById('helpPanel').classList.toggle('on');
+});
+document.getElementById('helpPanel').addEventListener('click', e => e.stopPropagation());
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape'){ closeDrawer(); closeHelp(); } });
+
+/* go */
+paintAll();
+boot();
+</script>
+</body>
+</html>
