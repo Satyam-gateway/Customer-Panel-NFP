@@ -23,10 +23,25 @@
   --contract:#6D3BD4;  --contract-bg:#EBE3FC;
   --stop:#C0322B;      --stop-bg:#FBE2E0;
 
+  /* darker twins, for text sitting on the tints */
+  --live-ink:#006B48;  --turn-ink:#9C4A07;
+
+  /* the one accent — everything live, pressable, or about a call speaks in it */
+  --accent:#046A4A;      /* safe as text and as a fill  */
+  --accent-lift:#00875A; /* fills and gradients only    */
+  --accent-deep:#02543A;
+  --accent-bg:#E4F4EC;
+  --accent-soft:#F4FAF8;
+  --accent-line:#CBE7DA;
+  --accent-rgb:0,135,90;
+
   --rail:248px;
-  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:22px;
   --shadow:0 1px 2px rgba(20,24,26,.05), 0 4px 16px rgba(20,24,26,.04);
   --shadow-lift:0 8px 28px rgba(20,24,26,.10);
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --spring:cubic-bezier(.2,1.5,.4,1);
+  --speed:1;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -226,11 +241,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
 /* ---------- home: first-run ---------- */
 #home[data-view="returning"] .only-new,
-#home[data-view="returning"] .only-assist,
-#home[data-view="assist"] .only-new,
-#home[data-view="assist"] .only-ret,
-#home[data-view="new"] .only-ret,
-#home[data-view="new"] .only-assist{display:none}
+#home[data-view="new"] .only-ret{display:none}
 #home[data-view="new"] .v-greet{display:none}
 #home:not([data-view="new"]) .v-welcome{display:none}
 .home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
@@ -257,19 +268,577 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   border-radius:var(--r-md);padding:10px 14px;background:rgba(255,255,255,.5)}
 
 /* ---------- home: ask / match ---------- */
-.ask{padding:20px}
-.ask h2{font-size:21px;margin:0 0 6px}
-.ask>p{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0 0 15px;max-width:62ch}
-.ask-field{border:1px solid var(--line);border-radius:var(--r-md);background:var(--paper);overflow:hidden}
-.ask-field textarea{width:100%;border:0;background:none;resize:none;font:inherit;
-  font-size:14px;color:var(--ink);padding:13px 14px 4px;outline:none;display:block}
-.ask-field textarea::placeholder{color:var(--faint)}
-.ask-tools{display:flex;align-items:center;gap:10px;padding:8px 10px 10px;flex-wrap:wrap}
-.ask-tools .go{margin-left:auto}
-.ask-hint{font-size:11.5px;color:var(--faint)}
+.btn.go{gap:9px;padding:12px 20px;font-weight:600;border-radius:var(--r-md)}
 .btn.mic::before{content:"";width:7px;height:11px;border-radius:4px;
   background:currentColor;opacity:.75;display:inline-block;margin-right:7px;vertical-align:-1px}
-.ask-note{font-size:11.5px;color:var(--faint);margin-top:11px}
+.ask-note{font-size:11.5px;color:var(--faint);margin-top:12px}
+
+/* ============================================================
+   THE ASK CARD — ported from relay-dashboard
+   Every rule is scoped under .askwrap rather than a bare .hero / .ask /
+   .staged, because those names are already spoken for elsewhere in this
+   file — the contracts composer, most of all. One card serves both views:
+   it is the same component, so it is the same markup and the same ids.
+   ============================================================ */
+/* the card is the page's centrepiece in both views, so it gets the full
+   column and sits in the middle of it — the same measure the dashboard uses */
+#home{max-width:1080px;margin-left:auto;margin-right:auto}
+.askwrap{margin-bottom:14px}
+.only-new{display:flex;flex-direction:column;gap:14px}
+/* the flex gap is real even when the box is empty, so it has to go too */
+#homeRecent:empty{display:none}
+
+/* ---- the returning view's own way out of the card ----
+   Somebody coming back rarely wants to start from nothing; the first thing
+   they want is usually the thing they were already doing. Hidden on the
+   first run, where there is nothing behind them to go back to. */
+.ret-jump{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+#home[data-view="new"] .ret-jump{display:none}
+.ret-jump .rj-lead{font-size:13px;color:var(--muted)}
+.rj{
+  display:inline-flex;align-items:center;gap:7px;background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:8px 15px;
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease);
+}
+.rj .g{font-size:13px;opacity:.9}
+.rj:hover{background:var(--accent-soft);border-color:var(--accent-line);transform:translateY(-1px)}
+.rj:active{transform:translateY(0)}
+.rj .n{
+  font-size:11.5px;font-weight:700;color:var(--muted);background:var(--line-soft);
+  border-radius:999px;padding:1px 7px;
+}
+
+.askwrap .hero{
+  position:relative;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
+  box-shadow:0 2px 6px rgba(16,24,28,.05),0 14px 40px -14px rgba(16,24,28,.17);
+  overflow:visible;
+  transition:box-shadow .3s var(--ease),border-color .3s var(--ease);
+}
+.askwrap .hero.focused{
+  border-color:var(--accent-line);
+  box-shadow:0 2px 6px rgba(16,24,28,.05),0 24px 60px -18px rgba(var(--accent-rgb),.26);
+}
+/* a slow wash behind the hero — reads as "someone is awake in there" */
+.askwrap .hero::before{
+  content:"";position:absolute;left:50%;top:-180px;width:620px;height:340px;
+  transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(ellipse at center, rgba(var(--accent-rgb),.09), rgba(var(--accent-rgb),0) 68%);
+  animation:heroWash calc(7s * var(--speed)) ease-in-out infinite;
+}
+@keyframes heroWash{0%,100%{opacity:.55;transform:translateX(-50%) scale(1)}
+  50%{opacity:1;transform:translateX(-50%) scale(1.12)}}
+
+/* the band across the top. Neutral, so the one green thing is the live dot. */
+.askwrap .hero-tag{
+  position:relative;display:flex;align-items:center;gap:8px;
+  background:var(--accent-soft);color:var(--ink);border-bottom:1px solid var(--line-soft);
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  font-weight:600;font-size:12.5px;padding:11px 40px;letter-spacing:-.005em;
+}
+.askwrap .hero-tag::before{content:none}
+.askwrap .hero-tag .who{color:var(--muted);font-weight:500;font-size:11.5px}
+.tinydot{width:7px;height:7px;border-radius:50%;background:var(--live);flex:none;position:relative}
+.tinydot::after{
+  content:"";position:absolute;inset:0;border-radius:50%;background:var(--live);
+  animation:tinyPulse calc(2.2s * var(--speed)) var(--ease) infinite;
+}
+@keyframes tinyPulse{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(2.6);opacity:0}}
+
+/* ---- the face at the end of the band ----
+   One face that keeps changing says "there are more of us than fit here" and
+   asks for nothing. The chevron is there for whoever does want the list. */
+.facepile{position:relative;display:flex;align-items:center;margin-left:auto}
+.fp-btn{
+  display:flex;align-items:center;gap:9px;padding:3px 9px 3px 3px;border-radius:999px;
+  border:1px solid transparent;background:transparent;cursor:pointer;font:inherit;
+  transition:background .2s var(--ease),border-color .2s var(--ease);
+}
+.fp-btn:hover,.facepile.open .fp-btn{background:var(--card);border-color:var(--accent-line)}
+/* fixed size — a swap that changed the band's height would shove the page */
+.fp-stage{position:relative;width:30px;height:30px;flex:none}
+.fp-stage .av{
+  position:absolute;inset:0;width:100%;height:100%;font-size:11px;
+  box-shadow:0 0 0 2px var(--card),0 2px 6px rgba(20,24,26,.14);
+}
+.fp-stage .av.out{animation:fpOut calc(.52s * var(--speed)) var(--ease) forwards}
+.fp-stage .av.in {animation:fpIn  calc(.52s * var(--speed)) var(--ease) backwards}
+@keyframes fpOut{to  {opacity:0;transform:translateY(-10px) scale(.9)}}
+@keyframes fpIn {from{opacity:0;transform:translateY(10px)  scale(.9)}}
+.fp-name{
+  font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;
+  width:56px;overflow:hidden;text-overflow:ellipsis;text-align:left;
+}
+.fp-name.swap{animation:fpNameIn calc(.52s * var(--speed)) var(--ease)}
+@keyframes fpNameIn{0%{opacity:0;transform:translateY(5px)}55%,100%{opacity:1;transform:none}}
+.fp-cv{width:12px;height:12px;flex:none;color:var(--faint);fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .24s var(--ease)}
+.facepile.open .fp-cv{transform:rotate(180deg)}
+.fp-menu{
+  position:absolute;top:calc(100% + 9px);right:0;z-index:70;width:320px;
+  max-height:min(62vh,380px);overflow:auto;padding:6px;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 20px 48px -16px rgba(20,24,26,.30),0 2px 8px rgba(20,24,26,.07);
+  opacity:0;transform:translateY(-7px) scale(.97);transform-origin:100% 0;
+  pointer-events:none;
+  transition:opacity .2s var(--ease),transform .2s var(--ease);
+}
+.facepile.open .fp-menu{opacity:1;transform:none;pointer-events:auto}
+.fp-head{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--faint);padding:9px 12px 7px}
+.fp-row{
+  display:flex;align-items:center;gap:11px;width:100%;cursor:pointer;font:inherit;
+  border:0;background:none;padding:8px 10px;border-radius:11px;text-align:left;
+  transition:background .16s var(--ease);
+}
+.fp-row:hover{background:var(--accent-soft)}
+.fp-row .av{width:34px;height:34px;font-size:11.5px;flex:none}
+.fp-row .t{min-width:0;flex:1}
+.fp-row .t b{display:block;font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.005em}
+.fp-row .t i{display:block;font-style:normal;font-size:11.5px;color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-st{flex:none;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.fp-st.live{background:var(--live-bg);color:var(--live-ink)}
+.fp-st.busy{background:var(--turn-bg);color:var(--turn-ink)}
+.fp-st.off{background:var(--line-soft);color:var(--muted)}
+
+/* ---- the ask itself ---- */
+.askwrap .ask{position:relative;padding:44px 40px 36px}
+.askwrap .ask h2{font-size:40px;line-height:1.1;letter-spacing:-.02em;margin:0 0 12px}
+.askwrap .ask-lede{color:var(--muted);font-size:16px;line-height:1.6;margin:0 0 26px;max-width:56ch}
+
+/* The composer. Resting it is a quiet recessed panel; focused it lifts off the
+   card, turns white, and picks up a soft green halo — every part on the same
+   curve and the same 260ms, so it reads as one object, not four properties. */
+.askwrap .ask-field{
+  position:relative;
+  border:1.5px solid var(--line);border-radius:20px;overflow:hidden;
+  background:linear-gradient(180deg,#FBFBFD,#F5F6F9);
+  box-shadow:inset 0 1px 2px rgba(20,24,26,.035);
+  transition:border-color .26s var(--ease),background .26s var(--ease),
+             box-shadow .26s var(--ease),transform .26s var(--ease);
+}
+.askwrap .hero.focused .ask-field{
+  border-color:var(--accent-line);
+  background:linear-gradient(180deg,#fff,#fff);
+  transform:translateY(-1px);
+  box-shadow:0 0 0 4px rgba(var(--accent-rgb),.10),
+             0 18px 40px -20px rgba(var(--accent-rgb),.45),
+             inset 0 1px 0 #fff;
+}
+.askwrap .ask-field::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;z-index:2;
+  background:linear-gradient(90deg,transparent,var(--accent-lift),transparent);
+  opacity:0;transform:scaleX(.4);transform-origin:50% 50%;
+  transition:opacity .3s var(--ease),transform .5s var(--ease);
+}
+.askwrap .hero.focused .ask-field::before{opacity:.75;transform:scaleX(1)}
+.askwrap .ask-field textarea{
+  width:100%;border:0;background:none;resize:none;font:inherit;font-size:19px;line-height:1.55;
+  color:var(--ink);padding:26px 26px 10px;outline:none;display:block;min-height:152px;
+  caret-color:var(--accent);position:relative;z-index:1;
+}
+.askwrap .ask-field textarea::placeholder{color:var(--faint)}
+
+/* the suggestion typing itself out behind the caret */
+.field-wrap{position:relative}
+.ghost{
+  position:absolute;inset:26px 26px auto 26px;pointer-events:none;
+  font-size:19px;line-height:1.55;color:var(--faint);white-space:pre-wrap;
+}
+.ghost .bar{
+  display:inline-block;width:2px;height:1.05em;margin-left:1px;vertical-align:-3px;border-radius:1px;
+  background:var(--accent);opacity:.6;animation:ghostCaret calc(1.05s * var(--speed)) steps(1) infinite;
+}
+@keyframes ghostCaret{0%,50%{opacity:.6}51%,100%{opacity:0}}
+
+.askwrap .staged{display:flex;flex-wrap:wrap;gap:7px;padding:8px 16px 0}
+.askwrap .staged:empty{display:none}
+.askwrap .chip-file{
+  display:inline-flex;align-items:center;gap:7px;background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 5px;font-size:12px;
+  animation:chipIn calc(.34s * var(--speed)) var(--spring) both;
+}
+@keyframes chipIn{from{opacity:0;transform:scale(.8) translateY(6px)}to{opacity:1;transform:none}}
+.askwrap .cf-ico{
+  font-size:9.5px;font-weight:700;letter-spacing:.02em;padding:3px 6px;border-radius:999px;
+  background:var(--accent-bg);color:var(--accent-deep);
+}
+.askwrap .cf-ico.log{background:var(--line-soft);color:var(--muted)}
+.askwrap .cf-name{color:var(--muted);max-width:180px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:400}
+.askwrap .cf-x{color:var(--faint);font-size:15px;line-height:1;padding:0 5px 2px;
+  border:0;background:none;cursor:pointer}
+.askwrap .cf-x:hover{color:var(--ink)}
+
+/* The tools sit on their own footer, divided by a hairline. That one line is
+   what turns a bordered textarea into something that reads as a composer. */
+.askwrap .ask-tools{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;flex-wrap:wrap;
+  border-top:1px solid var(--line-soft);background:rgba(255,255,255,.45);
+  transition:border-color .26s var(--ease),background .26s var(--ease);
+}
+.askwrap .hero.focused .ask-tools{border-top-color:#E7F2EC;background:#FBFDFC}
+.tool{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card);cursor:pointer;font:inherit;
+  font-size:13.5px;font-weight:600;color:var(--muted);
+  transition:background .2s var(--ease),color .2s var(--ease),
+             border-color .2s var(--ease),transform .2s var(--ease);
+}
+.tool:hover{background:var(--accent-bg);color:var(--accent-deep);border-color:var(--accent-line);
+  transform:translateY(-1px)}
+.tool:active{transform:translateY(0) scale(.98)}
+.tool.on{background:var(--accent-lift);border-color:var(--accent);color:#fff}
+.tool .g{font-size:14px;opacity:.75}
+
+/* One click, and it is the green the product is named for. The gradient runs
+   dark-to-darker on purpose: a lighter top edge would drop the white label
+   under 4.5:1. All the movement lives on the wrapper, because .golive clips
+   and an animated transform on it would beat its own hover lift. */
+.cta-ring{position:relative;display:inline-flex;border-radius:999px;margin-left:auto}
+@keyframes ctaBreathe{
+  0%,100%{box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+                     0 10px 24px -6px rgba(var(--accent-rgb),.45),
+                     0 2px 5px rgba(20,24,26,.10)}
+  50%    {box-shadow:0 1px 0 rgba(255,255,255,.28) inset,
+                     0 15px 32px -6px rgba(var(--accent-rgb),.62),
+                     0 2px 5px rgba(20,24,26,.10)}
+}
+.cta-ring .halo{
+  position:absolute;inset:-11px;border-radius:999px;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(var(--accent-rgb),.30),rgba(var(--accent-rgb),0));
+  animation:ctaGlow calc(2.7s * var(--speed)) ease-in-out infinite;
+}
+@keyframes ctaGlow{0%,100%{opacity:.45;transform:scale(.92)}50%{opacity:1;transform:scale(1.06)}}
+/* two rings going out from its edge, the way a phone rings */
+.cta-ring::before,.cta-ring::after{
+  content:"";position:absolute;inset:0;border-radius:999px;pointer-events:none;
+  border:2px solid var(--accent-lift);opacity:0;
+  animation:ctaRing calc(2.7s * var(--speed)) var(--ease) infinite;
+}
+.cta-ring::after{animation-delay:calc(.9s * var(--speed))}
+@keyframes ctaRing{0%{opacity:.55;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.11)}}
+/* once the pointer is on it, it stops asking */
+.cta-ring:hover .halo{animation:none;opacity:.8;transform:none}
+.cta-ring:hover::before,.cta-ring:hover::after{animation:none;opacity:0}
+.cta-ring:hover .golive{animation:none}
+
+.golive{
+  display:inline-flex;align-items:center;gap:11px;cursor:pointer;
+  background:linear-gradient(180deg,var(--accent-lift),var(--accent));
+  color:#fff;border:1px solid var(--accent);font-family:inherit;
+  border-radius:999px;padding:14px 26px 14px 20px;font-weight:700;font-size:16px;
+  letter-spacing:-.005em;
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+             0 10px 24px -6px rgba(var(--accent-rgb),.45),
+             0 2px 5px rgba(20,24,26,.10);
+  transition:transform .22s var(--spring),box-shadow .22s var(--ease),filter .2s var(--ease);
+  animation:ctaBreathe calc(2.7s * var(--speed)) ease-in-out infinite;
+}
+.golive:hover{
+  transform:translateY(-2px);
+  box-shadow:0 1px 0 rgba(255,255,255,.32) inset,
+             0 16px 32px -8px rgba(var(--accent-rgb),.55),
+             0 3px 7px rgba(20,24,26,.12);
+}
+.golive:active{transform:translateY(0) scale(.98);filter:brightness(.94)}
+/* the handset, with the two ring arcs going out from it on a loop */
+.golive .gd{width:19px;height:19px;flex:none;display:block;color:#fff}
+.golive .gd svg{width:100%;height:100%;display:block;overflow:visible}
+.golive .gd .arc{transform-origin:9px 13px;animation:ringOut calc(2.4s * var(--speed)) var(--ease) infinite}
+.golive .gd .arc2{animation-delay:calc(.18s * var(--speed))}
+@keyframes ringOut{0%{opacity:0;transform:scale(.72)}22%{opacity:.95;transform:scale(1)}
+  55%,100%{opacity:0;transform:scale(1.28)}}
+.golive .gd .body{transform-origin:12px 12px;animation:ringShake calc(2.4s * var(--speed)) var(--ease) infinite}
+@keyframes ringShake{0%,8%,20%,100%{transform:rotate(0)}12%{transform:rotate(-7deg)}16%{transform:rotate(5deg)}}
+
+/* starter phrasings — the real fix for "I don't know how to describe it".
+   Four chips with no label are four orphan buttons; one line turns them
+   into an offer. */
+.starters-lead{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:-.005em;margin:22px 0 10px}
+.starters{display:flex;gap:9px;flex-wrap:wrap}
+.starter{
+  font-size:13.5px;color:var(--muted);background:var(--card);cursor:pointer;font-family:inherit;
+  border:1px solid var(--line);border-radius:999px;padding:9px 16px;
+  transition:border-color .14s var(--ease),color .14s var(--ease),background .14s var(--ease);
+}
+.starter:hover{border-color:var(--accent-line);color:var(--accent-deep);background:var(--accent-bg)}
+
+/* The other door. Same green as the main button but hollow, so it reads as
+   the quieter of the two rather than a second thing fighting for the click. */
+.altcall{display:flex;align-items:center;gap:13px;flex-wrap:wrap;
+  margin-top:18px;padding-top:17px;border-top:1px solid var(--line)}
+.callnow{
+  display:inline-flex;align-items:center;gap:8px;flex:none;cursor:pointer;font-family:inherit;
+  font-size:13.5px;font-weight:600;color:var(--accent-deep);letter-spacing:-.006em;
+  background:var(--accent-bg);border:1px solid var(--accent-line);
+  border-radius:999px;padding:9px 18px 9px 15px;
+  transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease);
+}
+.callnow svg{width:15px;height:15px;flex:none}
+.callnow:hover{background:var(--accent-soft);border-color:var(--accent);transform:translateY(-1px)}
+.callnow:active{transform:translateY(0)}
+.callnow:hover svg{animation:ringShake calc(1.5s * var(--speed)) var(--ease) 1}
+.altcall .alt-note{font-size:12.5px;color:var(--muted);line-height:1.5}
+.askwrap .ask-note{text-align:center;margin-top:16px}
+
+/* ============================================================
+   ENTRANCE — the page assembles downward, once, when it is its turn
+   ported from relay-dashboard
+   ============================================================ */
+/* The order is not written here: JS sorts the pieces by where they actually
+   sit and hands each one its place in the queue as --d, because a delay
+   hard-coded per selector stops being top-to-bottom the moment the layout
+   reflows into one column on a phone. */
+.rise{
+  animation:pageRise calc(.82s * var(--speed)) cubic-bezier(.18,.86,.28,1) both;
+  animation-delay:calc(var(--d,0) * 1ms * var(--speed));
+}
+@keyframes pageRise{
+  from{opacity:0;transform:translateY(26px)}
+  to  {opacity:1;transform:none}
+}
+/* Held back until it is that piece's turn. Without this the page would be
+   fully drawn behind the welcome and then re-enter from nothing, which reads
+   as a flicker rather than an arrival. */
+.hold{opacity:0}
+
+/* ============================================================
+   THE COACH — one bubble that walks the screen while the box is empty
+   ported from relay-dashboard
+   ============================================================ */
+/* It hangs off the main column rather than the card, because its best home is
+   the empty page margin beside the card — pointing in at the thing it is
+   talking about instead of sitting on top of it. The main column is both the
+   scroller and a containing block, so the bubble scrolls with its target and
+   needs no scroll handler to keep up. */
+.coach{
+  /* almost no acceleration at the start and a very long tail: a curve that
+     arrives quickly and then stops reads as a throw. This reads as a glide. */
+  --glide:cubic-bezier(.3,.86,.2,1);
+  position:absolute;left:0;top:0;z-index:38;width:250px;
+  pointer-events:none;          /* it points at a button — never eat that click */
+  opacity:0;
+  transition:transform .92s var(--glide),opacity .34s var(--ease);
+}
+.coach[hidden]{display:none}
+.coach.on{opacity:1}
+/* First appearance is the one move that is not a move — it grows out of the
+   point of its own nub. The scale is on the inner box, never the outer one,
+   because the outer one's transform *is* its position on the page. */
+.coach.intro .coach-in{
+  animation:coachIn calc(.62s * var(--speed)) cubic-bezier(.22,1.24,.36,1) both;
+}
+@keyframes coachIn{from{transform:scale(.84)}to{transform:none}}
+.coach.intro .ca{
+  animation:coachNub calc(.26s * var(--speed)) var(--ease) calc(.34s * var(--speed)) both;
+}
+@keyframes coachNub{from{opacity:0}to{opacity:1}}
+/* The deep green of the button it points at, not a neutral black. A black
+   tooltip is the browser talking; this is Relay talking. */
+.coach-in{
+  position:relative;
+  background:linear-gradient(180deg,var(--accent),var(--accent-deep));
+  color:#fff;border-radius:14px;padding:11px 15px 13px;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 16px 36px -12px rgba(2,60,40,.46),0 2px 6px rgba(2,60,40,.20);
+  /* the four sentences are not the same length; JS hands it the two heights
+     to walk between rather than letting it jump mid-journey */
+  transition:height .5s var(--glide);
+}
+.coach-tx{
+  font-size:13px;line-height:1.45;font-weight:500;letter-spacing:-.004em;margin:0;
+  transition:opacity .17s var(--ease),transform .17s var(--ease);
+}
+/* the words leave before the bubble does and arrive after it lands, so you
+   never read a sentence that is sliding across the screen */
+.coach.moving .coach-tx{opacity:0;transform:translateY(6px)}
+.coach-dots{display:flex;gap:5px;margin-bottom:8px}
+.coach-dots i{
+  width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.32);
+  transition:background .34s var(--ease),transform .34s var(--ease);
+}
+.coach-dots i.on{background:#fff;transform:scale(1.3)}
+/* The nub is a square turned 45°, parked half under the bubble so only the
+   point shows. JS puts it on whichever edge faces the target, which is why it
+   fades out for the journey — a nub crawling round the perimeter mid-flight
+   looks like a bug. */
+.coach .ca{
+  position:absolute;width:13px;height:13px;background:var(--accent-deep);border-radius:3px;
+  transform:rotate(45deg);transition:opacity .2s var(--ease);
+}
+.coach.moving .ca{opacity:0}
+@media (prefers-reduced-motion:reduce){
+  /* the bubble stops touring and simply stands by the box with the one
+     instruction that matters — the words are the point, the walk was sugar */
+  .coach{transition:opacity .001ms !important}
+  .coach-dots{display:none}
+  .rise{animation:none}
+  .hold{opacity:1}
+}
+
+/* ============================================================
+   FIRST-TIME WELCOME — ported from relay-dashboard
+   ============================================================ */
+.orb{
+  width:30px;height:30px;border-radius:50%;flex:none;position:relative;
+  background:radial-gradient(circle at 32% 28%, #7BF0BE 0%, #24C98A 38%, #00875A 78%, #006B48 100%);
+  box-shadow:0 0 0 1px rgba(0,135,90,.18), 0 3px 12px rgba(0,135,90,.32);
+}
+.orb::after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  box-shadow:0 0 0 2px rgba(0,135,90,.45);
+  animation:orbPulse calc(2.8s * var(--speed)) var(--ease) infinite;
+}
+@keyframes orbPulse{0%{transform:scale(1);opacity:.65}70%,100%{transform:scale(1.85);opacity:0}}
+
+.welcome{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:24px}
+.welcome[hidden]{display:none}
+.wl-scrim{
+  position:absolute;inset:0;background:rgba(14,22,19,.42);backdrop-filter:blur(3px);
+  animation:wlFade calc(.3s * var(--speed)) var(--ease) both;
+}
+@keyframes wlFade{from{opacity:0}to{opacity:1}}
+.wl-card{
+  position:relative;z-index:1;width:min(452px,100%);max-height:calc(100vh - 48px);overflow-y:auto;
+  background:var(--card);border-radius:26px;padding:34px 36px 26px;text-align:center;
+  box-shadow:0 34px 90px -24px rgba(10,30,24,.42),0 3px 10px rgba(20,24,26,.08);
+  /* lands rather than appears */
+  animation:wlIn calc(.42s * var(--speed)) var(--spring) both;
+}
+@keyframes wlIn{from{opacity:0;transform:translateY(22px) scale(.965)}to{opacity:1;transform:none}}
+.welcome.out .wl-card{animation:wlOut calc(.2s * var(--speed)) var(--ease) both}
+.welcome.out .wl-scrim{animation:wlFade calc(.22s * var(--speed)) var(--ease) reverse both}
+@keyframes wlOut{to{opacity:0;transform:translateY(8px) scale(.985)}}
+/* the card lands, then fills itself in from the top down — reading order and
+   arrival order are the same thing, so nobody answers a half-drawn question */
+.wl-card > *{
+  animation:wlRise calc(.44s * var(--speed)) var(--ease) both;
+  animation-delay:calc((var(--d,0) * 1ms + 160ms) * var(--speed));
+}
+@keyframes wlRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.welcome.out .wl-card > *{animation:none}
+
+.wl-x{
+  position:absolute;top:16px;right:18px;width:28px;height:28px;border-radius:50%;
+  border:0;background:none;cursor:pointer;font-family:inherit;
+  color:var(--faint);font-size:13px;line-height:1;
+  transition:background .14s var(--ease),color .14s var(--ease);
+}
+.wl-x:hover{background:var(--line-soft);color:var(--ink)}
+.wl-orb{width:46px;height:46px;margin:2px auto 16px;display:block}
+.wl-card h2{
+  font-family:'Bricolage Grotesque',system-ui,sans-serif;
+  font-size:27px;line-height:1.16;letter-spacing:-.022em;font-weight:700;margin:0 0 9px;
+}
+.wl-sub{font-size:13.5px;line-height:1.55;color:var(--muted);margin:0 auto 22px;max-width:352px}
+/* from here down it is a form, and a form that wanders across the centre line
+   is hard to fill in — so the rest is left-aligned */
+.wl-photo{display:flex;align-items:center;gap:15px;text-align:left;
+  padding:14px;margin-bottom:20px;border-radius:16px;background:var(--paper)}
+.wl-drop{
+  width:54px;height:54px;flex:none;border-radius:50%;cursor:pointer;
+  border:1.6px dashed var(--line);color:var(--faint);background:var(--card);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease);
+}
+.wl-drop svg{width:21px;height:21px}
+.wl-drop:hover{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
+.wl-photo-tx b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.006em;margin-bottom:2px}
+.wl-photo-tx span{display:block;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.wl-l{display:block;text-align:left;font-size:12.5px;font-weight:600;
+  letter-spacing:-.005em;margin:0 0 8px}
+.wl-in{
+  width:100%;font:inherit;font-size:14.5px;color:var(--ink);
+  background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+  padding:12px 14px;outline:none;margin-bottom:20px;
+  transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
+}
+.wl-in:focus{border-color:var(--accent-line);box-shadow:0 0 0 3.5px rgba(var(--accent-rgb),.11)}
+.wl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.wl-chip{
+  font-size:13px;color:var(--muted);background:var(--card);cursor:pointer;font-family:inherit;
+  border:1px solid var(--line);border-radius:999px;padding:8px 14px;
+  transition:border-color .14s var(--ease),color .14s var(--ease),
+             background .14s var(--ease),transform .14s var(--spring);
+}
+.wl-chip:hover{border-color:var(--accent-line);color:var(--accent-deep)}
+/* chosen reads as filled, not merely outlined — at a glance you can see how
+   far down the card you have got without reading any of it */
+.wl-chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-deep);
+  font-weight:600;transform:scale(1.03)}
+.wl-go{
+  width:100%;font-size:15.5px;font-weight:700;letter-spacing:-.006em;color:#fff;
+  cursor:pointer;font-family:inherit;
+  background:linear-gradient(180deg,var(--accent-lift),var(--accent));
+  border:1px solid var(--accent);border-radius:999px;padding:14px 22px;margin-top:2px;
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+             0 10px 24px -8px rgba(var(--accent-rgb),.45);
+  transition:transform .2s var(--spring),box-shadow .2s var(--ease),filter .18s var(--ease);
+}
+.wl-go:hover{transform:translateY(-1.5px);filter:brightness(1.04);
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,0 14px 30px -8px rgba(var(--accent-rgb),.5)}
+.wl-go:active{transform:translateY(0)}
+.wl-skip{
+  display:block;margin:4px auto 0;padding:11px 14px;border:0;background:none;
+  cursor:pointer;font-family:inherit;
+  font-size:13px;color:var(--muted);border-radius:8px;
+  transition:color .14s var(--ease)}
+.wl-skip:hover{color:var(--ink)}
+
+/* On a phone the whole card has to clear the fold, or Continue is something
+   you have to go looking for. Everything loses a few pixels. */
+@media (max-width:560px){
+  .welcome{padding:12px;align-items:flex-end}
+  .wl-card{padding:24px 20px 16px;border-radius:22px}
+  .wl-orb{width:38px;height:38px;margin-bottom:12px}
+  .wl-card h2{font-size:22px}
+  .wl-sub{font-size:13px;margin-bottom:16px}
+  .wl-photo{padding:11px;margin-bottom:15px;gap:12px}
+  .wl-drop{width:46px;height:46px}
+  .wl-in{padding:11px 13px;margin-bottom:15px}
+  .wl-chips{gap:7px;margin-bottom:15px}
+  .wl-chip{font-size:12.5px;padding:7px 12px}
+  .wl-go{padding:13px 20px}
+}
+@media (max-width:900px){
+  .askwrap .ask{padding:30px 22px 26px}
+  .askwrap .ask h2{font-size:30px}
+  .askwrap .hero-tag{padding:11px 20px}
+}
+
+/* ---------- available engineers ---------- */
+.engp{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  overflow:hidden;box-shadow:var(--shadow)}
+.engp-h{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  padding:16px 18px 14px;border-bottom:1px solid var(--line-soft)}
+.engp-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.engp-t b{font-size:13.5px}
+.engp-t span{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:64ch}
+.eng-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(224px,1fr));gap:1px;
+  background:var(--line-soft)}
+.eng-card{display:flex;align-items:flex-start;gap:11px;text-align:left;font:inherit;
+  background:var(--card);border:0;padding:15px 16px;cursor:pointer;transition:background .14s}
+.eng-card:hover{background:var(--paper)}
+.eng-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.eng-main b{font-size:13px}
+.eng-main span{font-size:11.5px;color:var(--muted);line-height:1.45}
+.eng-when{font-size:11px;font-weight:600;color:var(--live)}
+.eng-card.off .eng-when{color:var(--faint)}
+.eng-card.busy .eng-when{color:var(--turn)}
+
+/* ---------- recent sessions under the ask box ---------- */
+.recent{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  overflow:hidden;box-shadow:var(--shadow)}
+.recent-h{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--line-soft)}
+.recent-h b{font-size:13.5px}
+.recent-h .lnk{font-size:12px;color:var(--live);font-weight:600;background:none;border:0;
+  font-family:inherit;cursor:pointer;padding:0}
+.recent-h .lnk:hover{text-decoration:underline}
+
 .cred{display:flex;align-items:center;gap:13px;margin-top:10px;padding:13px 16px;
   background:var(--line-soft);border-radius:var(--r-md)}
 .cred>span{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:70ch}
@@ -278,6 +847,81 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .stack-faces .av:last-child{margin-right:0}
 .newprob{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
 .newprob>span{font-size:12.5px;color:var(--muted)}
+
+/* ================= match + live call ================= */
+.mscrim{position:fixed;inset:0;background:rgba(20,24,26,.46);backdrop-filter:blur(0px);
+  opacity:0;pointer-events:none;z-index:80;
+  transition:opacity .34s ease,backdrop-filter .34s ease}
+.mscrim.on{opacity:1;pointer-events:auto;backdrop-filter:blur(4px)}
+.mwrap{position:fixed;inset:0;display:grid;place-items:center;padding:24px;
+  z-index:81;pointer-events:none;overflow:auto}
+.mwrap.on{pointer-events:auto}
+/* grows out from the middle of the screen, settles with a soft overshoot */
+.mcard{width:100%;max-width:470px;background:var(--card);border-radius:20px;
+  box-shadow:0 24px 70px rgba(20,24,26,.26);padding:28px;
+  transform-origin:50% 50%;will-change:transform,opacity;
+  opacity:0;transform:scale(.82) translateY(26px);
+  transition:opacity .2s ease,transform .38s cubic-bezier(.16,1.02,.3,1)}
+.mwrap.on .mcard{opacity:1;transform:none;transition-delay:.02s}
+/* each card swapped into the same shell re-plays the entrance */
+@keyframes mIn{from{opacity:0;transform:scale(.9) translateY(16px)}to{opacity:1;transform:none}}
+.mwrap.on .mcard.swap{animation:mIn .34s cubic-bezier(.16,1.02,.3,1)}
+@media (prefers-reduced-motion:reduce){
+  .mcard,.mwrap.on .mcard.swap{transition:opacity .12s;animation:none;transform:none}
+}
+.mcard h3{font-size:20px;margin:0 0 7px;letter-spacing:-.015em}
+.mcard p{font-size:13.5px;color:var(--muted);line-height:1.6;margin:0}
+.mcard .m-acts{display:flex;gap:9px;margin-top:22px}
+.mcard .m-acts .btn{flex:1;justify-content:center}
+.m-top{display:flex;align-items:center;gap:13px;margin-bottom:17px}
+.m-top .av{width:44px;height:44px;font-size:14px}
+
+/* the calling / on-call card */
+.call-state{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;
+  color:var(--live);margin-bottom:15px}
+.dotpulse2{width:8px;height:8px;border-radius:50%;background:var(--live);flex:none;
+  animation:dp 1.25s ease-in-out infinite}
+@keyframes dp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.78)}}
+.call-timer{font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  margin:4px 0 3px}
+.call-meta{font-size:12px;color:var(--faint)}
+.call-prob{margin-top:17px;padding:13px 15px;background:var(--paper);border-radius:var(--r-md);
+  font-size:13px;color:var(--muted);line-height:1.55;border:1px solid var(--line-soft);
+  max-height:104px;overflow:auto}
+.call-prob b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--faint);margin-bottom:5px;font-weight:700}
+.btn.end{background:var(--stop);border-color:var(--stop);color:#fff;width:100%;
+  justify-content:center;margin-top:20px;padding:12px}
+.btn.end:hover{background:#A82922;border-color:#A82922}
+
+/* name-the-project input */
+.m-input{width:100%;font:inherit;font-size:15px;color:var(--ink);margin-top:18px;
+  padding:13px 15px;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--paper);outline:none;transition:border-color .16s,box-shadow .16s}
+.m-input:focus{border-color:var(--live);box-shadow:0 0 0 3px var(--live-bg);background:var(--card)}
+.m-help{font-size:11.5px;color:var(--faint);margin-top:9px}
+.m-tick{width:46px;height:46px;border-radius:50%;background:var(--live-bg);color:var(--live);
+  display:grid;place-items:center;font-size:22px;margin-bottom:15px}
+
+/* pick an existing project, or start a new one */
+.m-or{display:flex;align-items:center;gap:10px;margin:18px 0 12px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.m-or::before,.m-or::after{content:"";height:1px;background:var(--line);flex:1}
+.pp-list{display:flex;flex-direction:column;gap:6px;max-height:212px;overflow:auto;
+  margin:0 -4px;padding:0 4px 2px}
+.pp{display:flex;align-items:center;gap:11px;width:100%;text-align:left;font:inherit;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:11px 13px;
+  transition:border-color .14s,background .14s,box-shadow .14s}
+.pp:hover{border-color:var(--live);background:var(--live-bg)}
+.pp.on{border-color:var(--live);box-shadow:0 0 0 2px var(--live-bg)}
+.pp-ico{width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;
+  background:var(--line-soft);color:var(--muted);font-size:12px;font-weight:700}
+.pp:hover .pp-ico,.pp.on .pp-ico{background:var(--live);color:#fff}
+.pp-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.pp-main b{font-size:13px}
+.pp-main span{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-go{font-size:15px;color:var(--faint);flex:none}
+.pp:hover .pp-go{color:var(--live)}
 
 /* ---------- chats: contract rows ---------- */
 .ci-kind{width:28px;height:28px;border-radius:7px;flex:none;display:grid;place-items:center;
@@ -850,8 +1494,19 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   <!-- ================= MAIN ================= -->
   <main class="main">
 
+    <!-- The coach hangs off the main column, not the card: on a wide screen it
+         can stand in the empty margin beside the card and point in at what it
+         is describing. Inside the card it could only ever cover it. -->
+    <div class="coach" id="coach" hidden aria-hidden="true">
+      <i class="ca" id="coachArrow"></i>
+      <div class="coach-in" id="coachIn">
+        <div class="coach-dots" id="coachDots"><i></i><i></i><i></i><i></i></div>
+        <p class="coach-tx" id="coachTx"></p>
+      </div>
+    </div>
+
     <!-- ============ HOME ============ -->
-    <section class="screen on" id="home" data-view="returning">
+    <section class="screen on" id="home" data-view="new">
       <div class="page-h home-head">
         <div>
           <h1 class="v-greet">Good morning, Rohan</h1>
@@ -862,9 +1517,8 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
         <div class="head-right">
           <div class="viewswitch" title="Demo only — not part of the product">
             <span>Viewing as</span>
-            <button class="vs on" data-view="returning">Returning</button>
-            <button class="vs" data-view="assist">No contracts</button>
-            <button class="vs" data-view="new">First time</button>
+            <button class="vs" data-view="returning">Returning</button>
+            <button class="vs on" data-view="new">First time</button>
           </div>
 
           <div class="stories v-greet">
@@ -888,119 +1542,75 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
         </div>
       </div>
 
-      <div class="only-new">
-        <div class="hero">
-          <div class="hero-tag live">Start here</div>
+      <!-- One card, both views. A returning customer asks for help the same
+           way a new one does, so there is no second composer to keep in step
+           with this one — only the things around it change. -->
+      <div class="askwrap">
+        <div class="hero" id="hero">
+          <div class="hero-tag" id="heroTag">
+            <span class="tinydot"></span>
+            <span id="heroTagText">Someone is free right now</span>
+            <div class="facepile" id="facePile">
+              <button class="fp-btn" id="fpBtn" aria-haspopup="true" aria-expanded="false">
+                <span class="fp-stage" id="fpStage"></span>
+                <span class="fp-name" id="fpName"></span>
+                <svg class="fp-cv" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="fp-menu" id="fpMenu"></div>
+            </div>
+          </div>
           <div class="ask">
-            <h2>What are you stuck on?</h2>
-            <p>Describe it in your own words. We match you with an engineer who works in your stack and has fixed this kind of thing before.</p>
-            <div class="ask-field">
-              <textarea rows="3" placeholder="My Stripe checkout times out on cold starts and I cannot work out why..."></textarea>
+            <h2>How can we help you?</h2>
+            <p class="ask-lede">Describe it in your own words, then click <b>Find me an engineer</b>. We match you with an engineer who works in your stack and has fixed this kind of thing before.</p>
+            <div class="ask-field" id="askField">
+              <div class="field-wrap">
+                <textarea id="askText" rows="3" placeholder="My payment page keeps timing out and I have no idea why..."></textarea>
+                <div class="ghost" id="ghost" aria-hidden="true"></div>
+              </div>
               <div class="staged ask-staged" id="askStaged"></div>
-              <button class="dropzone" id="askDrop">
-                <span class="dz-ico clip"></span>
-                <span class="dz-main">
-                  <b>Add a screenshot, log file or link</b>
-                  <small>Drop it here, or paste straight from your clipboard</small>
-                </span>
-              </button>
               <div class="ask-tools">
-                <button class="btn ghost mic">Hold to talk</button>
-                <span class="ask-hint">A screenshot of the error usually gets you matched faster</span>
-                <button class="btn go">Find me an engineer</button>
+                <button class="tool" data-attach id="askDrop"><span class="g">&#128206;</span>Add a screenshot</button>
+                <button class="tool talk" id="talk"><span class="g">&#127908;</span>Say it out loud</button>
+                <span class="cta-ring">
+                  <i class="halo" aria-hidden="true"></i>
+                  <button class="golive" id="askGo"><span class="gd" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="body" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/><path class="arc arc1" d="M15.05 5A5 5 0 0 1 19 8.95"/><path class="arc arc2" d="M15.05 1A9 9 0 0 1 23 8.94"/></svg></span>Find me an engineer</button>
+                </span>
               </div>
             </div>
-            <div class="ask-note">Matched in about a minute &middot; billed by the minute &middot; nothing up front</div>
-          </div>
-        </div>
 
-        <div class="cred">
-          <div class="stack-faces">
-            <div class="av" data-dot="" style="background:#00875A">SJ</div>
-            <div class="av" data-dot="" style="background:#2456C8">PN</div>
-            <div class="av" data-dot="" style="background:#6D3BD4">KS</div>
-            <div class="av" data-dot="" style="background:#B45309">MI</div>
-            <div class="av" data-dot="" style="background:#9AA1A6">AD</div>
-          </div>
-          <span>Relay engineers cover 40+ stacks. You do not pick one &mdash; whoever fits your problem and your stack joins the call.</span>
-        </div>
+            <p class="starters-lead">Not sure how to put it? Try one of these</p>
+            <div class="starters" id="starters">
+              <button class="starter">My site stopped working</button>
+              <button class="starter">Something broke after I made a change</button>
+              <button class="starter">I do not understand this error message</button>
+              <button class="starter">I am stuck halfway through building something</button>
+            </div>
 
-        <div class="door">
-          <div class="door-main">
-            <b>Would you rather hand the whole thing over?</b>
-            <span>Describe what you need and one engineer comes back with a fixed price. They build it, you watch it happen.</span>
-          </div>
-          <button class="btn" data-go="contracts">Get a quote</button>
-        </div>
+            <div class="altcall">
+              <button class="callnow" id="callNowBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Just call someone now
+              </button>
+              <span class="alt-note">Skip the writing &mdash; tell them on the call instead</span>
+            </div>
 
-        <div class="quiet">
-          <div class="quiet-h">As you go, this is where things land</div>
-          <div class="willbe">
-            <span>Calls you have had</span>
-            <span>Work Relay is building for you</span>
-            <span>People you have worked with</span>
+            <!-- Returning only. Not a new question at all — the door back to
+                 the work that is already under way. -->
+            <div class="ret-jump">
+              <span class="rj-lead">Or pick up something you already started</span>
+              <button class="rj" data-go="sessions"><span class="g">&#128172;</span>Recent sessions<span class="n" id="rjSess">8</span></button>
+              <button class="rj" data-go="projects"><span class="g">&#128193;</span>Your projects<span class="n" id="rjProj">4</span></button>
+            </div>
           </div>
         </div>
       </div>
 
-
-      <div class="only-assist">
-        <div class="hero">
-          <div class="hero-tag live">Start here</div>
-          <div class="ask">
-            <h2>What are you stuck on?</h2>
-            <p>Describe it in your own words. We match you with an engineer who works in your stack.
-               Satyam and Priya already know your projects, so they get first refusal.</p>
-            <div class="ask-field">
-              <textarea rows="2" placeholder="The booking form stopped sending confirmation emails..."></textarea>
-              <div class="staged ask-staged"></div>
-              <button class="dropzone">
-                <span class="dz-ico clip"></span>
-                <span class="dz-main">
-                  <b>Add a screenshot, log file or link</b>
-                  <small>Drop it here, or paste straight from your clipboard</small>
-                </span>
-              </button>
-              <div class="ask-tools">
-                <button class="btn ghost mic">Hold to talk</button>
-                <span class="ask-hint">A screenshot of the error usually gets you matched faster</span>
-                <button class="btn go">Find me an engineer</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="quiet">
-          <div class="quiet-h">Left open from your last calls</div>
-          <div class="strips">
-            <button class="strip" data-session="s-checkout">
-              <div class="av" data-dot="live" style="background:#00875A">SJ</div>
-              <div class="strip-main">
-                <b>Checkout does too much in one request</b>
-                <span class="strip-sub">Palm Seas &middot; from your call with Satyam on Tuesday</span>
-              </div>
-              <span class="btn sm solid" data-continue="s-checkout">Continue the session</span>
-            </button>
-            <button class="strip" data-session="s-checkout">
-              <div class="av" data-dot="live" style="background:#00875A">SJ</div>
-              <div class="strip-main">
-                <b>No retry handling on failed payments</b>
-                <span class="strip-sub">Palm Seas &middot; from your call with Satyam on Tuesday</span>
-              </div>
-              <span class="btn sm solid" data-continue="s-checkout">Continue the session</span>
-            </button>
-            <button class="strip" data-session="s-ios">
-              <div class="av" data-dot="off" style="background:#9AA1A6">AD</div>
-              <div class="strip-main">
-                <b>iOS build breaks again after every dependency update</b>
-                <span class="strip-sub">TrackFit &middot; from your call with Arjun on 17 Sep</span>
-              </div>
-              <span class="btn sm solid" data-continue="s-ios">Continue the session</span>
-            </button>
-          </div>
-        </div>
-
+      <div class="only-new">
+        <!-- Empty on arrival, so the first-run page is the card and nothing
+             else. It only grows a panel once there is a call to put in it. -->
+        <div id="homeRecent"></div>
       </div>
+
 
       <div class="only-ret">
 
@@ -2013,36 +2623,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
       </div>
 
       <div class="band">
-        <div class="rows">
-          <button class="row flat" data-project="palmseas">
-            <div class="row-main">
-              <div class="row-title">Palm Seas</div>
-              <div class="row-sub">3 sessions &middot; last call Tuesday with Satyam</div>
-            </div>
-            <div class="row-side"><span class="pill turn">Quote ready</span></div>
-          </button>
-          <button class="row flat" data-project="epicmail">
-            <div class="row-main">
-              <div class="row-title">Epicmail</div>
-              <div class="row-sub">2 sessions &middot; Priya asked you a question 2 hours ago</div>
-            </div>
-            <div class="row-side"><span class="pill turn">Needs a reply</span></div>
-          </button>
-          <button class="row flat" data-project="trackfit">
-            <div class="row-main">
-              <div class="row-title">TrackFit</div>
-              <div class="row-sub">1 session &middot; last call 17 Sep with Arjun</div>
-            </div>
-            <div class="row-side"><span class="pill mute">Quiet</span></div>
-          </button>
-          <button class="row flat" data-project="yopbox">
-            <div class="row-main">
-              <div class="row-title">YopBox</div>
-              <div class="row-sub">No sessions yet</div>
-            </div>
-            <div class="row-side"><span class="btn sm go">Get help</span></div>
-          </button>
-        </div>
+        <div class="rows" id="projRows"></div>
       </div>
     </section>
 
@@ -2127,6 +2708,60 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
     </div>
   </div>
 </aside>
+
+<!-- ============ CALL + PROJECT FLOW ============ -->
+<div class="mscrim" id="mScrim"></div>
+<div class="mwrap" id="mWrap"><div class="mcard" id="mCard"></div></div>
+
+<!-- ============ FIRST-TIME WELCOME ============ -->
+<div class="welcome" id="welcome" hidden>
+  <div class="wl-scrim" id="wlScrim"></div>
+  <div class="wl-card" role="dialog" aria-modal="true" aria-labelledby="wlTitle">
+    <button class="wl-x" id="wlX" aria-label="Close">&#10005;</button>
+
+    <span class="orb wl-orb" aria-hidden="true"></span>
+    <h2 id="wlTitle">Hi Rohan &mdash; welcome to Relay</h2>
+    <p class="wl-sub">When you get stuck, a real engineer joins you on a call. Two
+      questions first, so we know who to wake up. Skip them if you would rather not.</p>
+
+    <div class="wl-photo">
+      <button class="wl-drop" id="wlDrop" aria-label="Add a photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 1 2-2h2l1.5-2h7L17 7h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
+      </button>
+      <div class="wl-photo-tx">
+        <b>Add a photo</b>
+        <span>So the person on the call knows who they are talking to. Optional.</span>
+      </div>
+    </div>
+
+    <label class="wl-l" for="wlName">Your name</label>
+    <input class="wl-in" id="wlName" value="Rohan Mehta" autocomplete="name">
+
+    <!-- Both of these are picked, not typed. Nothing here should feel like
+         homework, and someone who is already stuck will not write a sentence
+         about their hobbies to get to a help button. -->
+    <p class="wl-l" id="wlDoL">What do you like making?</p>
+    <div class="wl-chips" id="wlDo" role="group" aria-labelledby="wlDoL">
+      <button class="wl-chip">Websites</button>
+      <button class="wl-chip">Apps</button>
+      <button class="wl-chip">Online shops</button>
+      <button class="wl-chip">Little tools for myself</button>
+      <button class="wl-chip">Still working that out</button>
+    </div>
+
+    <p class="wl-l" id="wlWhenL">And when do you usually do it?</p>
+    <div class="wl-chips" id="wlWhen" role="group" aria-labelledby="wlWhenL">
+      <button class="wl-chip">Mornings</button>
+      <button class="wl-chip">Daytime</button>
+      <button class="wl-chip">Evenings</button>
+      <button class="wl-chip">Late at night</button>
+      <button class="wl-chip">Weekends</button>
+    </div>
+
+    <button class="wl-go" id="wlGo">Continue</button>
+    <button class="wl-skip" id="wlSkip">Skip</button>
+  </div>
+</div>
 
 <script>
 const PEOPLE = {
@@ -2336,8 +2971,13 @@ document.querySelectorAll('.vs').forEach(b=>{
       n.style.display = v==='returning' ? '' : 'none';
     });
     document.getElementById('meSub').textContent =
-      v==='new' ? 'No calls yet' : v==='assist' ? '12.4 minutes used' : '34.8 minutes used';
+      v==='new' ? 'No calls yet' : '34.8 minutes used';
     document.querySelector('.main').scrollTop=0;
+    /* the welcome belongs to the first-run view, so it arrives with it */
+    if(v==='new'){
+      if(typeof maybeWelcome==='function') maybeWelcome();
+      if(typeof coachStart==='function') setTimeout(coachStart,420);
+    }else if(typeof coachStop==='function') coachStop();
   });
 });
 
@@ -2669,22 +3309,41 @@ document.addEventListener('click',e=>{
 
 const PROJECTS={
   palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'],
+    sub:'3 sessions &middot; last call Tuesday with Satyam', side:'<span class="pill turn">Quote ready</span>',
     blurb:'A booking site for a diving school. You are building it; Relay engineers come in when you get stuck and leave once it is working again.',
     stands:'Checkout times out on cold starts. A temporary fix is live, but the underlying design needs rebuilding.',
     waiting:'Satyam has quoted the rebuild at &euro;3,200. Nothing starts until you decide.'},
   epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'],
+    sub:'2 sessions &middot; Priya asked you a question 2 hours ago', side:'<span class="pill turn">Needs a reply</span>',
     blurb:'A campaign tool you run for a handful of clients. Small, but it sends real mail, so quiet failures are expensive.',
     stands:'Bounced campaign emails were being dropped silently. Logging is in, so you can see it happening now.',
     waiting:'Priya wants to know whether bounces should retry or just be reported to you. She is holding the quote until you answer.'},
   trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'],
+    sub:'1 session &middot; last call 17 Sep with Arjun', side:'<span class="pill mute">Quiet</span>',
     blurb:'A fitness tracker you took over from another developer. Most of your Relay time here goes on builds and releases rather than features.',
     stands:'The iOS certificate had expired and builds were failing. Arjun regenerated it and showed you how to do it yourself.',
     waiting:'Nothing today. Meera has a kickoff booked for the sync rewrite on Mon 29 Sep.'},
   yopbox:{n:'YopBox', stack:['Astro','Cloudflare'],
+    sub:'No sessions yet', side:'<span class="btn sm go">Get help</span>',
     blurb:'The newest of your projects. Nothing has gone wrong yet, so no engineer has been in.',
     stands:'Nothing has needed an engineer yet.',
     waiting:'Nothing.'}
 };
+let PROJ_ORDER=['palmseas','epicmail','trackfit','yopbox'];
+
+function renderProjRows(){
+  const el=document.getElementById('projRows');
+  if(!el) return;
+  el.innerHTML=PROJ_ORDER.map(k=>{
+    const P=PROJECTS[k];
+    const live=SESS_ORDER.filter(s=>SESSIONS[s].proj===k).length;
+    const sub=P.sub || (live?plural(live,'session')+' &middot; just created':'No sessions yet');
+    return '<button class="row flat" data-project="'+k+'">'+
+      '<div class="row-main"><div class="row-title">'+P.n+'</div>'+
+      '<div class="row-sub">'+sub+'</div></div>'+
+      '<div class="row-side">'+(P.side||'<span class="pill mute">New</span>')+'</div></button>';
+  }).join('');
+}
 
 /* a session is one thread of work. it holds one or more calls. */
 const SESSIONS={
@@ -3466,6 +4125,934 @@ document.addEventListener('click',e=>{
   if(label==='Something is off'){toast('Flagged — Satyam will correct the notes');return}
   if(label==='Open'){toast('Opening attachment');return}
 });
+
+/* ================= connect to an engineer → call → project ================= */
+const DEMO_ENGINEER='sj';                 /* who picks up in the demo */
+const mScrim=document.getElementById('mScrim');
+const mWrap=document.getElementById('mWrap');
+const mCard=document.getElementById('mCard');
+
+let callTimer=null, callSecs=0, callConnectT=null;
+let NEW_SESS=[];    /* sessions created from a call in this run */
+let pending=null;/* {problem, mins, who} carried from the call into the project step */
+
+function openModal(html,opts){
+  mCard.innerHTML=html;
+  paintIn(mCard);
+  mScrim.classList.add('on');
+  const wasOpen=mWrap.classList.contains('on');
+  mWrap.classList.add('on');
+  mCard.dataset.locked=(opts&&opts.locked)?'1':'';
+  /* swapping content inside an already-open shell: replay the grow-in */
+  mCard.classList.remove('swap');
+  if(wasOpen){ void mCard.offsetWidth; mCard.classList.add('swap'); }
+  const f=mCard.querySelector('[data-focus]');
+  if(f) setTimeout(()=>f.focus(),160);
+}
+function closeModal(){
+  mScrim.classList.remove('on');
+  mWrap.classList.remove('on');
+  mCard.classList.remove('swap');
+  mCard.dataset.locked='';
+  setTimeout(()=>{if(!mWrap.classList.contains('on')) mCard.innerHTML=''},380);
+}
+function stopCallTimer(){
+  clearInterval(callTimer); clearTimeout(callConnectT);
+  callTimer=null; callConnectT=null;
+}
+const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+
+/* ---- step 1: the call ---- */
+function startMatch(field){
+  const ta=field.querySelector('textarea');
+  const problem=(ta?ta.value:'').trim();
+  if(!problem){
+    if(ta) ta.focus();
+    toast('Tell us what is wrong first — a line or two is plenty');
+    return;
+  }
+  const p=PEOPLE[DEMO_ENGINEER], first=fName(DEMO_ENGINEER);
+  callSecs=0;
+  pending={problem:problem, mins:0, who:DEMO_ENGINEER};
+
+  openModal(
+    '<div class="m-top">'+
+      '<div class="av" data-dot="live" style="background:'+p.c+'">'+p.i+'</div>'+
+      '<div><h3 style="margin:0">'+p.n+'</h3>'+
+      '<p style="font-size:12.5px">Works in your stack &middot; has fixed this before</p></div>'+
+    '</div>'+
+    '<div class="call-state"><span class="dotpulse2"></span><span id="cState">Connecting you to '+first+'&hellip;</span></div>'+
+    '<div class="call-timer" id="cTimer">00:00</div>'+
+    '<div class="call-meta" id="cMeta">The meter starts when '+first+' picks up</div>'+
+    '<div class="call-prob"><b>What you said</b>'+escHtml(problem)+'</div>'+
+    '<button class="btn end" id="cEnd">End call</button>', {locked:true});
+
+  callConnectT=setTimeout(()=>{
+    const st=document.getElementById('cState');
+    if(!st) return;                              /* ended before pick-up */
+    st.textContent='On a call with '+first;
+    document.getElementById('cMeta').innerHTML='Billed by the minute &middot; nothing up front';
+    callTimer=setInterval(()=>{
+      callSecs++;
+      const t=document.getElementById('cTimer');
+      if(t) t.textContent=mmss(callSecs);
+    },1000);
+  },1800);
+}
+
+/* ---- step 2: offer to keep it as a project ---- */
+function endDemoCall(){
+  const connected=!!callTimer;
+  stopCallTimer();
+  if(!connected){
+    closeModal();
+    toast('Call cancelled — nothing was billed');
+    pending=null;
+    return;
+  }
+  pending.mins=Math.max(1,Math.round(callSecs/60));
+  offerProject();
+}
+
+function offerProject(){
+  const mins=pending.mins, first=fName(pending.who);
+  openModal(
+    '<div class="m-tick">&#10003;</div>'+
+    '<h3>Call ended &middot; '+plural(mins,'min')+'</h3>'+
+    '<p>'+first+' has written up the summary. Keep this session somewhere, so every '+
+    'call, note and file about it lands in one place?</p>'+
+    '<div class="call-prob"><b>This session</b>'+escHtml(pending.problem)+'</div>'+
+    '<div class="m-acts">'+
+      '<button class="btn" id="pSkip">Skip for now</button>'+
+      '<button class="btn go" id="pMake">Create a new project</button>'+
+    '</div>'+
+    projectPickList('Or add it to one you already have'));
+}
+
+/* the existing-projects picker, shared by the offer card and the name card */
+function projectPickList(heading){
+  if(!PROJ_ORDER.length) return '';
+  return '<div class="m-or">'+heading+'</div>'+
+    '<div class="pp-list">'+PROJ_ORDER.map(k=>{
+      const P=PROJECTS[k];
+      const live=SESS_ORDER.filter(s=>SESSIONS[s].proj===k).length;
+      const sub=live?plural(live,'session')+' already here':'No sessions yet';
+      return '<button class="pp" data-pick-proj="'+k+'">'+
+        '<span class="pp-ico">'+escHtml(P.n.slice(0,2).toUpperCase())+'</span>'+
+        '<span class="pp-main"><b>'+escHtml(P.n)+'</b><span>'+sub+'</span></span>'+
+        '<span class="pp-go">&rarr;</span></button>';
+    }).join('')+'</div>';
+}
+
+/* file the just-finished call under a project that already exists */
+function addToProject(key){
+  const P=PROJECTS[key];
+  if(!P||!pending) return;
+  const who=fName(pending.who);
+  const sKey=sessionFromCall(key);
+  const live=SESS_ORDER.filter(s=>SESSIONS[s].proj===key).length;
+  P.sub=plural(live,'session')+' &middot; just now with '+who;
+  pending=null;
+  closeModal();
+  renderProjRows();
+  renderSessFeed();
+  paintJump();
+  renderHomeRecent();
+  renderProject(key);
+  toast('Filed under “'+P.n+'” — the call and its write-up moved across');
+  return sKey;
+}
+
+/* ---- step 3: name it ---- */
+function askProjectName(){
+  const guess=pending.problem.split(/[\.\,\n]/)[0].trim().split(/\s+/).slice(0,2)
+                .join(' ').replace(/[^\w\s-]/g,'');
+  openModal(
+    '<h3>Name this project</h3>'+
+    '<p>Pick something you will recognise later. You can rename it at any time.</p>'+
+    '<input class="m-input" id="pName" data-focus maxlength="40" placeholder="e.g. Palm Seas" value="'+
+      escHtml(guess.charAt(0).toUpperCase()+guess.slice(1))+'">'+
+    '<div class="m-help">The call you just had, its summary and any files move under it.</div>'+
+    '<div class="m-acts">'+
+      '<button class="btn" id="pBack">Back</button>'+
+      '<button class="btn go" id="pSave">Create project</button>'+
+    '</div>'+
+    projectPickList('Or use an existing project'));
+}
+
+/* ---- build the session, and (optionally) the project it lives under ---- */
+function sessionFromCall(projKey){
+  const who=pending.who, first=fName(who), problem=pending.problem;
+  const key='s-new-'+Date.now();
+  const title=problem.length>52 ? problem.slice(0,52).trim()+'…' : problem;
+  SESSIONS[key]={
+    t:title, proj:projKey, who:who, state:'open',
+    started:'Just now', last:'Just now', grp:'This week',
+    open:[],
+    calls:[{
+      h:'First look at this', when:'Just now', mins:pending.mins,
+      p:'You described the problem and '+first+' picked it up. This is the write-up from that call.',
+      out:[['ok','Walked through what you are seeing'],
+           ['ok','Agreed the next step before anything gets built']],
+      ts:[['00:02','You',escHtml(problem)],
+          ['00:24',first,'Right — I have seen this one. Let me look at it with you.'],
+          ['01:10',first,'I will write this up so you have it in front of you after the call.']]
+    }]
+  };
+  SESS_ORDER=[key].concat(SESS_ORDER);
+  NEW_SESS=[key].concat(NEW_SESS);
+  return key;
+}
+
+function createProject(name){
+  const clean=(name||'').trim();
+  if(!clean){toast('Give the project a name first');return}
+  const base=clean.toLowerCase().replace(/[^a-z0-9]+/g,'')||'project';
+  let key=base, i=2;
+  while(PROJECTS[key]) key=base+(i++);
+
+  PROJECTS[key]={
+    n:clean, stack:[],
+    sub:'1 session &middot; just now with '+fName(pending.who),
+    side:'<span class="pill mute">New</span>',
+    blurb:'Created from your call with '+fName(pending.who)+'. Everything about this lands here from now on.',
+    stands:pending.problem,
+    waiting:'Nothing yet — '+fName(pending.who)+' has the summary written up.'
+  };
+  PROJ_ORDER=[key].concat(PROJ_ORDER);
+
+  const sKey=sessionFromCall(key);
+  pending=null;
+  closeModal();
+  renderProjRows();
+  renderSessFeed();
+  paintJump();
+  renderHomeRecent();
+  renderProject(key);
+  toast('“'+clean+'” created — this session now lives under it');
+  return sKey;
+}
+
+/* ---- recent sessions, shown under the ask box once you have had a call ---- */
+function renderHomeRecent(){
+  const el=document.getElementById('homeRecent');
+  if(!el) return;
+  /* only calls made in this run — a first-time customer has none until they call */
+  const keys=NEW_SESS.filter(k=>SESSIONS[k]).slice(0,3);
+  if(!keys.length){el.innerHTML='';return}
+  el.innerHTML='<div class="recent"><div class="recent-h">'+
+      '<b>Recent sessions</b>'+
+      '<button class="lnk" data-go="sessions">See all '+SESS_ORDER.length+'</button>'+
+    '</div><div class="rows">'+keys.map(k=>{
+      const S=SESSIONS[k], p=PEOPLE[S.who];
+      const where=S.proj&&PROJECTS[S.proj] ? PROJECTS[S.proj].n : 'Not in a project';
+      const mins=(S.calls||[]).reduce((a,c)=>a+(c.mins||0),0);
+      return '<button class="row flat" data-session="'+k+'">'+
+        '<div class="av" data-dot="'+(p?p.d:'off')+'" style="background:'+(p?p.c:'#9AA1A6')+'">'+(p?p.i:'??')+'</div>'+
+        '<div class="row-main"><div class="row-title">'+escHtml(S.t)+'</div>'+
+        '<div class="row-sub">'+escHtml(where)+' &middot; '+escHtml(S.last)+
+          (mins?' &middot; '+plural(mins,'min'):'')+'</div></div>'+
+        '<div class="row-side"><span class="btn sm">Open</span></div></button>';
+    }).join('')+'</div></div>';
+}
+
+/* ---- who is around, shown on the first-run home ---- */
+function renderEngineers(){
+  const grid=document.getElementById('engGrid');
+  if(!grid) return;
+  const order=['sj','pn','ks','md','ad'];
+  const when={live:'Free now',busy:'In a session',off:'Away'};
+  grid.innerHTML=order.map(k=>{
+    const p=PEOPLE[k];
+    const role=p.r.split('·')[0].trim();
+    return '<button class="eng-card '+p.d+'" data-person="'+k+'">'+
+      '<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+      '<span class="eng-main"><b>'+escHtml(p.n)+'</b>'+
+      '<span>'+escHtml(role)+'</span>'+
+      '<span class="eng-when">'+when[p.d]+'</span></span></button>';
+  }).join('');
+  const n=order.filter(k=>PEOPLE[k].d==='live').length;
+  const c=document.getElementById('engCount');
+  if(c) c.textContent=n+' online';
+}
+
+/* ---- wiring ---- */
+document.addEventListener('click',e=>{
+  /* "Find me an engineer" on any ask card */
+  const go=e.target.closest('.ask .golive, .ask .btn.go');
+  if(go){e.stopPropagation();startMatch(go.closest('.ask-field'));return}
+
+  /* the other door: skip the writing and go straight to a call */
+  const now=e.target.closest('#callNowBtn');
+  if(now){
+    e.stopPropagation();
+    const ta=document.getElementById('askText');
+    if(ta&&!ta.value.trim()){
+      ta.value='I would rather explain it on the call.';
+      startedTyping();
+    }
+    startMatch(document.getElementById('askField'));
+    return;
+  }
+
+  /* a starter phrasing drops straight into the box */
+  const st=e.target.closest('.starters .starter');
+  if(st){
+    e.stopPropagation();
+    const ta=document.getElementById('askText');
+    ta.value=st.textContent.trim()+' — ';
+    startedTyping();
+    ta.focus();
+    ta.setSelectionRange(ta.value.length,ta.value.length);
+    ta.dispatchEvent(new Event('input'));
+    return;
+  }
+
+  /* pick an existing project from the convert-to-project card */
+  const pick=e.target.closest('[data-pick-proj]');
+  if(pick){e.stopPropagation();addToProject(pick.dataset.pickProj);return}
+
+  /* hold-to-talk stub */
+  const mic=e.target.closest('.btn.talk, .tool.talk');
+  if(mic){
+    e.stopPropagation();
+    mic.classList.toggle('on');
+    toast(mic.classList.contains('on')?'Listening — say what is wrong':'Stopped listening');
+    return;
+  }
+
+  /* attach stages a demo file above the tool row */
+  const att=e.target.closest('[data-attach]');
+  if(att){
+    e.stopPropagation();
+    const field=att.closest('.ask-field');
+    let bar=field.querySelector('.ask-staged');
+    if(!bar){                                  /* removing the last chip drops the bar */
+      bar=document.createElement('div');
+      bar.className='staged ask-staged';
+      field.insertBefore(bar,field.querySelector('.ask-tools'));
+    }
+    const f=DEMO_FILES[dropN++ % DEMO_FILES.length];
+    const chip=document.createElement('div');
+    chip.className='chip-file';
+    chip.innerHTML='<span class="cf-ico'+(f.kind==='LOG'?' log':'')+'">'+f.kind+'</span>'+
+                   '<span class="cf-name">'+f.name+'</span>'+
+                   '<button class="cf-x" title="Remove">&times;</button>';
+    bar.appendChild(chip);
+    return;
+  }
+
+  if(e.target.closest('#cEnd')){e.stopPropagation();endDemoCall();return}
+  if(e.target.closest('#pMake')){e.stopPropagation();askProjectName();return}
+  if(e.target.closest('#pBack')){e.stopPropagation();offerProject();return}
+  if(e.target.closest('#pSave')){
+    e.stopPropagation();
+    createProject(document.getElementById('pName').value);
+    return;
+  }
+  if(e.target.closest('#pSkip')){
+    e.stopPropagation();
+    const k=sessionFromCall(null);
+    pending=null;
+    closeModal();
+    renderSessFeed();
+    paintJump();
+    renderHomeRecent();
+    renderSession(k);
+    toast('Kept as a one-off session — you can file it under a project later');
+    return;
+  }
+});
+
+/* enter submits the project name */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id==='pName'){
+    e.preventDefault();
+    createProject(e.target.value);
+  }
+  if(e.key==='Escape'&&mWrap.classList.contains('on')&&mCard.dataset.locked!=='1'){
+    closeModal();
+  }
+});
+mScrim.addEventListener('click',()=>{
+  if(mCard.dataset.locked!=='1') closeModal();
+});
+
+/* ============================================================
+   FIRST-RUN ASK CARD — band, reel, ghost typing, welcome
+   Everything below only decorates the box. The moment the button is
+   pressed, startMatch() takes over and the flow is unchanged.
+   ============================================================ */
+const REDUCED = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const SPEED   = 1;
+
+/* ---- the band's face: one person at a time, on a reel ---- */
+const fpWrap  = document.getElementById('facePile');
+const fpBtn   = document.getElementById('fpBtn');
+const fpStage = document.getElementById('fpStage');
+const fpName  = document.getElementById('fpName');
+const fpMenu  = document.getElementById('fpMenu');
+const heroTagText = document.getElementById('heroTagText');
+const FP_ORDER = ['sj','pn','ks','md','ad'];
+const ST_SHORT = {live:'Free', busy:'In a call', off:'Away'};
+let fpTimer=null, fpKey=null;
+
+/* Only people who are free get a turn. The band's claim is "N are free right
+   now" and the face is the evidence for it — showing someone who is in a call
+   would quietly contradict the sentence next to it. */
+function fpPool(){
+  const free=FP_ORDER.filter(k=>PEOPLE[k].d==='live');
+  return free.length?free:FP_ORDER;
+}
+function fpShow(k,animate){
+  const p=PEOPLE[k], old=fpStage.querySelector('.av');
+  const el=document.createElement('span');
+  el.className='av'+(animate?' in':'');
+  el.style.background=p.c;
+  el.dataset.dot=p.d;
+  el.textContent=p.i;
+  fpStage.appendChild(el);
+  if(old&&animate){old.classList.add('out');setTimeout(()=>old.remove(),560*SPEED)}
+  else if(old){old.remove()}
+  fpName.textContent=fName(k);
+  if(animate){fpName.classList.remove('swap');void fpName.offsetWidth;fpName.classList.add('swap')}
+  fpBtn.setAttribute('aria-label',p.n+', '+ST_SHORT[p.d].toLowerCase()+'. Open the full list.');
+}
+/* Step from whoever is showing rather than from a counter, so people going
+   busy mid-reel never make it skip or repeat. */
+function fpStep(animate){
+  const pool=fpPool();
+  const k=pool[(pool.indexOf(fpKey)+1)%pool.length];
+  fpKey=k;
+  fpShow(k,animate);
+}
+function fpStart(){
+  if(fpTimer) return;
+  fpStep(false);
+  if(REDUCED) return;      /* with motion off it is simply one face, standing still */
+  fpTimer=setInterval(()=>{
+    /* never swap the face out from under someone reading the open list */
+    if(!fpWrap.classList.contains('open')) fpStep(true);
+  },2800*SPEED);
+}
+function fpMenuRender(){
+  const rank={live:0,busy:1,off:2};
+  const list=FP_ORDER.slice().sort((a,b)=>rank[PEOPLE[a].d]-rank[PEOPLE[b].d]);
+  const n=list.filter(k=>PEOPLE[k].d==='live').length;
+  fpMenu.innerHTML='<div class="fp-head">'+(n===1?'1 free':n+' free')+' of '+list.length+'</div>'+
+    list.map(k=>{
+      const p=PEOPLE[k];
+      return '<button class="fp-row" data-person="'+k+'">'+
+        '<span class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</span>'+
+        '<span class="t"><b>'+escHtml(p.n)+'</b><i>'+escHtml(p.r.split('·')[0].trim())+'</i></span>'+
+        '<span class="fp-st '+p.d+'">'+ST_SHORT[p.d]+'</span></button>';
+    }).join('');
+}
+function fpOpen(on){
+  fpWrap.classList.toggle('open',on);
+  fpBtn.setAttribute('aria-expanded',on?'true':'false');
+  if(on) fpMenuRender();
+}
+fpBtn.addEventListener('click',e=>{e.stopPropagation();fpOpen(!fpWrap.classList.contains('open'))});
+/* anywhere else closes it — including a row, which hands off to the drawer,
+   and that wants the band behind it clear */
+document.addEventListener('click',()=>fpOpen(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape') fpOpen(false)});
+
+function paintHeroTag(){
+  const n=FP_ORDER.filter(k=>PEOPLE[k].d==='live').length;
+  heroTagText.textContent=n>1?n+' people are free right now':'Someone is free right now';
+}
+
+/* ---- the composer: focus lift, auto-grow, ghost typing ---- */
+const hero     = document.getElementById('hero');
+const askText  = document.getElementById('askText');
+const ghost    = document.getElementById('ghost');
+const PLACEHOLDER = askText.placeholder;
+let touched=false, ghostTimer=null;
+
+askText.addEventListener('focus',()=>hero.classList.add('focused'));
+askText.addEventListener('blur', ()=>hero.classList.remove('focused'));
+askText.addEventListener('input',()=>{
+  askText.style.height='auto';
+  askText.style.height=Math.max(152,askText.scrollHeight)+'px';   /* matches the CSS floor */
+  if(askText.value) startedTyping();
+});
+
+/* Real examples, typed out behind the caret. Shows the register we want —
+   plain sentences, no stack names — better than a static placeholder can. */
+const SUGGESTIONS=[
+  'My payment page keeps timing out and I have no idea why',
+  'I changed one file and now the whole site is blank',
+  'Users say they cannot log in, but it works for me',
+  'I am halfway through this and do not know what to do next'
+];
+function startedTyping(){
+  if(touched) return;
+  touched=true;
+  clearTimeout(ghostTimer);
+  ghost.textContent='';
+  askText.placeholder=PLACEHOLDER;    /* back to the plain hint if they clear it */
+  /* they are writing — the coaching is over, and it should not be seen to
+     linger a moment past the first keystroke */
+  coachStop();
+}
+/* type -> hold -> erase -> next. Only ever runs on an untouched, empty field. */
+function runGhost(){
+  if(REDUCED||touched) return;
+  let si=0;
+  const bar='<span class="bar"></span>';
+  const paint=t=>{ghost.innerHTML=t+bar};
+  function typeIn(){
+    const s=SUGGESTIONS[si]; let i=0;
+    (function step(){
+      if(touched) return;
+      paint(s.slice(0,++i));
+      ghostTimer=setTimeout(i<s.length?step:hold,34+Math.random()*36);
+    })();
+  }
+  function hold(){ghostTimer=setTimeout(eraseOut,2100)}
+  function eraseOut(){
+    const s=SUGGESTIONS[si]; let i=s.length;
+    (function step(){
+      if(touched) return;
+      paint(s.slice(0,--i));
+      ghostTimer=setTimeout(i>0?step:next,16);
+    })();
+  }
+  function next(){si=(si+1)%SUGGESTIONS.length;ghostTimer=setTimeout(typeIn,320)}
+  askText.placeholder='';            /* the ghost replaces it */
+  typeIn();
+}
+
+/* ---- the welcome card ---- */
+const welcome=document.getElementById('welcome');
+const wlName =document.getElementById('wlName');
+const WL_OUT =240;                   /* how long the card takes to leave */
+let wlOpen=false;
+
+/* This prototype has no account behind it, so "the first time" is the first
+   time the first-run view is looked at in this run. */
+let welcomeSeen=false;
+function openWelcome(){
+  if(wlOpen) return;
+  welcomeSeen=true; wlOpen=true;
+  welcome.hidden=false;
+  welcome.classList.remove('out');
+  /* stagger the card's own contents — reading order and arrival order match */
+  [...welcome.querySelector('.wl-card').children]
+    .forEach((c,i)=>c.style.setProperty('--d',i*55));
+  /* the name, not the photo — it is the only thing here anyone came to change */
+  setTimeout(()=>wlName.focus({preventScroll:true}),320*SPEED);
+}
+function closeWelcome(){
+  if(!wlOpen) return;
+  wlOpen=false;
+  welcome.classList.add('out');
+  setTimeout(()=>{welcome.hidden=true},WL_OUT*SPEED);
+  /* And only now does the page behind it arrive. Deliberately not overlapped
+     with the card's exit — two things moving over each other reads as a mess,
+     and the sweep is worth watching on its own. */
+  setTimeout(revealDashboard,WL_OUT*SPEED);
+}
+/* One answer per question. Pressing the chosen one again takes it back — the
+   whole card is skippable, so an answered question has to be un-answerable
+   too, or the only way out of a mis-tap is the Skip link. */
+['wlDo','wlWhen'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    const chip=e.target.closest('.wl-chip');
+    if(!chip) return;
+    e.stopPropagation();
+    const was=chip.classList.contains('on');
+    [...e.currentTarget.children].forEach(c=>c.classList.remove('on'));
+    chip.classList.toggle('on',!was);
+  });
+});
+document.getElementById('wlGo').addEventListener('click',e=>{
+  e.stopPropagation();
+  /* the one answer that has somewhere to go — if they changed their name the
+     page had better be calling them by it a second later */
+  const n=wlName.value.trim();
+  if(n){
+    const first=n.split(/\s+/)[0];
+    document.querySelectorAll('.v-welcome, .v-greet').forEach(el=>{
+      if(el.tagName==='H1') el.textContent=el.classList.contains('v-welcome')
+        ? 'Welcome to Relay, '+first : 'Good morning, '+first;
+    });
+  }
+  closeWelcome();
+  toast('All set — tell us what you are stuck on');
+});
+document.getElementById('wlSkip').addEventListener('click',e=>{e.stopPropagation();closeWelcome()});
+document.getElementById('wlX')   .addEventListener('click',e=>{e.stopPropagation();closeWelcome()});
+document.getElementById('wlScrim').addEventListener('click',e=>{e.stopPropagation();closeWelcome()});
+document.getElementById('wlDrop').addEventListener('click',e=>{
+  e.stopPropagation();toast('Photo upload is not wired up in the prototype');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&wlOpen) closeWelcome()});
+
+/* it belongs to the first-run view, so it arrives with it */
+function maybeWelcome(){
+  if(document.getElementById('home').dataset.view==='new'&&!welcomeSeen){
+    setTimeout(openWelcome,260);
+    return true;
+  }
+  return false;
+}
+
+/* ============================================================
+   ENTRANCE — the page arrives top to bottom, once, when it is its turn
+   ============================================================ */
+const RISE_STEP=58;    /* ms between one piece and the next */
+const RISE_RUN =820;   /* how long a single piece takes, matching .rise */
+let REVEAL=[], REVEALED=false;
+
+/* Runs before the first paint. Works out what order the pieces should arrive
+   in and hides them until then. Sorting by where things actually are, rather
+   than by markup order, is what keeps this honest — the rail is a column on a
+   desktop and a strip across the top on a phone, and in both cases this sweeps
+   down the screen the way somebody reads it. Ties go left to right. */
+function markEntrance(){
+  if(REDUCED) return;
+  const els=[
+    ...document.querySelectorAll('.rail .nav-item'),
+    document.querySelector('#home .page-h'),
+    hero,
+    document.querySelector('.askwrap .starters-lead'),
+    ...document.querySelectorAll('.askwrap .starters .starter'),
+    document.querySelector('.askwrap .altcall'),
+  ].filter(Boolean);
+
+  els.map(el=>({el,r:el.getBoundingClientRect()}))
+     .sort((a,b)=>(a.r.top-b.r.top)||(a.r.left-b.r.left))
+     .forEach((o,i)=>{
+       o.el.style.setProperty('--d',i*RISE_STEP);
+       o.el.classList.add('hold');
+     });
+
+  REVEAL=els;
+}
+
+/* and this is the turn. Returns how long the whole sweep takes, so whatever
+   comes next can wait for the page to settle instead of guessing. */
+function stageEntrance(){
+  if(REDUCED||!REVEAL.length) return 0;
+  REVEAL.forEach(el=>{el.classList.remove('hold');el.classList.add('rise')});
+  return (REVEAL.length-1)*RISE_STEP+RISE_RUN;
+}
+
+/* The page comes down, and only once it has settled does it start asking for
+   anything: the cursor lands in a box that has stopped moving, the placeholder
+   types into a box that is already there, and the coach waits longer still. */
+function revealDashboard(){
+  if(REVEALED) return;
+  /* nobody watches an animation they cannot see, and a page that finished
+     arriving behind the scrim has no arrival left to show when it goes */
+  if(wlOpen) return;
+  REVEALED=true;
+  setTimeout(startHome,stageEntrance()*SPEED);
+}
+function startHome(){
+  /* .focus() only fires a focus event when the document itself has focus — if
+     the window is in the background the class has to be set by hand. */
+  askText.focus({preventScroll:true});
+  hero.classList.add('focused');
+  runGhost();
+  /* And last of all, the bubble. It is the loudest thing on the screen and the
+     only one that moves on its own, so it does not get to speak over the page
+     arriving — it waits out the ghost's first line, long enough that somebody
+     who already knows what they came to type never sees it at all. */
+  setTimeout(coachStart,1700*SPEED);
+}
+
+/* ============================================================
+   THE COACH — one bubble that walks the screen while the box is empty
+   ============================================================ */
+const coach   =document.getElementById('coach');
+const coachIn =document.getElementById('coachIn');
+const coachTx =document.getElementById('coachTx');
+const coachArr=document.getElementById('coachArrow');
+const coachDot=[...document.getElementById('coachDots').children];
+const mainEl  =document.querySelector('.main');
+const askFieldEl=document.getElementById('askField');
+
+/* Each stop names what it points at, which margin it would rather stand in,
+   and what it says. `at` returns the thing to point at in window coordinates —
+   a function rather than a selector, because the first stop points at the line
+   you type on, which is not an element.
+
+   `gutter` is where it wants to be: the empty page margin on that side of the
+   card, pointing in. `fall` is where it goes instead when the window is too
+   narrow to have a margin — back on top of the card.
+
+   `tip` is the box the arrow has to reach from out there: the first stop aims
+   at the line you type on and touches the field that line is in. */
+const COACH_STOPS=[
+  { at:()=>{
+      const r=askText.getBoundingClientRect();
+      return {left:r.left+18,top:r.top+Math.min(r.height*.42,62),width:150,height:2};
+    },
+    tip:()=>askFieldEl.getBoundingClientRect(),
+    gutter:'left', fall:'bottom', text:'Describe your problem here' },
+
+  { at:()=>document.getElementById('askGo').getBoundingClientRect(),
+    gutter:'right', fall:'left', text:'Then click here to connect with an engineer' },
+
+  { at:()=>document.getElementById('facePile').getBoundingClientRect(),
+    gutter:'right', fall:'bottom', text:'We match you with an engineer who has worked on your problem' },
+
+  /* Last, and deliberately so: the two ways in, then who you get, and only then
+     the door for somebody who would rather not write any of it down. */
+  { at:()=>document.getElementById('callNowBtn').getBoundingClientRect(),
+    gutter:'right', fall:'right', text:'Or come down here if you would rather just talk' },
+];
+
+const COACH_GAP=13;   /* bubble to target, on the card */
+/* Out in the page margin it stands closer: there is nothing between it and the
+   card to be crowded by, and at arm's length the nub reads as a loose arrow
+   rather than as this bubble pointing at that box. */
+const COACH_HUG=6;
+const COACH_PAD=12;   /* bubble to the edge of whatever is holding it */
+const COACH_TIP=8;    /* how far the nub's point sticks out past the bubble */
+/* and how far over the card the bubble will lean to reach its target. A target
+   further in than this is not one it can walk up to without parking on top of
+   everything between, so it stays out at the edge. */
+const COACH_INTRUDE=80;
+let coachAt=0, coachTimer=null, coachHop=null, coachHide=null, coachOver=false;
+let coachHt=null, coachIntro=null;
+
+/* Used only once the margins have run out. Put the bubble on the first side of
+   the target that actually fits, starting from the one the stop asked for. */
+const COACH_ORDER={ bottom:['bottom','top','left','right'],
+                    top:   ['top','bottom','right','left'],
+                    left:  ['left','top','right','bottom'],
+                    right: ['right','bottom','left','top'] };
+
+const cclamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+
+function coachPlace(stop,instant){
+  const t=stop.at();
+  if(!t||(!t.width&&!t.height)) return false;
+
+  /* Window coordinates throughout; the one conversion into the main column's
+     own scrolled coordinates happens at the very end, once. */
+  const card=hero.getBoundingClientRect();
+  const M=mainEl.getBoundingClientRect();     /* it may not stray over the rail */
+  const cw=coach.offsetWidth, ch=coachIn.offsetHeight;
+  const cx=t.left+t.width/2, cy=t.top+t.height/2;
+  const fits=cw+COACH_HUG+COACH_PAD;
+
+  let side=null,x=0,y=0;
+
+  /* First choice: the empty margin beside the card. It only exists on a window
+     wide enough for the content column to stop short of the edges, which is
+     exactly when the bubble has somewhere better to be than on top of the card. */
+  if(stop.gutter==='left' && card.left-M.left>=fits){
+    side='left';  x=card.left-COACH_HUG-cw; y=cy-ch/2;
+  }else if(stop.gutter==='right' && M.right-card.right>=fits){
+    side='right'; x=card.right+COACH_HUG;   y=cy-ch/2;
+  }
+
+  if(side){
+    /* Stopping at the card's edge leaves the nub pointing at the card's
+       padding, which is not the thing it means. So the whole bubble leans in
+       until the point is on the box itself — and no further than
+       COACH_INTRUDE, which keeps it off anything written on the card. */
+    const e=(stop.tip||stop.at)();
+    const lean=side==='left' ? (e.left-cw-COACH_TIP)-x
+                             : x-(e.left+e.width+COACH_TIP);
+    if(lean>0&&lean<=COACH_INTRUDE) x+=side==='left'?lean:-lean;
+    /* the margin runs the height of the window, so only the ends need holding */
+    y=cclamp(y,M.top+COACH_PAD,Math.max(M.top+COACH_PAD,M.bottom-ch-COACH_PAD));
+  }else{
+    /* No margin. Back on the card, kept inside it. */
+    const room={
+      top:   (t.top-card.top)                -COACH_GAP-COACH_PAD,
+      bottom:(card.bottom-t.top-t.height)    -COACH_GAP-COACH_PAD,
+      left:  (t.left-card.left)              -COACH_GAP-COACH_PAD,
+      right: (card.right-t.left-t.width)     -COACH_GAP-COACH_PAD,
+    };
+    const need={top:ch,bottom:ch,left:cw,right:cw};
+    side=(COACH_ORDER[stop.fall]||COACH_ORDER.bottom).find(s=>room[s]>=need[s])||stop.fall;
+
+    if(side==='bottom'){x=cx-cw/2;             y=t.top+t.height+COACH_GAP}
+    if(side==='top')   {x=cx-cw/2;             y=t.top-ch-COACH_GAP}
+    if(side==='left')  {x=t.left-cw-COACH_GAP; y=cy-ch/2}
+    if(side==='right') {x=t.left+t.width+COACH_GAP; y=cy-ch/2}
+
+    x=cclamp(x,card.left+COACH_PAD,Math.max(card.left+COACH_PAD,card.right-cw-COACH_PAD));
+    y=cclamp(y,card.top +COACH_PAD,Math.max(card.top +COACH_PAD,card.bottom-ch-COACH_PAD));
+  }
+
+  /* The bubble may have been pushed along its axis to stay in bounds, so the
+     nub is placed from where the bubble actually landed — it keeps pointing at
+     the target even when the bubble no longer lines up with it. */
+  const vert=side==='top'||side==='bottom';
+  const off=cclamp(vert?cx-x:cy-y,16,(vert?cw:ch)-16)-6.5;
+  /* and it takes the colour of the end of the gradient it is sitting on */
+  const nub=side==='bottom'?'var(--accent)'
+           :side==='top'   ?'var(--accent-deep)':'#03603F';
+  coachArr.style.cssText=
+    (side==='bottom'?`left:${off}px;top:-5px`
+    :side==='top'   ?`left:${off}px;top:${ch-8}px`
+    :side==='left'  ?`left:${cw-8}px;top:${off}px`
+                    :`left:-5px;top:${off}px`)+`;background:${nub}`;
+
+  /* the entrance grows the bubble out of the nub's point, so it has to be told
+     where on the box that point is — only known here, after the nub is placed */
+  const oa=(off+6.5)+'px';
+  coachIn.style.transformOrigin=
+    side==='bottom'?`${oa} 0`
+   :side==='top'   ?`${oa} 100%`
+   :side==='left'  ?`100% ${oa}`:`0 ${oa}`;
+
+  /* out of the window's coordinates and into the column it hangs off */
+  const px=x-M.left+mainEl.scrollLeft;
+  const py=y-M.top +mainEl.scrollTop;
+
+  /* The first placement must not be a journey from the top-left corner, so the
+     travel transition is switched off, the move is forced through with a
+     reflow, and it is switched back on — all in one go. A rAF would be neater
+     and would not survive the tab being in the background, where rAF simply
+     stops and the bubble would never appear at all. */
+  if(instant) coach.style.transition='none';
+  coach.style.transform=`translate3d(${Math.round(px)}px,${Math.round(py)}px,0)`;
+  if(instant){void coach.offsetWidth;coach.style.transition=''}
+  return true;
+}
+
+function coachPaint(i){
+  coachTx.textContent=COACH_STOPS[i].text;
+  coachDot.forEach((d,n)=>d.classList.toggle('on',n===i));
+}
+
+/* Walk the box from the height it had to the height the new sentence needs.
+   The order matters and is not the obvious one: the text is swapped and the
+   bubble is placed first, at the new text's true height, because placement
+   measures the box and must never measure one that is mid-flight. */
+function coachMorph(h0){
+  clearTimeout(coachHt);
+  if(REDUCED) return;
+  const h1=coachIn.offsetHeight;
+  if(!h0||h0===h1) return;
+  coachIn.style.height=h0+'px';
+  void coachIn.offsetWidth;
+  coachIn.style.height=h1+'px';
+  coachHt=setTimeout(()=>{coachIn.style.height=''},560*SPEED);
+}
+
+function coachGo(i,instant){
+  coachAt=i;
+  if(instant){
+    clearTimeout(coachHt);
+    coachIn.style.height='';
+    coachPaint(i);
+    /* a dismissal from a moment ago still has its hide pending — cancel it, or
+       it lands 360ms from now and takes this bubble down with it */
+    clearTimeout(coachHide);
+    /* off before the placement below, because the forced reflow inside it is
+       what re-arms the entrance if the bubble has been dismissed and called
+       back — an animation only restarts across a reflow with the class gone */
+    coach.classList.remove('intro');
+    coach.hidden=false;
+    coachPlace(COACH_STOPS[i],true);
+    coach.classList.remove('moving');
+    coach.classList.add('intro','on');       /* that reflow is what runs these */
+    clearTimeout(coachIntro);
+    coachIntro=setTimeout(()=>coach.classList.remove('intro'),1000*SPEED);
+    return;
+  }
+  /* words out, then travel with the text hidden, then words back in */
+  coach.classList.add('moving');
+  clearTimeout(coachHop);
+  coachHop=setTimeout(()=>{
+    const h0=coachIn.offsetHeight;
+    coachPaint(i);
+    coachPlace(COACH_STOPS[i]);
+    coachMorph(h0);
+    /* the words come back as it settles, not after it has stopped */
+    coachHop=setTimeout(()=>coach.classList.remove('moving'),700*SPEED);
+  },180*SPEED);
+}
+
+function coachStart(){
+  if(coachTimer||touched||askText.value.trim()) return;
+  if(document.getElementById('home').dataset.view!=='new') return;
+  if(!document.getElementById('home').classList.contains('on')) return;
+  coachGo(0,true);
+  if(REDUCED){coachTimer=-1;return}              /* one stop, standing still */
+  coachTimer=setInterval(()=>{
+    if(coachOver) return;   /* they are reading it — do not move it mid-sentence */
+    coachGo((coachAt+1)%COACH_STOPS.length);
+  },3400*SPEED);
+}
+
+function coachStop(){
+  if(coachTimer&&coachTimer!==-1) clearInterval(coachTimer);
+  clearTimeout(coachHop);
+  clearTimeout(coachIntro);
+  clearTimeout(coachHt);
+  coachTimer=null;
+  coach.classList.remove('on','intro');
+  /* let it fade before it leaves the layout */
+  clearTimeout(coachHide);
+  coachHide=setTimeout(()=>{if(!coachTimer) coach.hidden=true},360);
+}
+
+/* Hovering the bubble holds it still. Its own pointer-events are off so it
+   cannot block the button it points at, so the document has to report this. */
+document.addEventListener('pointermove',e=>{
+  if(!coachTimer||coachTimer===-1) return;
+  const b=coach.getBoundingClientRect();
+  coachOver=e.clientX>=b.left&&e.clientX<=b.right&&
+            e.clientY>=b.top &&e.clientY<=b.bottom;
+});
+document.addEventListener('pointerleave',()=>{coachOver=false});
+
+/* The card changes width with the window, and a bubble pinned to stale
+   coordinates would drift off its target. */
+let coachRz=null;
+addEventListener('resize',()=>{
+  if(!coachTimer) return;
+  clearTimeout(coachRz);
+  coachRz=setTimeout(()=>coachPlace(COACH_STOPS[coachAt],true),140);
+});
+
+/* the coach belongs to the home screen and to nothing else */
+const _show=show;
+show=function(id){
+  _show(id);
+  if(id==='home'){ if(!touched) setTimeout(coachStart,420); }
+  else coachStop();
+};
+
+/* the two counts on the returning view's jump row, kept honest as sessions
+   and projects are created during the demo */
+function paintJump(){
+  const s=document.getElementById('rjSess'), p=document.getElementById('rjProj');
+  if(s) s.textContent=SESS_ORDER.length;
+  if(p) p.textContent=PROJ_ORDER.length;
+}
+
+/* ---- boot ---- */
+paintJump();
+renderProjRows();
+renderEngineers();
+renderHomeRecent();
+paintHeroTag();
+fpStart();
+
+/* The first-run view is what the page opens on, so the chrome that belongs to
+   a returning customer is not there to be seen arriving. */
+document.querySelectorAll('.nav-item .count').forEach(n=>{n.style.display='none'});
+document.getElementById('meSub').textContent='No calls yet';
+
+/* Before anything is drawn: work out the order the page will arrive in, and
+   hold it there. Two openings, and only one of them happens — there is no
+   sense assembling a page behind a scrim, and a page that finished arriving
+   while it was hidden has no arrival left to show when the scrim goes. */
+markEntrance();
+if(!maybeWelcome()) revealDashboard();
 </script>
 </body>
 </html>
