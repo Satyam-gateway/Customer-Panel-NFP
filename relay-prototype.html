@@ -369,7 +369,9 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 #home[data-view="new"] .only-ret{display:none}
 #home[data-view="new"] .v-greet{display:none}
 #home:not([data-view="new"]) .v-welcome{display:none}
-.home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+/* The greeting moved down into the card, so all that is left up here is the
+   demo switch and the faces — and they belong on the right. */
+.home-head{display:flex;align-items:flex-start;justify-content:flex-end;gap:20px}
 .viewswitch{display:flex;align-items:center;gap:6px;background:var(--line-soft);
   border:1px solid var(--line);border-radius:999px;padding:4px 5px 4px 12px;flex:none}
 .viewswitch>span{font-size:11px;color:var(--faint);font-weight:600;margin-right:2px}
@@ -407,47 +409,33 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
    ============================================================ */
 /* the card is the page's centrepiece in both views, so it gets the full
    column and sits in the middle of it — the same measure the dashboard uses */
-#home{max-width:1080px;margin-left:auto;margin-right:auto}
-.askwrap{margin-bottom:14px}
+#home{max-width:940px;margin-left:auto;margin-right:auto}
+/* A composer is read one line at a time, so it is given a column and not a
+   page: narrow enough that the eye never has to travel, centred so there is
+   nothing either side of it competing to be looked at first. Everything the
+   two views hang underneath it keeps the same measure, or the card would read
+   as a narrow thing sitting on a wider page. */
+.askwrap,.only-new,.only-ret{max-width:780px;margin-left:auto;margin-right:auto}
+/* Dropped down off the top of the page. With the card gone there is nothing
+   up there to anchor it, and a composer pinned to the ceiling above half a
+   screen of empty white reads as the leftovers of something rather than the
+   thing you came for. It is a share of the window's height rather than a
+   fixed inset, so a short laptop screen is not pushed into scrolling for it
+   — and it is capped, so a tall one does not strand it in the middle. */
+.askwrap{margin-top:clamp(14px,12vh,130px);margin-bottom:14px}
 .only-new{display:flex;flex-direction:column;gap:14px}
 /* the flex gap is real even when the box is empty, so it has to go too */
 #homeRecent:empty{display:none}
 
-/* ---- the returning view's own way out of the card ----
-   Somebody coming back rarely wants to start from nothing; the first thing
-   they want is usually the thing they were already doing. Hidden on the
-   first run, where there is nothing behind them to go back to. */
-.ret-jump{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
-#home[data-view="new"] .ret-jump{display:none}
-.ret-jump .rj-lead{font-size:13px;color:var(--muted)}
-.rj{
-  display:inline-flex;align-items:center;gap:7px;background:var(--card);
-  border:1px solid var(--line);border-radius:999px;padding:8px 15px;
-  font-size:13.5px;font-weight:600;color:var(--ink);
-  transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease);
-}
-.rj .g{font-size:13px;opacity:.9}
-.rj:hover{background:var(--accent-soft);border-color:var(--accent-line);transform:translateY(-1px)}
-.rj:active{transform:translateY(0)}
-.rj .n{
-  font-size:11.5px;font-weight:700;color:var(--muted);background:var(--line-soft);
-  border-radius:999px;padding:1px 7px;
-}
-
-.askwrap .hero{
-  position:relative;
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-xl);
-  box-shadow:0 2px 6px rgba(16,24,28,.05),0 14px 40px -14px rgba(16,24,28,.17);
-  overflow:visible;
-  transition:box-shadow .3s var(--ease),border-color .3s var(--ease);
-}
-.askwrap .hero.focused{
-  border-color:var(--accent-line);
-  box-shadow:0 2px 6px rgba(16,24,28,.05),0 24px 60px -18px rgba(var(--accent-rgb),.26);
-}
-/* a slow wash behind the hero — reads as "someone is awake in there" */
+/* There is one box on this page and it is the box you type in. The card that
+   used to hold it has been taken away entirely — no border, no fill, no
+   shadow — because a panel drawn around a panel makes the page look like it
+   is asking twice. What is left is a bare column on the page background, the
+   way ChatGPT, Claude and every other composer worth copying does it. */
+.askwrap .hero{position:relative;background:none;border:0;box-shadow:none;overflow:visible}
+/* a slow wash behind the composer — reads as "someone is awake in there" */
 .askwrap .hero::before{
-  content:"";position:absolute;left:50%;top:-180px;width:620px;height:340px;
+  content:"";position:absolute;left:50%;top:-140px;width:620px;height:340px;
   transform:translateX(-50%);pointer-events:none;
   background:radial-gradient(ellipse at center, rgba(var(--accent-rgb),.09), rgba(var(--accent-rgb),0) 68%);
   animation:heroWash calc(7s * var(--speed)) ease-in-out infinite;
@@ -455,90 +443,34 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 @keyframes heroWash{0%,100%{opacity:.55;transform:translateX(-50%) scale(1)}
   50%{opacity:1;transform:translateX(-50%) scale(1.12)}}
 
-/* the band across the top. Neutral, so the one green thing is the live dot. */
-.askwrap .hero-tag{
-  position:relative;display:flex;align-items:center;gap:8px;
-  background:var(--accent-soft);color:var(--ink);border-bottom:1px solid var(--line-soft);
-  border-radius:var(--r-xl) var(--r-xl) 0 0;
-  font-weight:600;font-size:12.5px;padding:11px 40px;letter-spacing:-.005em;
-}
-.askwrap .hero-tag::before{content:none}
-.askwrap .hero-tag .who{color:var(--muted);font-weight:500;font-size:11.5px}
-.tinydot{width:7px;height:7px;border-radius:50%;background:var(--live);flex:none;position:relative}
-.tinydot::after{
-  content:"";position:absolute;inset:0;border-radius:50%;background:var(--live);
-  animation:tinyPulse calc(2.2s * var(--speed)) var(--ease) infinite;
-}
-@keyframes tinyPulse{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(2.6);opacity:0}}
-
-/* ---- the face at the end of the band ----
-   One face that keeps changing says "there are more of us than fit here" and
-   asks for nothing. The chevron is there for whoever does want the list. */
-.facepile{position:relative;display:flex;align-items:center;margin-left:auto}
-.fp-btn{
-  display:flex;align-items:center;gap:9px;padding:3px 9px 3px 3px;border-radius:999px;
-  border:1px solid transparent;background:transparent;cursor:pointer;font:inherit;
-  transition:background .2s var(--ease),border-color .2s var(--ease);
-}
-.fp-btn:hover,.facepile.open .fp-btn{background:var(--card);border-color:var(--accent-line)}
-/* fixed size — a swap that changed the band's height would shove the page */
-.fp-stage{position:relative;width:30px;height:30px;flex:none}
-.fp-stage .av{
-  position:absolute;inset:0;width:100%;height:100%;font-size:11px;
-  box-shadow:0 0 0 2px var(--card),0 2px 6px rgba(20,24,26,.14);
-}
-.fp-stage .av.out{animation:fpOut calc(.52s * var(--speed)) var(--ease) forwards}
-.fp-stage .av.in {animation:fpIn  calc(.52s * var(--speed)) var(--ease) backwards}
-@keyframes fpOut{to  {opacity:0;transform:translateY(-10px) scale(.9)}}
-@keyframes fpIn {from{opacity:0;transform:translateY(10px)  scale(.9)}}
-.fp-name{
-  font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;
-  width:56px;overflow:hidden;text-overflow:ellipsis;text-align:left;
-}
-.fp-name.swap{animation:fpNameIn calc(.52s * var(--speed)) var(--ease)}
-@keyframes fpNameIn{0%{opacity:0;transform:translateY(5px)}55%,100%{opacity:1;transform:none}}
-.fp-cv{width:12px;height:12px;flex:none;color:var(--faint);fill:none;stroke:currentColor;
-  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .24s var(--ease)}
-.facepile.open .fp-cv{transform:rotate(180deg)}
-.fp-menu{
-  position:absolute;top:calc(100% + 9px);right:0;z-index:70;width:320px;
-  max-height:min(62vh,380px);overflow:auto;padding:6px;
-  background:var(--card);border:1px solid var(--line);border-radius:16px;
-  box-shadow:0 20px 48px -16px rgba(20,24,26,.30),0 2px 8px rgba(20,24,26,.07);
-  opacity:0;transform:translateY(-7px) scale(.97);transform-origin:100% 0;
-  pointer-events:none;
-  transition:opacity .2s var(--ease),transform .2s var(--ease);
-}
-.facepile.open .fp-menu{opacity:1;transform:none;pointer-events:auto}
-.fp-head{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--faint);padding:9px 12px 7px}
-.fp-row{
-  display:flex;align-items:center;gap:11px;width:100%;cursor:pointer;font:inherit;
-  border:0;background:none;padding:8px 10px;border-radius:11px;text-align:left;
-  transition:background .16s var(--ease);
-}
-.fp-row:hover{background:var(--accent-soft)}
-.fp-row .av{width:34px;height:34px;font-size:11.5px;flex:none}
-.fp-row .t{min-width:0;flex:1}
-.fp-row .t b{display:block;font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.005em}
-.fp-row .t i{display:block;font-style:normal;font-size:11.5px;color:var(--muted);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fp-st{flex:none;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px}
-.fp-st.live{background:var(--live-bg);color:var(--live-ink)}
-.fp-st.busy{background:var(--turn-bg);color:var(--turn-ink)}
-.fp-st.off{background:var(--line-soft);color:var(--muted)}
-
 /* ---- the ask itself ---- */
-.askwrap .ask{position:relative;padding:44px 40px 36px}
-.askwrap .ask h2{font-size:40px;line-height:1.1;letter-spacing:-.02em;margin:0 0 12px}
-.askwrap .ask-lede{color:var(--muted);font-size:16px;line-height:1.6;margin:0 0 26px;max-width:56ch}
+/* no side padding: the card's inset went with the card, and the box is now
+   measured by the column it sits in */
+.askwrap .ask{position:relative;padding:0}
+
+/* The mark, then the greeting, then the box — one centred stack, because the
+   greeting and the thing it is greeting you into are the same object. It is
+   said once here and nowhere else on the page; a heading in the corner saying
+   the same words would only be the page talking over itself. */
+/* Each step down the stack gets more air than the one above it: the mark and
+   the greeting are one thing said twice, so they sit close; the greeting and
+   the box are two different things, so they stand apart. */
+.ask-brand{display:flex;flex-direction:column;align-items:center;gap:16px;margin:0 0 34px}
+/* .orb is declared again further down for the welcome card, so the mark has
+   to be reached through its parent to win on specificity rather than order */
+.ask-brand .orb{width:34px;height:34px}
+.ask-name{
+  font-family:"Bricolage Grotesque",sans-serif;
+  font-size:23px;font-weight:700;letter-spacing:-.018em;color:var(--accent-deep);line-height:1.1;
+  margin:0;text-align:center;
+}
 
 /* The composer. Resting it is a quiet recessed panel; focused it lifts off the
    card, turns white, and picks up a soft green halo — every part on the same
    curve and the same 260ms, so it reads as one object, not four properties. */
 .askwrap .ask-field{
   position:relative;
-  border:1.5px solid var(--line);border-radius:20px;overflow:hidden;
+  border:1.5px solid var(--line);border-radius:16px;overflow:hidden;
   background:linear-gradient(180deg,#FBFBFD,#F5F6F9);
   box-shadow:inset 0 1px 2px rgba(20,24,26,.035);
   transition:border-color .26s var(--ease),background .26s var(--ease),
@@ -560,8 +492,8 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 }
 .askwrap .hero.focused .ask-field::before{opacity:.75;transform:scaleX(1)}
 .askwrap .ask-field textarea{
-  width:100%;border:0;background:none;resize:none;font:inherit;font-size:19px;line-height:1.55;
-  color:var(--ink);padding:26px 26px 10px;outline:none;display:block;min-height:152px;
+  width:100%;border:0;background:none;resize:none;font:inherit;font-size:15px;line-height:1.55;
+  color:var(--ink);padding:18px 20px 6px;outline:none;display:block;min-height:92px;
   caret-color:var(--accent);position:relative;z-index:1;
 }
 .askwrap .ask-field textarea::placeholder{color:var(--faint)}
@@ -569,8 +501,8 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 /* the suggestion typing itself out behind the caret */
 .field-wrap{position:relative}
 .ghost{
-  position:absolute;inset:26px 26px auto 26px;pointer-events:none;
-  font-size:19px;line-height:1.55;color:var(--faint);white-space:pre-wrap;
+  position:absolute;inset:18px 20px auto 20px;pointer-events:none;
+  font-size:15px;line-height:1.55;color:var(--faint);white-space:pre-wrap;
 }
 .ghost .bar{
   display:inline-block;width:2px;height:1.05em;margin-left:1px;vertical-align:-3px;border-radius:1px;
@@ -597,18 +529,23 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   border:0;background:none;cursor:pointer}
 .askwrap .cf-x:hover{color:var(--ink)}
 
-/* The tools sit on their own footer, divided by a hairline. That one line is
-   what turns a bordered textarea into something that reads as a composer. */
+/* The tools sit on the floor of the same box, with no rule above them. The
+   border around the whole thing is already saying where the composer ends;
+   a second line inside it only cuts the box in half. Signs to the left,
+   voice and the button together on the right, which is the order of the
+   decision: what you are attaching, then how you would rather say it. */
 .askwrap .ask-tools{
-  display:flex;align-items:center;gap:10px;padding:14px 16px;flex-wrap:wrap;
-  border-top:1px solid var(--line-soft);background:rgba(255,255,255,.45);
-  transition:border-color .26s var(--ease),background .26s var(--ease);
+  display:flex;align-items:center;gap:8px;padding:6px 10px 10px;flex-wrap:wrap;
 }
-.askwrap .hero.focused .ask-tools{border-top-color:#E7F2EC;background:#FBFDFC}
+/* voice, call and send travel together on the right — they are the three ways
+   of finishing the sentence, and separating them would make one look like the
+   odd one out */
+.tools-r{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+.askwrap .ask-tools .cta-ring{margin-left:0}
 .tool{
-  display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
   border:1px solid var(--line);background:var(--card);cursor:pointer;font:inherit;
-  font-size:13.5px;font-weight:600;color:var(--muted);
+  font-size:12.5px;font-weight:600;color:var(--muted);
   transition:background .2s var(--ease),color .2s var(--ease),
              border-color .2s var(--ease),transform .2s var(--ease);
 }
@@ -616,7 +553,42 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   transform:translateY(-1px)}
 .tool:active{transform:translateY(0) scale(.98)}
 .tool.on{background:var(--accent-lift);border-color:var(--accent);color:#fff}
-.tool .g{font-size:14px;opacity:.75}
+.tool .g{font-size:12.5px;opacity:.75}
+/* A sign, not a sentence. Both of these are understood the world over, so the
+   label only ever cost the row width — it survives as the title and the
+   accessible name, which is where a label of that kind actually gets read. */
+.tool.ico{width:32px;height:32px;padding:0;justify-content:center;flex:none}
+.tool.ico svg{width:16px;height:16px;display:block}
+.tool.bare{border-color:transparent;background:none}
+.tool.bare:hover{border-color:transparent;background:var(--accent-bg)}
+
+/* Where this ask belongs. Nobody has a project or an earlier session before
+   their first call, so until then these two are not in the row at all —
+   an empty dropdown is worse than no dropdown. */
+.scope-wrap{display:none}
+body.hascalls .scope-wrap{display:inline-flex}
+.pickwrap{position:relative}
+.scope .cv{width:11px;height:11px;flex:none;opacity:.7}
+.scope .lb{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scope.set{border-color:var(--accent-line);background:var(--accent-bg);color:var(--accent-deep)}
+
+/* the list opens upward — the row is already at the floor of the box */
+.pickpop{
+  position:absolute;bottom:calc(100% + 8px);left:0;z-index:40;min-width:212px;max-width:280px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;
+  box-shadow:0 18px 40px -16px rgba(20,24,26,.28),0 2px 6px rgba(20,24,26,.06);
+  opacity:0;transform:translateY(6px) scale(.98);pointer-events:none;
+  transition:opacity .16s var(--ease),transform .16s var(--ease);
+}
+.pickwrap.open .pickpop{opacity:1;transform:none;pointer-events:auto}
+.pickpop button{
+  display:block;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:13px;
+  color:var(--ink);padding:7px 9px;border-radius:8px;cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pickpop button:hover{background:var(--accent-soft);color:var(--accent-deep)}
+.pickpop .none{padding:8px 9px;color:var(--faint);font-size:12.5px}
+.pickpop .clear{color:var(--muted);border-top:1px solid var(--line-soft);border-radius:0 0 8px 8px;margin-top:3px}
 
 /* One click, and it is the green the product is named for. The gradient runs
    dark-to-darker on purpose: a lighter top edge would drop the white label
@@ -651,10 +623,10 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .cta-ring:hover .golive{animation:none}
 
 .golive{
-  display:inline-flex;align-items:center;gap:11px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:9px;cursor:pointer;
   background:linear-gradient(180deg,var(--accent-lift),var(--accent));
   color:#fff;border:1px solid var(--accent);font-family:inherit;
-  border-radius:999px;padding:14px 26px 14px 20px;font-weight:700;font-size:16px;
+  border-radius:999px;padding:9px 18px 9px 14px;font-weight:700;font-size:13.5px;
   letter-spacing:-.005em;
   box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
              0 10px 24px -6px rgba(var(--accent-rgb),.45),
@@ -670,7 +642,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 }
 .golive:active{transform:translateY(0) scale(.98);filter:brightness(.94)}
 /* the handset, with the two ring arcs going out from it on a loop */
-.golive .gd{width:19px;height:19px;flex:none;display:block;color:#fff}
+.golive .gd{width:15px;height:15px;flex:none;display:block;color:#fff}
 .golive .gd svg{width:100%;height:100%;display:block;overflow:visible}
 .golive .gd .arc{transform-origin:9px 13px;animation:ringOut calc(2.4s * var(--speed)) var(--ease) infinite}
 .golive .gd .arc2{animation-delay:calc(.18s * var(--speed))}
@@ -679,35 +651,40 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .golive .gd .body{transform-origin:12px 12px;animation:ringShake calc(2.4s * var(--speed)) var(--ease) infinite}
 @keyframes ringShake{0%,8%,20%,100%{transform:rotate(0)}12%{transform:rotate(-7deg)}16%{transform:rotate(5deg)}}
 
+/* The call button drops its sentence and keeps its ring. At this size the
+   handset and the green are the whole message, and the row now has two other
+   buttons in it that need the width. The words survive as the tooltip. */
+.golive.ico{width:36px;height:36px;padding:0;justify-content:center;border-radius:999px;gap:0}
+.golive.ico .gd{width:17px;height:17px}
+
+/* Send is the quiet door: the same problem, written down, answered in the
+   thread instead of on the line. It stays grey until there is something to
+   send, so it never looks like the thing you were supposed to press. */
+.sendbtn{
+  width:36px;height:36px;flex:none;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--faint);
+  cursor:pointer;font:inherit;
+  transition:background .2s var(--ease),color .2s var(--ease),
+             border-color .2s var(--ease),transform .2s var(--ease);
+}
+.sendbtn svg{width:16px;height:16px;display:block}
+.sendbtn:hover{border-color:var(--line-soft);color:var(--muted)}
+.sendbtn.ready{background:var(--ink);border-color:var(--ink);color:#fff}
+.sendbtn.ready:hover{transform:translateY(-1px);color:#fff}
+.sendbtn:active{transform:translateY(0) scale(.96)}
+
 /* starter phrasings — the real fix for "I don't know how to describe it".
-   Four chips with no label are four orphan buttons; one line turns them
-   into an offer. */
-.starters-lead{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:-.005em;margin:22px 0 10px}
-.starters{display:flex;gap:9px;flex-wrap:wrap}
+   They sit under the box with nothing introducing them: four short sentences
+   in the first person are self-explaining, and a line of label above them
+   would be one more thing to read before the thing worth reading. Centred on
+   the box, so the column reads as one stack. */
+.starters{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:26px}
 .starter{
-  font-size:13.5px;color:var(--muted);background:var(--card);cursor:pointer;font-family:inherit;
-  border:1px solid var(--line);border-radius:999px;padding:9px 16px;
+  font-size:12.5px;color:var(--muted);background:var(--card);cursor:pointer;font-family:inherit;
+  border:1px solid var(--line);border-radius:999px;padding:6px 13px;
   transition:border-color .14s var(--ease),color .14s var(--ease),background .14s var(--ease);
 }
 .starter:hover{border-color:var(--accent-line);color:var(--accent-deep);background:var(--accent-bg)}
-
-/* The other door. Same green as the main button but hollow, so it reads as
-   the quieter of the two rather than a second thing fighting for the click. */
-.altcall{display:flex;align-items:center;gap:13px;flex-wrap:wrap;
-  margin-top:18px;padding-top:17px;border-top:1px solid var(--line)}
-.callnow{
-  display:inline-flex;align-items:center;gap:8px;flex:none;cursor:pointer;font-family:inherit;
-  font-size:13.5px;font-weight:600;color:var(--accent-deep);letter-spacing:-.006em;
-  background:var(--accent-bg);border:1px solid var(--accent-line);
-  border-radius:999px;padding:9px 18px 9px 15px;
-  transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease);
-}
-.callnow svg{width:15px;height:15px;flex:none}
-.callnow:hover{background:var(--accent-soft);border-color:var(--accent);transform:translateY(-1px)}
-.callnow:active{transform:translateY(0)}
-.callnow:hover svg{animation:ringShake calc(1.5s * var(--speed)) var(--ease) 1}
-.altcall .alt-note{font-size:12.5px;color:var(--muted);line-height:1.5}
-.askwrap .ask-note{text-align:center;margin-top:16px}
 
 /* ============================================================
    ENTRANCE — the page assembles downward, once, when it is its turn
@@ -929,9 +906,9 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   .wl-go{padding:13px 20px}
 }
 @media (max-width:900px){
-  .askwrap .ask{padding:30px 22px 26px}
-  .askwrap .ask h2{font-size:30px}
-  .askwrap .hero-tag{padding:11px 20px}
+  .ask-name{font-size:20px}
+  .askwrap .ask-field textarea{padding:16px 16px 6px;min-height:84px}
+  .ghost{inset:16px 16px auto 16px}
 }
 
 /* ---------- available engineers ---------- */
@@ -1154,27 +1131,10 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 .ask-staged{padding:10px 12px 0}
 .ask-staged:empty{display:none}
 
-/* ---------- home: engineer stories rail ---------- */
+/* ---------- home: the strip above the composer ----------
+   Once the rail of engineer faces came out there is one thing left up here,
+   the demo switch, and it sits at the right on its own. */
 .head-right{display:flex;flex-direction:column;align-items:flex-end;gap:14px;flex:none}
-.stories{display:flex;gap:11px;align-items:flex-start}
-.story{background:none;border:0;padding:0;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:5px;width:56px}
-.story .ring{width:48px;height:48px;border-radius:50%;padding:2.5px;
-  display:grid;place-items:center;box-sizing:border-box;transition:transform .12s ease}
-.story:hover .ring{transform:scale(1.06)}
-.story .ring .av{width:100%;height:100%;box-shadow:0 0 0 2px var(--paper)}
-.story.live .ring{background:conic-gradient(from 210deg,#00875A,#5AD6A8,#00875A)}
-.story.busy .ring{background:conic-gradient(from 210deg,#B45309,#E8B05C,#B45309)}
-.story.off .ring{background:var(--line)}
-.story.off .av-img{filter:grayscale(.85);opacity:.75}
-.story.add .ring{background:none;border:1.5px dashed var(--faint)}
-.story.add:hover .ring{border-color:var(--live);background:var(--live-bg)}
-.plus{font-size:21px;font-weight:300;color:var(--faint);line-height:1}
-.story.add:hover .plus{color:var(--live)}
-.s-name{font-size:11px;font-weight:600;color:var(--muted);
-  max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.story.off .s-name{color:var(--faint)}
-#home[data-view="new"] .stories{display:none}
 @media (max-width:1100px){
   .home-head{flex-direction:column;align-items:stretch;gap:16px}
   .head-right{align-items:flex-start}
@@ -1804,44 +1764,24 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
     <div class="coach" id="coach" hidden aria-hidden="true">
       <i class="ca" id="coachArrow"></i>
       <div class="coach-in" id="coachIn">
-        <div class="coach-dots" id="coachDots"><i></i><i></i><i></i><i></i></div>
+        <div class="coach-dots" id="coachDots"><i></i><i></i><i></i></div>
         <p class="coach-tx" id="coachTx"></p>
       </div>
     </div>
 
     <!-- ============ HOME ============ -->
     <section class="screen on" id="home" data-view="new">
+      <!-- The greeting lives on the card now, and the rail of engineer faces
+           that used to sit here has gone with the faces on the card's band:
+           who you get is the answer to asking, not a shelf to browse before
+           you have asked. What is left of the returning view is the sessions
+           you already have open, and those are underneath where they belong. -->
       <div class="page-h home-head">
-        <div>
-          <h1 class="v-greet">Good morning, Rohan</h1>
-          <h1 class="v-welcome">Welcome to Relay, Rohan</h1>
-          <p class="v-greet">Thursday, 25 September</p>
-          <p class="v-welcome">Real engineers, on call for whatever you are building.</p>
-        </div>
         <div class="head-right">
           <div class="viewswitch" title="Demo only — not part of the product">
             <span>Viewing as</span>
             <button class="vs" data-view="returning">Returning</button>
             <button class="vs on" data-view="new">First time</button>
-          </div>
-
-          <div class="stories v-greet">
-            <button class="story add" title="Describe something new and get matched">
-              <span class="ring"><span class="plus">+</span></span>
-              <span class="s-name">New</span>
-            </button>
-            <button class="story live" data-person="sj">
-              <span class="ring"><span class="av" style="background:#00875A">SJ</span></span>
-              <span class="s-name">Satyam</span>
-            </button>
-            <button class="story live" data-person="pn">
-              <span class="ring"><span class="av" style="background:#2456C8">PN</span></span>
-              <span class="s-name">Priya</span>
-            </button>
-            <button class="story off" data-person="ad">
-              <span class="ring"><span class="av" style="background:#9AA1A6">AD</span></span>
-              <span class="s-name">Arjun</span>
-            </button>
           </div>
         </div>
       </div>
@@ -1851,59 +1791,56 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
            with this one — only the things around it change. -->
       <div class="askwrap">
         <div class="hero" id="hero">
-          <div class="hero-tag" id="heroTag">
-            <span class="tinydot"></span>
-            <span id="heroTagText">Someone is free right now</span>
-            <div class="facepile" id="facePile">
-              <button class="fp-btn" id="fpBtn" aria-haspopup="true" aria-expanded="false">
-                <span class="fp-stage" id="fpStage"></span>
-                <span class="fp-name" id="fpName"></span>
-                <svg class="fp-cv" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-              </button>
-              <div class="fp-menu" id="fpMenu"></div>
-            </div>
-          </div>
           <div class="ask">
-            <h2>How can we help you?</h2>
-            <p class="ask-lede">Describe it in your own words, then click <b>Find me an engineer</b>. We match you with an engineer who works in your stack and has fixed this kind of thing before.</p>
+            <div class="ask-brand">
+              <span class="orb ask-orb" aria-hidden="true"></span>
+              <h1 class="ask-name v-welcome">Welcome to Relay, <span class="who">Rohan</span></h1>
+              <h1 class="ask-name v-greet">Good morning, <span class="who">Rohan</span></h1>
+            </div>
             <div class="ask-field" id="askField">
               <div class="field-wrap">
-                <textarea id="askText" rows="3" placeholder="My payment page keeps timing out and I have no idea why..."></textarea>
+                <textarea id="askText" rows="3" placeholder="Ask anything here"></textarea>
                 <div class="ghost" id="ghost" aria-hidden="true"></div>
               </div>
               <div class="staged ask-staged" id="askStaged"></div>
               <div class="ask-tools">
-                <button class="tool" data-attach id="askDrop"><span class="g">&#128206;</span>Add a screenshot</button>
-                <button class="tool talk" id="talk"><span class="g">&#127908;</span>Say it out loud</button>
-                <span class="cta-ring">
-                  <i class="halo" aria-hidden="true"></i>
-                  <button class="golive" id="askGo"><span class="gd" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="body" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/><path class="arc arc1" d="M15.05 5A5 5 0 0 1 19 8.95"/><path class="arc arc2" d="M15.05 1A9 9 0 0 1 23 8.94"/></svg></span>Find me an engineer</button>
+                <button class="tool ico" data-attach id="askDrop" title="Add a screenshot" aria-label="Add a screenshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+                <!-- Nothing to file an ask under until there has been a call,
+                     so before that these two are not in the row at all. -->
+                <span class="pickwrap scope-wrap" id="projPick">
+                  <button class="tool scope" id="projScope" aria-haspopup="true" aria-expanded="false" title="File this under a project">
+                    <span class="lb">Project</span>
+                    <svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="pickpop" id="projPop"></div>
+                </span>
+                <span class="pickwrap scope-wrap" id="sessPick">
+                  <button class="tool scope" id="sessScope" aria-haspopup="true" aria-expanded="false" title="Add this to a session you already have open">
+                    <span class="lb">Session</span>
+                    <svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="pickpop" id="sessPop"></div>
+                </span>
+
+                <span class="tools-r">
+                  <button class="tool ico bare talk" id="talk" title="Say it out loud" aria-label="Say it out loud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/></svg></button>
+                  <span class="cta-ring">
+                    <i class="halo" aria-hidden="true"></i>
+                    <button class="golive ico" id="askGo" title="Find me an engineer — talk to someone now" aria-label="Find me an engineer"><span class="gd" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="body" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/><path class="arc arc1" d="M15.05 5A5 5 0 0 1 19 8.95"/><path class="arc arc2" d="M15.05 1A9 9 0 0 1 23 8.94"/></svg></span></button>
+                  </span>
+                  <button class="sendbtn" id="askSend" title="Send it as a message instead" aria-label="Send it as a message instead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg></button>
                 </span>
               </div>
             </div>
 
-            <p class="starters-lead">Not sure how to put it? Try one of these</p>
+            <!-- The one row under the box, and the only thing there: three ways
+                 to start the sentence for somebody who cannot start it. Three,
+                 because three fit on a line — a fourth wrapped onto a row of
+                 its own and read as an afterthought rather than a choice. -->
             <div class="starters" id="starters">
               <button class="starter">My site stopped working</button>
               <button class="starter">Something broke after I made a change</button>
               <button class="starter">I do not understand this error message</button>
-              <button class="starter">I am stuck halfway through building something</button>
-            </div>
-
-            <div class="altcall">
-              <button class="callnow" id="callNowBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                Just call someone now
-              </button>
-              <span class="alt-note">Skip the writing &mdash; tell them on the call instead</span>
-            </div>
-
-            <!-- Returning only. Not a new question at all — the door back to
-                 the work that is already under way. -->
-            <div class="ret-jump">
-              <span class="rj-lead">Or pick up something you already started</span>
-              <button class="rj" data-go="sessions"><span class="g">&#128172;</span>Recent sessions<span class="n" id="rjSess">8</span></button>
-              <button class="rj" data-go="projects"><span class="g">&#128193;</span>Your projects<span class="n" id="rjProj">4</span></button>
             </div>
           </div>
         </div>
@@ -3465,6 +3402,8 @@ document.querySelectorAll('.vs').forEach(b=>{
     });
     document.getElementById('meSub').textContent =
       v==='new' ? 'No calls yet' : '34.8 minutes used';
+    /* a returning customer has calls behind them by definition */
+    setHasCalls(v==='returning');
     document.querySelector('.main').scrollTop=0;
     /* the welcome belongs to the first-run view, so it arrives with it */
     if(v==='new'){
@@ -4614,7 +4553,7 @@ function openAsk(){
 
 /* ---------- the buttons that had nothing behind them ---------- */
 document.addEventListener('click',e=>{
-  const b=e.target.closest('.btn, .story');
+  const b=e.target.closest('.btn');
   if(!b) return;
   const l=b.textContent.trim().replace(/\s+/g,' ');
 
@@ -4642,14 +4581,6 @@ document.addEventListener('click',e=>{
     e.stopPropagation();
     const panel=sm.closest('.match');
     sessionFromMatch(sm.dataset.startmatch, panel.dataset.q||'Something is broken');
-    return;
-  }
-
-  /* home stories: "+ New" is the same door as the box below it */
-  if(b.classList.contains('story')&&b.classList.contains('add')){
-    e.stopPropagation();
-    openAsk();
-    toast('Describe what is going wrong — we match you from that');
     return;
   }
 
@@ -5202,6 +5133,7 @@ function endDemoCall(){
 }
 
 function offerProject(){
+  setHasCalls(true);            /* there is now something to file the next ask under */
   const mins=pending.mins, first=fName(pending.who);
   openModal(
     '<div class="m-tick">&#10003;</div>'+
@@ -5243,7 +5175,6 @@ function addToProject(key){
   closeModal();
   renderProjRows();
   renderSessFeed();
-  paintJump();
   renderHomeRecent();
   renderProject(key);
   toast('Filed under “'+P.n+'” — the call and its write-up moved across');
@@ -5313,7 +5244,6 @@ function createProject(name){
   closeModal();
   renderProjRows();
   renderSessFeed();
-  paintJump();
   renderHomeRecent();
   renderProject(key);
   toast('“'+clean+'” created — this session now lives under it');
@@ -5368,19 +5298,6 @@ document.addEventListener('click',e=>{
   /* "Find me an engineer" on any ask card */
   const go=e.target.closest('.ask .golive, .ask .btn.go');
   if(go){e.stopPropagation();startMatch(go.closest('.ask-field'));return}
-
-  /* the other door: skip the writing and go straight to a call */
-  const now=e.target.closest('#callNowBtn');
-  if(now){
-    e.stopPropagation();
-    const ta=document.getElementById('askText');
-    if(ta&&!ta.value.trim()){
-      ta.value='I would rather explain it on the call.';
-      startedTyping();
-    }
-    startMatch(document.getElementById('askField'));
-    return;
-  }
 
   /* a starter phrasing drops straight into the box */
   const st=e.target.closest('.starters .starter');
@@ -5443,7 +5360,6 @@ document.addEventListener('click',e=>{
     pending=null;
     closeModal();
     renderSessFeed();
-    paintJump();
     renderHomeRecent();
     renderSession(k);
     toast('Kept as a one-off session — you can file it under a project later');
@@ -5473,83 +5389,10 @@ mScrim.addEventListener('click',()=>{
 const REDUCED = matchMedia('(prefers-reduced-motion:reduce)').matches;
 const SPEED   = 1;
 
-/* ---- the band's face: one person at a time, on a reel ---- */
-const fpWrap  = document.getElementById('facePile');
-const fpBtn   = document.getElementById('fpBtn');
-const fpStage = document.getElementById('fpStage');
-const fpName  = document.getElementById('fpName');
-const fpMenu  = document.getElementById('fpMenu');
-const heroTagText = document.getElementById('heroTagText');
-const FP_ORDER = ['sj','pn','ks','md','ad'];
-const ST_SHORT = {live:'Free', busy:'In a call', off:'Away'};
-let fpTimer=null, fpKey=null;
-
-/* Only people who are free get a turn. The band's claim is "N are free right
-   now" and the face is the evidence for it — showing someone who is in a call
-   would quietly contradict the sentence next to it. */
-function fpPool(){
-  const free=FP_ORDER.filter(k=>PEOPLE[k].d==='live');
-  return free.length?free:FP_ORDER;
-}
-function fpShow(k,animate){
-  const p=PEOPLE[k], old=fpStage.querySelector('.av');
-  const el=document.createElement('span');
-  el.className='av'+(animate?' in':'');
-  el.style.background=p.c;
-  el.dataset.dot=p.d;
-  el.textContent=p.i;
-  fpStage.appendChild(el);
-  if(old&&animate){old.classList.add('out');setTimeout(()=>old.remove(),560*SPEED)}
-  else if(old){old.remove()}
-  fpName.textContent=fName(k);
-  if(animate){fpName.classList.remove('swap');void fpName.offsetWidth;fpName.classList.add('swap')}
-  fpBtn.setAttribute('aria-label',p.n+', '+ST_SHORT[p.d].toLowerCase()+'. Open the full list.');
-}
-/* Step from whoever is showing rather than from a counter, so people going
-   busy mid-reel never make it skip or repeat. */
-function fpStep(animate){
-  const pool=fpPool();
-  const k=pool[(pool.indexOf(fpKey)+1)%pool.length];
-  fpKey=k;
-  fpShow(k,animate);
-}
-function fpStart(){
-  if(fpTimer) return;
-  fpStep(false);
-  if(REDUCED) return;      /* with motion off it is simply one face, standing still */
-  fpTimer=setInterval(()=>{
-    /* never swap the face out from under someone reading the open list */
-    if(!fpWrap.classList.contains('open')) fpStep(true);
-  },2800*SPEED);
-}
-function fpMenuRender(){
-  const rank={live:0,busy:1,off:2};
-  const list=FP_ORDER.slice().sort((a,b)=>rank[PEOPLE[a].d]-rank[PEOPLE[b].d]);
-  const n=list.filter(k=>PEOPLE[k].d==='live').length;
-  fpMenu.innerHTML='<div class="fp-head">'+(n===1?'1 free':n+' free')+' of '+list.length+'</div>'+
-    list.map(k=>{
-      const p=PEOPLE[k];
-      return '<button class="fp-row" data-person="'+k+'">'+
-        '<span class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</span>'+
-        '<span class="t"><b>'+escHtml(p.n)+'</b><i>'+escHtml(p.r.split('·')[0].trim())+'</i></span>'+
-        '<span class="fp-st '+p.d+'">'+ST_SHORT[p.d]+'</span></button>';
-    }).join('');
-}
-function fpOpen(on){
-  fpWrap.classList.toggle('open',on);
-  fpBtn.setAttribute('aria-expanded',on?'true':'false');
-  if(on) fpMenuRender();
-}
-fpBtn.addEventListener('click',e=>{e.stopPropagation();fpOpen(!fpWrap.classList.contains('open'))});
-/* anywhere else closes it — including a row, which hands off to the drawer,
-   and that wants the band behind it clear */
-document.addEventListener('click',()=>fpOpen(false));
-document.addEventListener('keydown',e=>{if(e.key==='Escape') fpOpen(false)});
-
-function paintHeroTag(){
-  const n=FP_ORDER.filter(k=>PEOPLE[k].d==='live').length;
-  heroTagText.textContent=n>1?n+' people are free right now':'Someone is free right now';
-}
+/* The band that used to sit on top of this card — the live dot, the count of
+   who is free, and the face that cycled through them — has been taken out
+   with the card. Who you get is the answer to pressing the button, not
+   something to be sold before the question has even been typed. */
 
 /* ---- the composer: focus lift, auto-grow, ghost typing ---- */
 const hero     = document.getElementById('hero');
@@ -5561,8 +5404,13 @@ let touched=false, ghostTimer=null;
 askText.addEventListener('focus',()=>hero.classList.add('focused'));
 askText.addEventListener('blur', ()=>hero.classList.remove('focused'));
 askText.addEventListener('input',()=>{
+  /* The floor is the CSS min-height and nothing else: min-height beats height,
+     so writing the raw scrollHeight here leaves the box exactly where it was
+     resting until the text genuinely outgrows it. A number hardcoded in here
+     would jump the box the moment the first letter landed — and the one that
+     used to be here was left over from a taller box, so it jumped 60px. */
   askText.style.height='auto';
-  askText.style.height=Math.max(152,askText.scrollHeight)+'px';   /* matches the CSS floor */
+  askText.style.height=askText.scrollHeight+'px';
   if(askText.value) startedTyping();
 });
 
@@ -5662,9 +5510,10 @@ document.getElementById('wlGo').addEventListener('click',e=>{
   const n=wlName.value.trim();
   if(n){
     const first=n.split(/\s+/)[0];
-    document.querySelectorAll('.v-welcome, .v-greet').forEach(el=>{
-      if(el.tagName==='H1') el.textContent=el.classList.contains('v-welcome')
-        ? 'Welcome to Relay, '+first : 'Good morning, '+first;
+    /* only the name moves — the greeting around it is markup now, and the
+       green span has to survive being called something else */
+    document.querySelectorAll('.v-welcome .who, .v-greet .who').forEach(el=>{
+      el.textContent=first;
     });
   }
   closeWelcome();
@@ -5705,9 +5554,7 @@ function markEntrance(){
     ...document.querySelectorAll('.rail .nav-item'),
     document.querySelector('#home .page-h'),
     hero,
-    document.querySelector('.askwrap .starters-lead'),
     ...document.querySelectorAll('.askwrap .starters .starter'),
-    document.querySelector('.askwrap .altcall'),
   ].filter(Boolean);
 
   els.map(el=>({el,r:el.getBoundingClientRect()}))
@@ -5785,13 +5632,10 @@ const COACH_STOPS=[
   { at:()=>document.getElementById('askGo').getBoundingClientRect(),
     gutter:'right', fall:'left', text:'Then click here to connect with an engineer' },
 
-  { at:()=>document.getElementById('facePile').getBoundingClientRect(),
-    gutter:'right', fall:'bottom', text:'We match you with an engineer who has worked on your problem' },
-
-  /* Last, and deliberately so: the two ways in, then who you get, and only then
-     the door for somebody who would rather not write any of it down. */
-  { at:()=>document.getElementById('callNowBtn').getBoundingClientRect(),
-    gutter:'right', fall:'right', text:'Or come down here if you would rather just talk' },
+  /* There used to be a third stop here, pointing at the faces on the card's
+     band. The band went with the card, and the tour is better for it: write
+     it, send it, and that is the whole instruction. A stop aimed at the pills
+     underneath had nowhere to stand but on top of them. */
 ];
 
 const COACH_GAP=13;   /* bubble to target, on the card */
@@ -5807,6 +5651,10 @@ const COACH_TIP=8;    /* how far the nub's point sticks out past the bubble */
 const COACH_INTRUDE=80;
 let coachAt=0, coachTimer=null, coachHop=null, coachHide=null, coachOver=false;
 let coachHt=null, coachIntro=null;
+/* It walks its stops once and is then finished for the visit. A tour that comes
+   back every time you return to the home screen stops being help and starts
+   being something to wait out, so the last stop retires it. */
+let coachDone=false;
 
 /* Used only once the margins have run out. Put the bubble on the first side of
    the target that actually fits, starting from the one the stop asked for. */
@@ -5963,14 +5811,15 @@ function coachGo(i,instant){
 }
 
 function coachStart(){
-  if(coachTimer||touched||askText.value.trim()) return;
+  if(coachDone||coachTimer||touched||askText.value.trim()) return;
   if(document.getElementById('home').dataset.view!=='new') return;
   if(!document.getElementById('home').classList.contains('on')) return;
   coachGo(0,true);
-  if(REDUCED){coachTimer=-1;return}              /* one stop, standing still */
+  if(REDUCED){coachTimer=-1;coachDone=true;return}   /* one stop, standing still */
   coachTimer=setInterval(()=>{
     if(coachOver) return;   /* they are reading it — do not move it mid-sentence */
-    coachGo((coachAt+1)%COACH_STOPS.length);
+    if(coachAt>=COACH_STOPS.length-1){ coachDone=true; coachStop(); return }
+    coachGo(coachAt+1);
   },3400*SPEED);
 }
 
@@ -6013,13 +5862,6 @@ show=function(id){
   else coachStop();
 };
 
-/* the two counts on the returning view's jump row, kept honest as sessions
-   and projects are created during the demo */
-function paintJump(){
-  const s=document.getElementById('rjSess'), p=document.getElementById('rjProj');
-  if(s) s.textContent=SESS_ORDER.length;
-  if(p) p.textContent=PROJ_ORDER.length;
-}
 
 
 /* ================= PROFILE ================= */
@@ -6144,13 +5986,161 @@ document.addEventListener('click',e=>{
   }
 });
 
+/* ============================================================
+   THE TOOL ROW: where an ask belongs, and the two ways out of it
+   ============================================================ */
+
+/* Project and Session are only offered to somebody who has both. Before the
+   first call there is nothing in either list, and a dropdown that opens onto
+   "nothing yet" is worse than no dropdown at all. */
+function setHasCalls(on){ document.body.classList.toggle('hascalls', !!on) }
+
+let askScope={proj:null, sess:null};
+function paintScope(){
+  const p=document.getElementById('projScope'), s=document.getElementById('sessScope');
+  if(!p||!s) return;
+  /* innerHTML, not textContent: these are authored titles and some of them
+     carry an entity (&pound;180) that has to arrive as a character */
+  p.querySelector('.lb').innerHTML = askScope.proj ? PROJECTS[askScope.proj].n : 'Project';
+  p.classList.toggle('set', !!askScope.proj);
+  s.querySelector('.lb').innerHTML = askScope.sess ? SESSIONS[askScope.sess].t : 'Session';
+  s.classList.toggle('set', !!askScope.sess);
+}
+function closePicks(){
+  document.querySelectorAll('.pickwrap.open').forEach(w=>{
+    w.classList.remove('open');
+    const b=w.querySelector('.scope'); if(b) b.setAttribute('aria-expanded','false');
+  });
+}
+/* Built at open time rather than at boot: both lists grow as calls happen,
+   and a menu painted once would be out of date by the second session. */
+function fillPick(wrap){
+  const proj=wrap.id==='projPick';
+  const keys=proj?PROJ_ORDER:SESS_ORDER.slice(0,6);
+  const label=k=>proj?PROJECTS[k].n:SESSIONS[k].t;
+  const picked=proj?askScope.proj:askScope.sess;
+  /* authored titles, not typed ones — they carry entities of their own
+     (&pound;180) and escaping them would print the entity */
+  let html=keys.map(k=>'<button data-val="'+k+'">'+label(k)+'</button>').join('');
+  if(!keys.length) html='<div class="none">'+(proj?'No projects yet':'No earlier sessions')+'</div>';
+  if(picked) html+='<button class="clear" data-val="">'+
+    (proj?'Not under a project':'Not part of a session')+'</button>';
+  wrap.querySelector('.pickpop').innerHTML=html;
+}
+
+document.addEventListener('click',e=>{
+  const tgl=e.target.closest('.scope');
+  if(tgl){
+    e.stopPropagation();
+    const wrap=tgl.closest('.pickwrap'), was=wrap.classList.contains('open');
+    closePicks();
+    if(!was){ fillPick(wrap); wrap.classList.add('open'); tgl.setAttribute('aria-expanded','true') }
+    return;
+  }
+  const opt=e.target.closest('.pickpop button');
+  if(opt){
+    e.stopPropagation();
+    const wrap=opt.closest('.pickwrap');
+    if(wrap.id==='projPick') askScope.proj=opt.dataset.val||null;
+    else                     askScope.sess=opt.dataset.val||null;
+    closePicks(); paintScope();
+    return;
+  }
+  closePicks();   /* a click anywhere else puts them away */
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape') closePicks()});
+
+/* ---- send: the same problem, written down ---- */
+/* The call button is for "I need somebody on this now". This one is for the
+   same problem at three in the morning, when waiting for a reply is fine and
+   holding a line open is not. It lands as a real thread, with the engineer
+   who would have picked up. */
+const askSend=document.getElementById('askSend');
+const hm=()=>{const d=new Date();return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};
+function paintSend(){ if(askSend) askSend.classList.toggle('ready', !!askText.value.trim()) }
+askText.addEventListener('input',paintSend);
+
+let askThreadN=0;
+function openThread(id,row){
+  document.querySelectorAll('.thread').forEach(t=>t.classList.toggle('on',t.id===id));
+  document.querySelectorAll('.ci').forEach(c=>c.classList.toggle('on',c===row));
+}
+function sendAsMessage(){
+  const text=askText.value.trim();
+  if(!text){ askText.focus(); toast('Write the problem first — a line or two is plenty'); return }
+
+  const k=DEMO_ENGINEER, p=PEOPLE[k], first=fName(k), t=hm();
+  const id='t-ask-'+(++askThreadN);
+  const where = askScope.proj ? PROJECTS[askScope.proj].n
+              : askScope.sess ? SESSIONS[askScope.sess].t : null;
+
+  const thread=document.createElement('div');
+  thread.className='thread';
+  thread.id=id;
+  thread.innerHTML=
+    '<div class="thread-h">'+
+      '<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+      '<div style="flex:1">'+
+        '<button class="who" data-person="'+k+'" style="display:block">'+p.n+'</button>'+
+        '<div class="st">Sent just now &middot; usually replies in about 15 minutes</div>'+
+      '</div>'+
+      '<button class="btn sm" data-person="'+k+'">View profile</button>'+
+      '<button class="btn sm go">Start a call</button>'+
+    '</div>'+
+    '<div class="thread-body">'+
+      (where?'<div class="smark"><span class="smark-pill"><b>Filed under</b> &middot; '+
+             where+'</span></div>':'')+
+      '<div class="msg me"><div class="av" style="background:#6D3BD4">RM</div>'+
+        '<div><div class="bub">'+escHtml(text)+'</div>'+
+        '<div class="when">'+t+' <span class="tick"></span></div></div></div>'+
+      '<div class="msg"><div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+        '<div><div class="bub">Got it, reading this now. I will come back to you here &mdash; and if '+
+        'it turns out to be quicker said than typed, I will ask you for a call.</div>'+
+        '<div class="when">'+t+'</div></div></div>'+
+    '</div>'+
+    '<div class="thread-foot"><div class="composer">'+
+      '<textarea placeholder="Tell '+first+' more, or send a screenshot"></textarea>'+
+      '<div class="comp-bar"><div style="flex:1"></div>'+
+        '<button class="btn sm go">Start a call</button>'+
+        '<button class="btn sm solid">Send</button>'+
+      '</div>'+
+    '</div></div>';
+  document.querySelector('#chats .split').appendChild(thread);
+  paintIn(thread);
+
+  const row=document.createElement('button');
+  row.className='ci';
+  row.dataset.thread=id;
+  row.innerHTML=
+    '<div class="av" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+    '<div style="min-width:0"><div class="ci-name">'+p.n+'</div>'+
+    '<div class="ci-sub">'+escHtml(text.length>40?text.slice(0,40)+'…':text)+'</div></div>';
+  const list=document.querySelector('#chats .chat-list');
+  list.querySelector('.grp').insertAdjacentElement('afterend',row);
+  paintIn(row);
+  row.addEventListener('click',()=>openThread(id,row));
+
+  /* the box goes back to empty — the ask has somewhere to live now */
+  askText.value='';
+  askText.style.height='';
+  const staged=document.getElementById('askStaged');
+  if(staged) staged.innerHTML='';
+  askScope={proj:null,sess:null};
+  paintScope(); paintSend();
+
+  openThread(id,row);
+  show('chats');
+  toast('Sent to '+first+' — the reply lands here in Chats');
+}
+if(askSend) askSend.addEventListener('click',e=>{e.stopPropagation();sendAsMessage()});
+
 /* ---- boot ---- */
-paintJump();
 renderProjRows();
 renderEngineers();
 renderHomeRecent();
-paintHeroTag();
-fpStart();
+paintScope();
+paintSend();
+setHasCalls(document.getElementById('home').dataset.view==='returning');
 
 /* The first-run view is what the page opens on, so the chrome that belongs to
    a returning customer is not there to be seen arriving. */
