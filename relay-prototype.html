@@ -72,6 +72,49 @@ a{color:inherit;text-decoration:none}
   --rail-hover:rgba(76,42,160,.055); --rail-on:rgba(76,42,160,.11);
   --rail-faint:#988CB8;
 }
+/* --- treatments built around the green mark rather than against it --- */
+.app[data-rail="forest"]{      /* the logo's own family, taken very dark */
+  --rail-bg:#0C3527;  --rail-line:#0C3527;  --rail-hr:rgba(255,255,255,.13);
+  --rail-ink:#FFFFFF; --rail-muted:#9DC4B4; --rail-brand:#FFFFFF;
+  --rail-hover:rgba(255,255,255,.08); --rail-on:rgba(255,255,255,.14);
+  --rail-faint:#7BA694;
+}
+.app[data-rail="petrol"]{      /* one step cooler than the mark — analogous, not matching */
+  --rail-bg:#0E3742;  --rail-line:#0E3742;  --rail-hr:rgba(255,255,255,.13);
+  --rail-ink:#FFFFFF; --rail-muted:#9FC2CC; --rail-brand:#FFFFFF;
+  --rail-hover:rgba(255,255,255,.08); --rail-on:rgba(255,255,255,.14);
+  --rail-faint:#7DA3AE;
+}
+.app[data-rail="navy"]{        /* cool and neutral; green reads as the only colour on screen */
+  --rail-bg:#13224A;  --rail-line:#13224A;  --rail-hr:rgba(255,255,255,.14);
+  --rail-ink:#FFFFFF; --rail-muted:#A8B6D8; --rail-brand:#FFFFFF;
+  --rail-hover:rgba(255,255,255,.08); --rail-on:rgba(255,255,255,.15);
+  --rail-faint:#8593BA;
+}
+.app[data-rail="sand"]{        /* warm light chrome against the cool content area */
+  --rail-bg:#F3F0E8;  --rail-line:#E4DFD2;  --rail-hr:#E4DFD2;
+  --rail-ink:#1F241F; --rail-muted:#6B6E63; --rail-brand:#1F241F;
+  --rail-hover:rgba(0,135,90,.06); --rail-on:rgba(0,135,90,.13);
+  --rail-faint:#9A9C8F;
+}
+.app[data-rail="mint"]{        /* the mark's own green, washed out to a tint */
+  --rail-bg:#E9F4EE;  --rail-line:#D3E6DB;  --rail-hr:#D3E6DB;
+  --rail-ink:#12241C; --rail-muted:#586F62; --rail-brand:#12241C;
+  --rail-hover:rgba(0,135,90,.07); --rail-on:rgba(0,135,90,.14);
+  --rail-faint:#8BA498;
+}
+.app[data-rail="mist"]{        /* cool pale grey-blue — quietest of the light set */
+  --rail-bg:#EDF1F4;  --rail-line:#DAE2E8;  --rail-hr:#DAE2E8;
+  --rail-ink:#141B21; --rail-muted:#59656E; --rail-brand:#141B21;
+  --rail-hover:rgba(0,135,90,.06); --rail-on:rgba(0,135,90,.12);
+  --rail-faint:#909EA8;
+}
+.app[data-rail="cloud"]{       /* plain white: the green mark is the only colour in the chrome */
+  --rail-bg:#FFFFFF;  --rail-line:#E4E9E9;  --rail-hr:#E4E9E9;
+  --rail-ink:#14181A; --rail-muted:#5D666A; --rail-brand:#14181A;
+  --rail-hover:rgba(0,135,90,.06); --rail-on:rgba(0,135,90,.12);
+  --rail-faint:#98A0A4;
+}
 .rail{
   background:var(--rail-bg);border-right:1px solid var(--rail-line);
   display:flex;flex-direction:column;padding:20px 12px 12px;gap:2px;overflow-y:auto;
@@ -110,20 +153,20 @@ a{color:inherit;text-decoration:none}
 }
 .count.turn{background:var(--turn-bg);color:var(--turn)}
 .count.moving{background:var(--moving-bg);color:var(--moving)}
-/* badges keep their meaning on the dark violets */
-.app:not([data-rail="lilac"]) .count.turn{background:rgba(245,158,11,.22);color:#F7C27D}
-.app:not([data-rail="lilac"]) .count.moving{background:rgba(147,180,255,.22);color:#B6CBFF}
-.app:not([data-rail="lilac"]) .orb{box-shadow:0 0 0 1px rgba(255,255,255,.18), 0 3px 14px rgba(0,135,90,.40)}
-.app[data-rail="lilac"] .count.turn{background:var(--turn-bg);color:var(--turn)}
-.app[data-rail="lilac"] .count.moving{background:var(--moving-bg);color:var(--moving)}
+/* badges keep their meaning on the dark rails */
+.app[data-tone="dark"] .count.turn{background:rgba(245,158,11,.22);color:#F7C27D}
+.app[data-tone="dark"] .count.moving{background:rgba(147,180,255,.22);color:#B6CBFF}
+.app[data-tone="dark"] .orb{box-shadow:0 0 0 1px rgba(255,255,255,.18), 0 3px 14px rgba(0,135,90,.40)}
+.app[data-tone="light"] .count.turn{background:var(--turn-bg);color:var(--turn)}
+.app[data-tone="light"] .count.moving{background:var(--moving-bg);color:var(--moving)}
 
 /* demo-only: switch the rail treatment */
-.railswitch{display:flex;align-items:center;gap:7px;padding:10px 10px 2px;margin-top:2px}
+.railswitch{display:flex;align-items:center;gap:7px;padding:10px 10px 2px;margin-top:2px;flex-wrap:wrap}
 .railswitch .rs-l{font-size:10.5px;font-weight:700;color:var(--rail-faint);
-  letter-spacing:.04em;text-transform:uppercase;margin-right:auto}
+  letter-spacing:.04em;text-transform:uppercase;width:100%;margin-bottom:2px}
 .rs{width:17px;height:17px;border-radius:50%;flex:none;cursor:pointer;
   border:1px solid rgba(20,24,26,.16);transition:transform .12s,box-shadow .12s}
-.app:not([data-rail="lilac"]) .rs{border-color:rgba(255,255,255,.24)}
+.app[data-tone="dark"] .rs{border-color:rgba(255,255,255,.24)}
 .rs:hover{transform:scale(1.12)}
 .rs.on{box-shadow:0 0 0 2px var(--rail-bg), 0 0 0 3.5px var(--live)}
 
@@ -1097,7 +1140,14 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
       <button class="rs on" data-rail="violet"    style="background:#2A1259" title="Deep violet"></button>
       <button class="rs"    data-rail="aubergine" style="background:#3C1440" title="Aubergine"></button>
       <button class="rs"    data-rail="iris"      style="background:#4A3AA8" title="Iris"></button>
+      <button class="rs"    data-rail="navy"      style="background:#13224A" title="Navy"></button>
+      <button class="rs"    data-rail="petrol"    style="background:#0E3742" title="Petrol"></button>
+      <button class="rs"    data-rail="forest"    style="background:#0C3527" title="Forest — the logo's own green, taken dark"></button>
       <button class="rs"    data-rail="lilac"     style="background:#F1EDFC" title="Lilac"></button>
+      <button class="rs"    data-rail="sand"      style="background:#F3F0E8" title="Sand"></button>
+      <button class="rs"    data-rail="mint"      style="background:#E9F4EE" title="Mint — the logo's green as a tint"></button>
+      <button class="rs"    data-rail="mist"      style="background:#EDF1F4" title="Mist"></button>
+      <button class="rs"    data-rail="cloud"     style="background:#FFFFFF" title="Cloud"></button>
     </div>
   </nav>
 
@@ -1568,22 +1618,6 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
               </div>
             </div>
 
-            <div class="msg">
-              <div class="av" data-dot="live" style="background:#00875A">SJ</div>
-              <div>
-                <div class="bub" style="padding:0;overflow:hidden;width:330px">
-                  <div style="padding:13px 15px;border-bottom:1px solid var(--line)">
-                    <div style="font-weight:600;font-size:14px">Rebuild Palm Seas checkout</div>
-                    <div style="font-size:12.5px;color:var(--muted);margin-top:3px">Fixed price &middot; about 3 weeks</div>
-                  </div>
-                  <div style="padding:13px 15px;display:flex;align-items:center;gap:11px">
-                    <span class="money">&euro;3,200</span>
-                    <button class="btn sm solid" style="margin-left:auto" data-go="contracts">Review quote</button>
-                  </div>
-                </div>
-                <div class="when">9:35</div>
-              </div>
-            </div>
           </div>
 
           <div class="thread-foot">
@@ -1979,7 +2013,7 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
     <!-- ============ SESSION DETAIL ============ -->
     <section class="screen" id="session">
-      <button class="back" data-go="sessions">&larr; All sessions</button>
+      <button class="back" id="sessBack" data-go="sessions">&larr; All sessions</button>
       <div id="sessDetail"></div>
     </section>
 
@@ -3097,15 +3131,18 @@ document.addEventListener('click',e=>{
 
 /* ---------- demo: rail treatment ---------- */
 const APP=document.querySelector('.app');
+const LIGHT_RAILS=['lilac','sand','mint','mist','cloud'];
 function setRail(name){
   APP.dataset.rail=name;
+  APP.dataset.tone=LIGHT_RAILS.indexOf(name)>-1?'light':'dark';
   document.querySelectorAll('.rs').forEach(b=>b.classList.toggle('on',b.dataset.rail===name));
   try{localStorage.setItem('relayRail',name)}catch(err){}
 }
 document.querySelectorAll('.rs').forEach(b=>{
   b.addEventListener('click',e=>{e.stopPropagation();setRail(b.dataset.rail)});
 });
-const RAILS=['violet','aubergine','iris','lilac'];
+const RAILS=['violet','aubergine','iris','navy','petrol','forest',
+             'lilac','sand','mint','mist','cloud'];
 let savedRail='violet';
 try{const v=localStorage.getItem('relayRail'); if(RAILS.indexOf(v)>-1) savedRail=v}catch(err){}
 setRail(savedRail);
@@ -3113,19 +3150,19 @@ setRail(savedRail);
 /* ================= projects -> sessions -> calls ================= */
 
 const PROJECTS={
-  palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'], pill:{k:'turn',t:'Quote ready'},
+  palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'],
     blurb:'A booking site for a diving school. You are building it; Relay engineers come in when you get stuck and leave once it is working again.',
     stands:'Checkout times out on cold starts. A temporary fix is live, but the underlying design needs rebuilding.',
     waiting:'Satyam has quoted the rebuild at &euro;3,200. Nothing starts until you decide.'},
-  epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'], pill:{k:'turn',t:'Needs a reply'},
+  epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'],
     blurb:'A campaign tool you run for a handful of clients. Small, but it sends real mail, so quiet failures are expensive.',
     stands:'Bounced campaign emails were being dropped silently. Logging is in, so you can see it happening now.',
     waiting:'Priya wants to know whether bounces should retry or just be reported to you. She is holding the quote until you answer.'},
-  trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'], pill:{k:'mute',t:'Quiet'},
+  trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'],
     blurb:'A fitness tracker you took over from another developer. Most of your Relay time here goes on builds and releases rather than features.',
     stands:'The iOS certificate had expired and builds were failing. Arjun regenerated it and showed you how to do it yourself.',
     waiting:'Nothing today. Meera has a kickoff booked for the sync rewrite on Mon 29 Sep.'},
-  yopbox:{n:'YopBox', stack:['Astro','Cloudflare'], pill:{k:'mute',t:'Not started'},
+  yopbox:{n:'YopBox', stack:['Astro','Cloudflare'],
     blurb:'The newest of your projects. Nothing has gone wrong yet, so no engineer has been in.',
     stands:'Nothing has needed an engineer yet.',
     waiting:'Nothing.'}
@@ -3350,7 +3387,7 @@ function sessRow(k){
     '</div>'+
     '<span class="srow-r">'+
       '<span class="srow-when">'+s.last+'</span>'+
-      '<span class="btn sm'+(s.state==='open'?' solid':'')+'" data-continue="'+k+'">Continue the session</span>'+
+      '<span class="btn sm solid" data-continue="'+k+'">Continue the session</span>'+
     '</span></button>';
 }
 function renderSessFeed(){
@@ -3406,6 +3443,8 @@ const SPARK='<svg class="spark" viewBox="0 0 24 24" aria-hidden="true">'+
 const MEAV='<div class="av" style="background:#6D3BD4">RM</div>';
 
 let currentSession=null;
+let currentProject=null;
+let sessBackTo=null;   /* project key to return to from a session, or null for the feed */
 
 /* a free message between calls */
 function msgHtml(m){
@@ -3441,6 +3480,12 @@ function renderSession(key,mode){
   currentSession=key;
   const p=PEOPLE[s.who], first=fName(s.who);
   const n=s.calls.length, cont=(mode==='continue');
+
+  /* remember where this was opened from, so Back goes there and not always to the feed.
+     re-renders happen while already on the session screen — those must not reset it. */
+  const from=document.querySelector('.screen.on');
+  if(from && from.id!=='session')
+    sessBackTo=(from.id==='project' && currentProject) ? currentProject : null;
 
   document.getElementById('sessDetail').innerHTML=
     '<div class="sx-h">'+
@@ -3480,6 +3525,17 @@ function renderSession(key,mode){
 
   paintIn(document.getElementById('sessDetail'));
   show('session');
+
+  /* Back points at wherever you came in from */
+  const back=document.getElementById('sessBack');
+  if(sessBackTo && PROJECTS[sessBackTo]){
+    back.innerHTML='&larr; '+PROJECTS[sessBackTo].n;
+    back.removeAttribute('data-go');
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('on',x.dataset.go==='projects'));
+  }else{
+    back.innerHTML='&larr; All sessions';
+    back.setAttribute('data-go','sessions');
+  }
 
   /* "Continue" drops you at the bottom of the thread, ready to type */
   if(cont) setTimeout(()=>{
@@ -3618,6 +3674,7 @@ function rollUpProject(key,mins){
 /* ---------- project detail ---------- */
 function renderProject(key){
   const P=PROJECTS[key]; if(!P) return;
+  currentProject=key;
   const keys=SESS_ORDER.filter(k=>SESSIONS[k].proj===key);
   const tally={};
   keys.forEach(k=>{const w=SESSIONS[k].who; tally[w]=(tally[w]||0)+1});
@@ -3662,19 +3719,13 @@ function projSub(k){
   const s=SESSIONS[keys[0]];
   return plural(keys.length,'session')+' &middot; last call '+s.last+' with '+fName(s.who);
 }
-function projPill(k){
-  const P=PROJECTS[k], keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===k);
-  if(!keys.length) return '<span class="pill mute">Not started</span>';
-  return '<span class="pill '+(P.pill?P.pill.k:'mute')+'">'+(P.pill?P.pill.t:'Quiet')+'</span>';
-}
 function renderProjects(){
   const keys=Object.keys(PROJECTS);
   const rows=document.getElementById('projRows');
   if(rows) rows.innerHTML=keys.map(k=>
     '<button class="row flat" data-project="'+k+'">'+
       '<div class="row-main"><div class="row-title">'+PROJECTS[k].n+'</div>'+
-      '<div class="row-sub">'+projSub(k)+'</div></div>'+
-      '<div class="row-side">'+projPill(k)+'</div></button>').join('');
+      '<div class="row-sub">'+projSub(k)+'</div></div></button>').join('');
 
   const cards=document.getElementById('projCards');
   if(cards){
@@ -3684,10 +3735,9 @@ function renderProjects(){
       return '<button class="pc" data-project="'+k+'">'+
         '<div class="pc-t">'+PROJECTS[k].n+'</div>'+
         '<div class="pc-s">'+projSub(k)+'</div>'+
-        '<div class="pc-f">'+
-          (who?'<div class="av" data-dot="'+who.d+'" style="background:'+who.c+'">'+who.i+'</div>':'')+
-          projPill(k)+
-        '</div></button>';
+        (who?'<div class="pc-f"><div class="av" data-dot="'+who.d+'" style="background:'+
+             who.c+'">'+who.i+'</div></div>':'')+
+        '</button>';
     }).join('');
     paintIn(cards);
   }
@@ -3758,7 +3808,7 @@ function pickerConfirm(){
     PROJECTS[key]={
       n:name,
       stack:stack.length?stack:['Stack not set yet'],
-      pill:{k:'mute',t:'New'},
+     
       blurb:'You started this project by filing a session under it. Relay writes this summary '+
             'from the sessions that land here, so it fills out as engineers come in.',
       stands:s?'Everything so far sits in &ldquo;'+s.t+'&rdquo;.':'Nothing has needed an engineer yet.',
@@ -3942,6 +3992,14 @@ document.addEventListener('click',e=>{
 
 /* ---------- wiring ---------- */
 document.addEventListener('click',e=>{
+  /* session Back, when it points at a project rather than the feed */
+  if(e.target.closest('#sessBack') && sessBackTo && PROJECTS[sessBackTo]){
+    e.stopPropagation();
+    const k=sessBackTo; sessBackTo=null;
+    renderProject(k);
+    return;
+  }
+
   const tab=e.target.closest('[data-sfilter]');
   if(tab){
     e.stopPropagation();
