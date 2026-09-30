@@ -6574,9 +6574,41 @@ const askText  = document.getElementById('askText');
 const ghost    = document.getElementById('ghost');
 const PLACEHOLDER = askText.placeholder;
 let touched=false, ghostTimer=null;
+/* bumped every time the ghost is stopped: a chain already in flight checks it
+   and stands down, so a restart can never end up with two of them typing */
+let ghostRun=0;
 
-askText.addEventListener('focus',()=>hero.classList.add('focused'));
-askText.addEventListener('blur', ()=>hero.classList.remove('focused'));
+/* The suggestions are there to show you how to start. Once the caret is in
+   the box you are starting, and something typing itself under your cursor is
+   no longer a prompt — it is interference. */
+function ghostStop(){
+  ghostRun++;
+  clearTimeout(ghostTimer);
+  ghostTimer=null;
+  ghost.innerHTML='';
+  askText.placeholder=PLACEHOLDER;
+}
+
+/* The page opens with the caret already in the box and the ghost typing —
+   that pairing is the opening itself, so the focus it puts there is not the
+   reader reaching for the box and must not count as one. */
+let bootFocus=false;
+
+askText.addEventListener('focus',()=>{
+  hero.classList.add('focused');
+  if(bootFocus){ bootFocus=false; return }
+  ghostStop();
+});
+askText.addEventListener('blur', ()=>{
+  hero.classList.remove('focused');
+  /* left without writing anything — the empty box goes back to suggesting */
+  if(!touched && !askText.value.trim()) setTimeout(runGhost,420);
+});
+/* Clicking into a box that is already focused fires no focus event, and at
+   this point it always is — so the click and the first key have to say so
+   themselves, or the ghost would type on under the reader's own cursor. */
+askText.addEventListener('pointerdown',ghostStop);
+askText.addEventListener('keydown',ghostStop);
 askText.addEventListener('input',()=>{
   /* The floor is the CSS min-height and nothing else: min-height beats height,
      so writing the raw scrollHeight here leaves the box exactly where it was
@@ -6599,9 +6631,7 @@ const SUGGESTIONS=[
 function startedTyping(){
   if(touched) return;
   touched=true;
-  clearTimeout(ghostTimer);
-  ghost.textContent='';
-  askText.placeholder=PLACEHOLDER;    /* back to the plain hint if they clear it */
+  ghostStop();                        /* back to the plain hint if they clear it */
   /* they are writing — the coaching is over, and neither half of it should be
      seen to linger a moment past the first keystroke */
   coachStop();
@@ -6609,14 +6639,16 @@ function startedTyping(){
 }
 /* type -> hold -> erase -> next. Only ever runs on an untouched, empty field. */
 function runGhost(){
-  if(REDUCED||touched) return;
+  if(REDUCED||touched||askText.value.trim()) return;
   let si=0;
+  const mine=++ghostRun;               /* this chain's claim on the ghost */
+  const alive=()=>!touched && mine===ghostRun;
   const bar='<span class="bar"></span>';
   const paint=t=>{ghost.innerHTML=t+bar};
   function typeIn(){
     const s=SUGGESTIONS[si]; let i=0;
     (function step(){
-      if(touched) return;
+      if(!alive()) return;
       paint(s.slice(0,++i));
       ghostTimer=setTimeout(i<s.length?step:hold,34+Math.random()*36);
     })();
@@ -6625,7 +6657,7 @@ function runGhost(){
   function eraseOut(){
     const s=SUGGESTIONS[si]; let i=s.length;
     (function step(){
-      if(touched) return;
+      if(!alive()) return;
       paint(s.slice(0,--i));
       ghostTimer=setTimeout(i>0?step:next,16);
     })();
@@ -6764,6 +6796,7 @@ function revealDashboard(){
 function startHome(){
   /* .focus() only fires a focus event when the document itself has focus — if
      the window is in the background the class has to be set by hand. */
+  bootFocus=true;
   askText.focus({preventScroll:true});
   hero.classList.add('focused');
   runGhost();
