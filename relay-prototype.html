@@ -4139,6 +4139,9 @@ document.querySelectorAll('.vs').forEach(b=>{
       v==='new' ? 'No calls yet' : '34.8 minutes used';
     /* a returning customer has calls behind them by definition */
     setHasCalls(v==='returning');
+    /* the recent panel belongs to one view and not the other, so it is
+       rebuilt on the way across rather than left as the last view wrote it */
+    if(typeof renderHomeRecent==='function') renderHomeRecent();
     document.querySelector('.main').scrollTop=0;
     /* The welcome and the coach bubble belong to the first-run view: they are
        introductions, and a returning customer has already been introduced.
@@ -6406,7 +6409,15 @@ function renderHomeRecent(){
 
   const el=document.getElementById('homeRecent');
   if(!el) return;
-  /* only calls made in this run — a first-time customer has none until they call */
+
+  /* The first-run page is the card and nothing else — it stays that way even
+     after a call happens while it is on screen. Somebody arriving for the
+     first time has no history to be shown, and a panel offering to "see all
+     9" of sessions they have never had is the opposite of a first run. The
+     returning view is where work already done belongs. */
+  const home=document.getElementById('home');
+  if(home && home.dataset.view==='new'){ el.innerHTML=''; return }
+
   const keys=NEW_SESS.filter(k=>SESSIONS[k]).slice(0,3);
   if(!keys.length){el.innerHTML='';return}
   el.innerHTML='<div class="recent"><div class="recent-h">'+
