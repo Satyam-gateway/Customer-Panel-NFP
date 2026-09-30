@@ -5979,16 +5979,32 @@ const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart
    {oneoff:true} → "+ New session": it stays a one-off */
 let callScope=null;
 
+/* The green button is a phone, not a form. Pressing it puts you in a call —
+   whatever is in the box comes with you if you wrote something, and nothing
+   is asked of you if you did not. Where the call lands afterwards is the
+   answer to the two chips, not to the textarea. */
 function startMatch(field){
   const ta=field.querySelector('textarea');
-  const problem=(ta?ta.value:'').trim();
-  if(!problem){
-    if(ta) ta.focus();
-    toast('Tell us what is wrong first — a line or two is plenty');
-    return;
-  }
+  const problem=(ta?ta.value:'').trim();     /* optional */
+
+  const sess = askScope.sess && askScope.sess!=='__new__' && SESSIONS[askScope.sess]
+             ? askScope.sess : null;
+  const proj = sess ? (SESSIONS[sess].proj||null) : askScope.proj;
+
+  /* whoever already knows this bit of work, before whoever is merely free */
+  let who = sess ? SESSIONS[sess].who : (proj ? projLead(proj) : null);
+  if(!who){ try{ who=freeKey() }catch(err){ who=DEMO_ENGINEER } }
+
   callScope=null;
-  beginCall(problem,DEMO_ENGINEER);
+  window.__callFiling={who:who, proj:proj, sess:askScope.sess, problem:problem};
+  window.startCall(who);
+
+  /* the box has somewhere to be now — empty it, the way sending does */
+  if(ta){ ta.value=''; ta.style.height='' }
+  const staged=document.getElementById('askStaged');
+  if(staged) staged.innerHTML='';
+  askScope={proj:null,sess:null};
+  paintScope(); paintSend();
 }
 
 function beginCall(problem,who,note){
@@ -7139,7 +7155,12 @@ function paintScope(){
      carry an entity (&pound;180) that has to arrive as a character */
   p.querySelector('.lb').innerHTML = askScope.proj ? PROJECTS[askScope.proj].n : 'Project';
   p.classList.toggle('set', !!askScope.proj);
-  s.querySelector('.lb').innerHTML = askScope.sess ? SESSIONS[askScope.sess].t : 'Session';
+  /* three states, not two: nothing chosen, a session chosen, or "put this in
+     a new one" — which reads as a choice even though it files like nothing */
+  s.querySelector('.lb').innerHTML =
+      askScope.sess==='__new__'                ? 'New session'
+    : askScope.sess && SESSIONS[askScope.sess] ? SESSIONS[askScope.sess].t
+    :                                            'Session';
   s.classList.toggle('set', !!askScope.sess);
 }
 function closePicks(){
@@ -7181,12 +7202,25 @@ const PICK_TICK='<svg class="tk" viewBox="0 0 16 16" fill="none" stroke="current
    it was with, what it belongs to, and how long ago it was. */
 function fillPick(wrap){
   const proj=wrap.id==='projPick';
-  const keys=proj?PROJ_ORDER:SESS_ORDER;
+  /* The sessions menu answers "which piece of work is this?", so it only ever
+     offers sessions that could hold it: the chosen project's, or — before a
+     project is chosen — the ones that belong to no project at all. */
+  const keys = proj ? PROJ_ORDER
+             : askScope.proj ? SESS_ORDER.filter(k=>SESSIONS[k].proj===askScope.proj)
+             :                 SESS_ORDER.filter(k=>!SESSIONS[k].proj);
   const picked=proj?askScope.proj:askScope.sess;
   let body='';
 
+  /* "a new one" is always available, so the sessions menu is never a dead end */
+  const newRow = proj ? '' :
+    '<div class="pk-list"><button class="opt'+(picked==='__new__'?' on':'')+'" data-val="__new__">'+
+      '<span class="mk round" style="background:var(--live)">+</span>'+
+      '<span class="tx"><span class="t1">Start a new session</span>'+
+      '<span class="t2">Filed when the call ends</span></span>'+PICK_TICK+'</button></div>';
+
   if(!keys.length){
-    body='<div class="none">'+(proj?'No projects yet':'No earlier sessions')+'</div>';
+    body=newRow+'<div class="none">'+(proj?'No projects yet'
+      : askScope.proj?'No sessions in this project yet':'No one-off sessions yet')+'</div>';
   }
   else if(proj){
     /* authored copy, entities and all — running P.sub through an escaper
@@ -7205,12 +7239,13 @@ function fillPick(wrap){
     /* the same This week / Earlier split the Sessions screen uses, so the
        menu reads the way the list you already know reads */
     let grp=null;
-    body='<div class="pk-list">'+keys.map(k=>{
+    body=newRow+'<div class="pk-list">'+keys.map(k=>{
       const S=SESSIONS[k], P=PEOPLE[S.who];
       let head='';
       if(S.grp!==grp){ grp=S.grp; head='<div class="pk-g">'+grp+'</div>' }
       const bits=[S.state==='open'?'Open':'Finished'];
-      if(S.proj && PROJECTS[S.proj]) bits.push(PROJECTS[S.proj].n);
+      /* naming the project on every row is noise once the list is that project */
+      if(!askScope.proj && S.proj && PROJECTS[S.proj]) bits.push(PROJECTS[S.proj].n);
       if(P) bits.push(fName(S.who));
       if(S.ago) bits.push(S.ago);
       return head+'<button class="opt'+(k===picked?' on':'')+'" data-val="'+k+'">'+
@@ -7230,7 +7265,9 @@ function fillPick(wrap){
 
   /* If something is already chosen, open the list onto it rather than onto
      the top — scrolling to find your own answer is a silly thing to ask. */
-  const list=wrap.querySelector('.pk-list'), sel=wrap.querySelector('.opt.on');
+  /* the sessions menu has two lists now — the new-session row and the real
+     ones — so scroll whichever one the selection is actually in */
+  const sel=wrap.querySelector('.opt.on'), list=sel&&sel.closest('.pk-list');
   if(list&&sel) list.scrollTop=Math.max(0,sel.offsetTop-(list.clientHeight-sel.offsetHeight)/2);
 }
 
@@ -7247,8 +7284,19 @@ document.addEventListener('click',e=>{
   if(opt){
     e.stopPropagation();
     const wrap=opt.closest('.pickwrap');
-    if(wrap.id==='projPick') askScope.proj=opt.dataset.val||null;
-    else                     askScope.sess=opt.dataset.val||null;
+    if(wrap.id==='projPick'){
+      askScope.proj=opt.dataset.val||null;
+      /* a session held from the old project cannot survive into the new one;
+         "a new one" is not tied to any project, so it does */
+      if(askScope.sess && askScope.sess!=='__new__' &&
+         (!SESSIONS[askScope.sess] || SESSIONS[askScope.sess].proj!==askScope.proj))
+        askScope.sess=null;
+    }else{
+      askScope.sess=opt.dataset.val||null;
+      /* a session belongs to a project, so picking one answers both chips */
+      if(askScope.sess && askScope.sess!=='__new__' && SESSIONS[askScope.sess])
+        askScope.proj=SESSIONS[askScope.sess].proj||null;
+    }
     closePicks(); paintScope();
     return;
   }
@@ -7698,6 +7746,17 @@ if(!maybeWelcome()) revealDashboard();
     if (secs < 1) return;                       /* nobody picked up — nothing billed */
     if (typeof pending === "undefined") return; /* main script absent — nothing to file into */
 
+    /* The call was aimed at a session that already exists, so it joins that
+       session rather than starting another. The panel's own closeCall(key,mins)
+       appends the call, re-dates the session, floats it to the top and rewrites
+       its summary — reached through window because this closure has a
+       closeCall() of its own that would otherwise shadow it. */
+    if (f.sess && f.sess !== "__new__" && typeof SESSIONS !== "undefined" && SESSIONS[f.sess]) {
+      window.closeCall(f.sess, Math.max(1, Math.round(secs / 60)));
+      show("session");
+      return;
+    }
+
     /* no "what is wrong?" box any more, so the first thing you said in the
        call's own chat becomes the session title, then the typed sheet text,
        then a plain fallback */
@@ -7735,11 +7794,12 @@ if(!maybeWelcome()) revealDashboard();
       try { who = projLead(k); } catch (_) {}
       return { who: who || someoneFree(), proj: k };
     }
-    /* the open session's call button */
+    /* the open session's call button — the call joins the session you are
+       standing in rather than starting a second one beside it */
     if (btn.closest(".sx-call") || btn.classList.contains("sx-call")) {
       try {
         const s = SESSIONS[currentSession];
-        if (s) return { who: s.who, proj: s.proj || null };
+        if (s) return { who: s.who, proj: s.proj || null, sess: currentSession };
       } catch (_) {}
       return { who: someoneFree(), proj: null };
     }
