@@ -367,8 +367,6 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 /* ---------- home: first-run ---------- */
 #home[data-view="returning"] .only-new,
 #home[data-view="new"] .only-ret{display:none}
-#home[data-view="new"] .v-greet{display:none}
-#home:not([data-view="new"]) .v-welcome{display:none}
 /* The greeting moved down into the card, so all that is left up here is the
    demo switch and the faces — and they belong on the right. */
 .home-head{display:flex;align-items:flex-start;justify-content:flex-end;gap:20px}
@@ -926,6 +924,7 @@ body.hascalls .scope-wrap{display:inline-flex}
   padding:12px 14px;outline:none;margin-bottom:20px;
   transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
 }
+.wl-in::placeholder{color:var(--faint)}
 .wl-in:focus{border-color:var(--accent-line);box-shadow:0 0 0 3.5px rgba(var(--accent-rgb),.11)}
 .wl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
 .wl-chip{
@@ -1986,7 +1985,9 @@ body.hascalls .scope-wrap{display:inline-flex}
     <div class="coach" id="coach" hidden aria-hidden="true">
       <i class="ca" id="coachArrow"></i>
       <div class="coach-in" id="coachIn">
-        <div class="coach-dots" id="coachDots"><i></i><i></i><i></i></div>
+        <!-- One per COACH_STOPS entry. A dot with no stop behind it never
+             lights up, so the tour reads as having a leg left when it is done. -->
+        <div class="coach-dots" id="coachDots"><i></i><i></i></div>
         <p class="coach-tx" id="coachTx"></p>
       </div>
     </div>
@@ -2016,8 +2017,11 @@ body.hascalls .scope-wrap{display:inline-flex}
           <div class="ask">
             <div class="ask-brand">
               <span class="orb ask-orb" aria-hidden="true"></span>
-              <h1 class="ask-name v-welcome">Welcome to Relay, <span class="who">Rohan</span></h1>
-              <h1 class="ask-name v-greet">Hello, <span class="who">Rohan</span></h1>
+              <!-- One heading for both views. There were two, swapped by
+                   data-view, but the returning customer is no less welcome
+                   than the new one and the switch only meant the line under
+                   the orb changed out from under you when you flipped views. -->
+              <h1 class="ask-name">Welcome to Relay, <span class="who">Rohan</span></h1>
             </div>
             <div class="ask-field" id="askField">
               <div class="field-wrap">
@@ -3432,14 +3436,11 @@ body.hascalls .scope-wrap{display:inline-flex}
       <button class="wl-chip">Still working that out</button>
     </div>
 
-    <p class="wl-l" id="wlWhenL">And when do you usually do it?</p>
-    <div class="wl-chips" id="wlWhen" role="group" aria-labelledby="wlWhenL">
-      <button class="wl-chip">Mornings</button>
-      <button class="wl-chip">Daytime</button>
-      <button class="wl-chip">Evenings</button>
-      <button class="wl-chip">Late at night</button>
-      <button class="wl-chip">Weekends</button>
-    </div>
+    <!-- Typed, not picked: the chips above cover the thing everyone answers
+         the same way, and there is no shortlist that would not put words in
+         somebody's mouth here. Blank is a fine answer — the card is skippable. -->
+    <label class="wl-l" for="wlLike">And what do you like doing most?</label>
+    <input class="wl-in" id="wlLike" placeholder="Designing it, shipping it, fixing what breaks&hellip;">
 
     <button class="wl-go" id="wlGo">Continue</button>
     <button class="wl-skip" id="wlSkip">Skip</button>
@@ -6063,7 +6064,7 @@ function closeWelcome(){
 /* One answer per question. Pressing the chosen one again takes it back — the
    whole card is skippable, so an answered question has to be un-answerable
    too, or the only way out of a mis-tap is the Skip link. */
-['wlDo','wlWhen'].forEach(id=>{
+['wlDo'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{
     const chip=e.target.closest('.wl-chip');
     if(!chip) return;
@@ -6082,7 +6083,7 @@ document.getElementById('wlGo').addEventListener('click',e=>{
     const first=n.split(/\s+/)[0];
     /* only the name moves — the greeting around it is markup now, and the
        green span has to survive being called something else */
-    document.querySelectorAll('.v-welcome .who, .v-greet .who').forEach(el=>{
+    document.querySelectorAll('.ask-name .who').forEach(el=>{
       el.textContent=first;
     });
   }
