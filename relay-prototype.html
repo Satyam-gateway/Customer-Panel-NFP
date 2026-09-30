@@ -839,12 +839,14 @@ body.hascalls .scope-wrap{display:inline-flex}
 }
 .coach.moving .ca{opacity:0}
 
-/* ---- and what the bubble leaves behind ----
-   The bubble says its piece and goes, and the page is then a blank box with
-   nothing on it that says what to do. This picks up at that moment and says
-   the part the bubble never did: who is on the other end. Three engineers,
-   their own faces, their dots green, and the fact of it in words — and under
-   them one line naming the button that reaches them.
+/* ---- who is on the other end ----
+   On the first-time view the bubble says its piece and goes, and the page is
+   then a blank box with nothing on it that says what to do; this picks up at
+   that moment and says the part the bubble never did. On the returning view
+   there was never a bubble, and the question is the same one: three
+   engineers, their own faces, their dots green, and the fact of it in words —
+   and under them one line naming the button that reaches them. Who is free
+   this minute is not something a second visit teaches you, so it is on both.
 
    It names it by drawing it. There was an arrow here that flew from the line
    up to the real button; it was a lot of movement to say one small thing, and
@@ -2271,12 +2273,14 @@ body.hascalls .scope-wrap{display:inline-flex}
               <button class="starter">I do not understand this error message</button>
             </div>
 
-            <!-- Hidden until the coach above has finished and gone, and
-                 then the part it never said: who is actually on the other
-                 end. Three engineers who are free this minute, the fact of it
-                 in words, and under them one line that names the button which
-                 reaches them — by drawing it, in the middle of the sentence,
-                 at the size of a word.
+            <!-- On the first-time view this is hidden until the coach above
+                 has finished and gone, and is then the part it never said; on
+                 the returning view, where there is no coach, it is simply
+                 there. Three engineers who are free this minute, the fact of
+                 it in words, and under them one line that names the button
+                 which reaches them — by drawing it, in the middle of the
+                 sentence, at the size of a word. Both views share this card,
+                 so both views get this.
 
                  It arrives once and stays put for as long as the box is empty,
                  and goes at the first keystroke. The three faces are real
@@ -3906,15 +3910,20 @@ document.querySelectorAll('.vs').forEach(b=>{
     /* a returning customer has calls behind them by definition */
     setHasCalls(v==='returning');
     document.querySelector('.main').scrollTop=0;
-    /* the welcome belongs to the first-run view, so it arrives with it */
+    /* The welcome and the coach bubble belong to the first-run view: they are
+       introductions, and a returning customer has already been introduced.
+       The row of faces under the card is not an introduction — it is who is
+       free this minute, which changes by the hour — so it comes up on both.
+       It waits out the switch the same 420ms either way, so it arrives after
+       the view has finished changing shape rather than during. */
     if(v==='new'){
       if(typeof maybeWelcome==='function') maybeWelcome();
       if(typeof coachStart==='function') setTimeout(coachStart,420);
-      if(typeof hintStart==='function')  setTimeout(hintStart,420);
     }else{
       if(typeof coachStop==='function') coachStop();
-      if(typeof hintStop==='function')  hintStop();
     }
+    if(typeof hintStop==='function')  hintStop();
+    if(typeof hintStart==='function') setTimeout(hintStart,420);
   });
 });
 
@@ -6752,11 +6761,15 @@ hintEl.querySelectorAll('.hint-faces .av').forEach(av=>{
 });
 
 function hintStart(){
-  /* it is the coach's second half, so it never speaks before the coach has
-     finished — which also makes it safe to call from anywhere */
-  if(!coachDone||touched||askText.value.trim()) return;
+  if(touched||askText.value.trim()) return;
   const home=document.getElementById('home');
-  if(home.dataset.view!=='new'||!home.classList.contains('on')) return;
+  if(!home.classList.contains('on')) return;
+  /* On the first-time view it is the coach's second half and waits its turn:
+     the bubble tours, retires, and hands over. The returning view has no
+     bubble to wait for — and needs this just as much, because who is free
+     right now is not something a returning customer already knows. It is the
+     same card either way, so it is the same row of faces either way. */
+  if(home.dataset.view==='new'&&!coachDone) return;
   hintEl.classList.add('on');
   hintLit(true);
 }
