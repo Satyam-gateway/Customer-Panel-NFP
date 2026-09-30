@@ -12,40 +12,36 @@
     },
     {
       "name": "relay",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "-m",
-        "http.server",
+        "serve.js",
         "8756"
       ],
       "port": 8756
     },
     {
       "name": "relay-alt",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "-m",
-        "http.server",
+        "serve.js",
         "8761"
       ],
       "port": 8761
     },
     {
       "name": "relay-profile",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "-m",
-        "http.server",
+        "serve.js",
         "8767"
       ],
       "port": 8767
     },
     {
       "name": "relay-nav",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
-        "-m",
-        "http.server",
+        "serve.js",
         "8773"
       ],
       "port": 8773

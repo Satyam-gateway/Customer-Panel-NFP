@@ -367,8 +367,6 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 /* ---------- home: first-run ---------- */
 #home[data-view="returning"] .only-new,
 #home[data-view="new"] .only-ret{display:none}
-#home[data-view="new"] .v-greet{display:none}
-#home:not([data-view="new"]) .v-welcome{display:none}
 /* The greeting moved down into the card, so all that is left up here is the
    demo switch and the faces — and they belong on the right. */
 .home-head{display:flex;align-items:flex-start;justify-content:flex-end;gap:20px}
@@ -840,11 +838,175 @@ body.hascalls .scope-wrap{display:inline-flex}
   transform:rotate(45deg);transition:opacity .2s var(--ease);
 }
 .coach.moving .ca{opacity:0}
+
+/* ---- and what the bubble leaves behind ----
+   The bubble says its piece and goes, and the page is then a blank box with
+   nothing on it that says what to do. This picks up at that moment and says
+   the part the bubble never did: who is on the other end. Three engineers,
+   their own faces, their dots green, and the fact of it in words — and under
+   them one line naming the button that reaches them.
+
+   It names it by drawing it. There was an arrow here that flew from the line
+   up to the real button; it was a lot of movement to say one small thing, and
+   what it mostly did was drag the eye off the sentence. A picture of the
+   button, set in the sentence at the size of a word, says the same thing
+   standing still and survives being read in any order.
+
+   It loops, because once the bubble has gone it is the only instruction left
+   and somebody who looks up two minutes later should still find it running.
+   It sits under the starters: out of the way, and the last thing the eye
+   passes on its way back up to the box. */
+.askhint{
+  position:relative;                    /* the ring on the real button hangs off this */
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  /* a clear gap under the starters — this is a different kind of thing from the
+     three buttons above it, and butted up against them it read as a fourth row
+     of the same list rather than as a separate aside */
+  margin-top:44px;
+  opacity:0;transition:opacity .45s var(--ease);
+}
+.askhint.on{opacity:1}
+
+/* the faces and the fact, on one line: three people and what is true of them */
+.hint-who{display:flex;align-items:center;gap:11px}
+.hint-faces{display:flex;align-items:center}
+/* bigger than the rosters elsewhere on purpose — these are the whole argument
+   for pressing the button, and small they were three smudges. At this size you
+   can see that they are three particular people rather than three avatars. */
+.hint-faces .av{
+  width:44px;height:44px;font-size:14.5px;margin-left:-12px;
+  border:2.5px solid var(--card);box-shadow:0 2px 7px rgba(20,24,26,.13);
+  opacity:0;transform:translateY(8px) scale(.82);
+}
+.hint-faces .av:first-child{margin-left:0}
+.hint-faces .av[data-dot]::after{width:12px;height:12px}
+
+.hint-eng{
+  font-size:12.5px;font-weight:600;color:var(--live);white-space:nowrap;
+  opacity:0;transform:translateY(3px);
+}
+
+/* nothing animates until it is on the page, so the loop always begins at its
+   beginning rather than wherever the clock happened to be */
+.askhint.on .hint-faces .av{
+  animation:hintFace calc(5.2s * var(--speed)) var(--spring) infinite;
+}
+/* one after another, left to right: a group arriving, not a group appearing */
+.askhint.on .hint-faces .av:nth-child(2){animation-delay:calc(.12s * var(--speed))}
+.askhint.on .hint-faces .av:nth-child(3){animation-delay:calc(.24s * var(--speed))}
+@keyframes hintFace{
+  0%       {opacity:0;transform:translateY(8px) scale(.82)}
+  8%       {opacity:1;transform:translateY(-1px) scale(1.05)}
+  13%,86%  {opacity:1;transform:translateY(0)    scale(1)}
+  95%,100% {opacity:0;transform:translateY(8px) scale(.82)}
+}
+
+.askhint.on .hint-eng{animation:hintSay calc(5.2s * var(--speed)) var(--ease) infinite}
+@keyframes hintSay{
+  0%,11%   {opacity:0;transform:translateY(3px)}
+  21%,86%  {opacity:1;transform:translateY(0)}
+  95%,100% {opacity:0;transform:translateY(3px)}
+}
+
+/* ---- the line that names the button ----
+   One line, standing still under the faces, with the button drawn into the
+   middle of it at the size of a word: click *this*, the green one, to reach
+   them. Naming a button by drawing it is the only description that cannot go
+   stale — there is no "top right" to get wrong when the window changes shape,
+   and nothing to re-read if the row reflows.
+
+   It keeps the pill it flew in: a hairline and a little card-coloured ground
+   are what let a picture of a button sit inside a sentence without reading as
+   a stray glyph, and they give the line a shape of its own under the faces. */
+.hint-fly{
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  padding:6px 14px 6px 13px;border-radius:999px;
+  background:var(--card);border:1px solid var(--accent-line);
+  box-shadow:0 1px 3px rgba(20,24,26,.06);
+  pointer-events:none;              /* it names a button — never eat that click */
+  opacity:0;transform:translateY(3px);
+}
+.hint-say{font-size:13px;color:var(--muted);line-height:1}
+.hint-say b{font-weight:650;color:var(--accent-deep)}
+
+/* The button itself, shrunk to a word. Same green, same round, same handset —
+   small enough to sit on a 13px line without shoving it open, big enough that
+   the handset is still a handset rather than a speck. */
+.hint-call{
+  width:22px;height:22px;flex:none;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,var(--accent-lift),var(--accent));
+  border:1px solid var(--accent);color:#fff;
+  box-shadow:0 1px 0 rgba(255,255,255,.20) inset,
+             0 3px 8px -3px rgba(var(--accent-rgb),.5);
+}
+.hint-call svg{width:11px;height:11px;display:block}
+
+.askhint.on .hint-fly{animation:hintSay calc(5.2s * var(--speed)) var(--ease) infinite}
+/* a beat behind the green line above it, so the two read top to bottom */
+.askhint.on .hint-fly{animation-delay:calc(.10s * var(--speed))}
+
+/* One ring on the real button, a beat after the line has been read: the line
+   draws the button, and then the button it drew answers. That is the whole job
+   the arrow used to do, done once and quietly, without anything crossing the
+   card to do it. Its position is the one thing JS still measures. */
+.hint-ping{
+  position:absolute;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
+  border-radius:999px;border:2px solid var(--accent);pointer-events:none;
+  opacity:0;z-index:5;
+  transform:translate(var(--px,0px),var(--py,0px)) scale(.7);
+}
+.askhint.on .hint-ping{animation:hintPing calc(5.2s * var(--speed)) var(--ease) infinite}
+@keyframes hintPing{
+  0%,44%   {opacity:0;  transform:translate(var(--px,0px),var(--py,0px)) scale(.7)}
+  50%      {opacity:.65;transform:translate(var(--px,0px),var(--py,0px)) scale(.9)}
+  72%,100% {opacity:0;  transform:translate(var(--px,0px),var(--py,0px)) scale(1.9)}
+}
+
+/* ---- and the button lights up while the hint is talking ----
+   The line below draws the button; this is the button admitting it. The collar
+   is on for the whole time the hint is up, not just for a beat, because the
+   point is that the eye can leave the sentence, come back anywhere on the card,
+   and still land on the one green thing. It swells once a loop on the same beat
+   as the ring, so the two read as one gesture rather than two.
+
+   The collar lives on the wrapper, not the button: .golive already spends its
+   own box-shadow on ctaBreathe, and a second animation on the same property
+   would simply delete the first. It goes the moment the pointer arrives — once
+   you have found it, it has nothing left to say. */
+.cta-ring.lit{
+  border-radius:999px;
+  box-shadow:0 0 0 3px rgba(var(--accent-rgb),.20);
+  animation:ctaLit calc(5.2s * var(--speed)) var(--ease) infinite;
+}
+@keyframes ctaLit{
+  0%,40%   {box-shadow:0 0 0 3px  rgba(var(--accent-rgb),.20)}
+  50%      {box-shadow:0 0 0 10px rgba(var(--accent-rgb),.30)}
+  72%,100% {box-shadow:0 0 0 3px  rgba(var(--accent-rgb),.20)}
+}
+/* brighter, wider pool of green behind it than the resting halo */
+.cta-ring.lit .halo{
+  inset:-16px;
+  background:radial-gradient(closest-side,rgba(var(--accent-rgb),.44),rgba(var(--accent-rgb),0));
+}
+.cta-ring.lit:hover{animation:none;box-shadow:none}
+
 @media (prefers-reduced-motion:reduce){
   /* the bubble stops touring and simply stands by the box with the one
      instruction that matters — the words are the point, the walk was sugar */
   .coach{transition:opacity .001ms !important}
   .coach-dots{display:none}
+  /* and below it nothing arrives and nothing fades: the faces are simply
+     there, and so is the line under them with the button drawn into it. That
+     line was always the load-bearing part — the looping was only there to
+     catch an eye that had wandered off. */
+  .askhint{transition:opacity .001ms !important}
+  .hint-faces .av{opacity:1;transform:none}
+  .hint-eng{opacity:1;transform:none}
+  .askhint.on .hint-fly{animation:none;opacity:1;transform:none}
+  .hint-ping{display:none}
+  /* the collar stays — it is the highlight, not the motion */
+  .cta-ring.lit{animation:none;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.24)}
   .rise{animation:none}
   .hold{opacity:1}
 }
@@ -926,6 +1088,7 @@ body.hascalls .scope-wrap{display:inline-flex}
   padding:12px 14px;outline:none;margin-bottom:20px;
   transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
 }
+.wl-in::placeholder{color:var(--faint)}
 .wl-in:focus{border-color:var(--accent-line);box-shadow:0 0 0 3.5px rgba(var(--accent-rgb),.11)}
 .wl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
 .wl-chip{
@@ -2209,7 +2372,9 @@ body.hascalls .scope-wrap{display:inline-flex}
     <div class="coach" id="coach" hidden aria-hidden="true">
       <i class="ca" id="coachArrow"></i>
       <div class="coach-in" id="coachIn">
-        <div class="coach-dots" id="coachDots"><i></i><i></i><i></i></div>
+        <!-- One per COACH_STOPS entry. A dot with no stop behind it never
+             lights up, so the tour reads as having a leg left when it is done. -->
+        <div class="coach-dots" id="coachDots"><i></i><i></i></div>
         <p class="coach-tx" id="coachTx"></p>
       </div>
     </div>
@@ -2239,8 +2404,11 @@ body.hascalls .scope-wrap{display:inline-flex}
           <div class="ask">
             <div class="ask-brand">
               <span class="orb ask-orb" aria-hidden="true"></span>
-              <h1 class="ask-name v-welcome">Welcome to Relay, <span class="who">Rohan</span></h1>
-              <h1 class="ask-name v-greet">Good morning, <span class="who">Rohan</span></h1>
+              <!-- One heading for both views. There were two, swapped by
+                   data-view, but the returning customer is no less welcome
+                   than the new one and the switch only meant the line under
+                   the orb changed out from under you when you flipped views. -->
+              <h1 class="ask-name">Welcome to Relay, <span class="who">Rohan</span></h1>
             </div>
             <div class="ask-field" id="askField">
               <div class="field-wrap">
@@ -2249,7 +2417,7 @@ body.hascalls .scope-wrap{display:inline-flex}
               </div>
               <div class="staged ask-staged" id="askStaged"></div>
               <div class="ask-tools">
-                <button class="tool ico" data-attach id="askDrop" title="Add a screenshot" aria-label="Add a screenshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+                <button class="tool ico" data-attach id="askDrop" title="Add files and more" aria-label="Add files and more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
                 <!-- Nothing to file an ask under until there has been a call,
                      so before that these two are not in the row at all. -->
                 <span class="pickwrap scope-wrap" id="projPick">
@@ -2287,6 +2455,34 @@ body.hascalls .scope-wrap{display:inline-flex}
               <button class="starter">Something broke after I made a change</button>
               <button class="starter">I do not understand this error message</button>
             </div>
+
+            <!-- Hidden until the coach above has finished and gone, and
+                 then the part it never said: who is actually on the other
+                 end. Three of the engineers, live, the fact of it in words,
+                 and under them one line that names the button which reaches
+                 them — by drawing it, in the middle of the sentence, at the
+                 size of a word. The real button rings once a beat later, so
+                 the picture and the thing it is a picture of introduce each
+                 other. It loops for as long as the box is empty and goes at
+                 the first keystroke. All of it is decoration to a screen
+                 reader, so the label carries the whole sentence instead. -->
+            <div class="askhint" id="askHint" role="img"
+                 aria-label="Engineers are available now — click the call button on the chat screen to connect to one of them">
+              <span class="hint-who" aria-hidden="true">
+                <span class="hint-faces">
+                  <span class="av" data-dot="live">SJ</span>
+                  <span class="av" data-dot="live">PN</span>
+                  <span class="av" data-dot="live">MI</span>
+                </span>
+                <span class="hint-eng">Engineers available</span>
+              </span>
+              <span class="hint-fly" aria-hidden="true">
+                <span class="hint-say"><b>Click</b></span>
+                <span class="hint-call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                <span class="hint-say">on the chat screen to connect to them</span>
+              </span>
+              <span class="hint-ping" aria-hidden="true"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -2301,7 +2497,7 @@ body.hascalls .scope-wrap{display:inline-flex}
       <div class="only-ret">
 
       <div class="quiet">
-        <div class="quiet-h">Left open from your last calls</div>
+        <div class="quiet-h">Recent sessions</div>
         <div class="strips">
           <button class="strip" data-session="s-checkout">
             <div class="av" data-dot="live" style="background:#00875A">SJ</div>
@@ -3655,14 +3851,11 @@ body.hascalls .scope-wrap{display:inline-flex}
       <button class="wl-chip">Still working that out</button>
     </div>
 
-    <p class="wl-l" id="wlWhenL">And when do you usually do it?</p>
-    <div class="wl-chips" id="wlWhen" role="group" aria-labelledby="wlWhenL">
-      <button class="wl-chip">Mornings</button>
-      <button class="wl-chip">Daytime</button>
-      <button class="wl-chip">Evenings</button>
-      <button class="wl-chip">Late at night</button>
-      <button class="wl-chip">Weekends</button>
-    </div>
+    <!-- Typed, not picked: the chips above cover the thing everyone answers
+         the same way, and there is no shortlist that would not put words in
+         somebody's mouth here. Blank is a fine answer — the card is skippable. -->
+    <label class="wl-l" for="wlLike">And what do you like doing most?</label>
+    <input class="wl-in" id="wlLike" placeholder="Designing it, shipping it, fixing what breaks&hellip;">
 
     <button class="wl-go" id="wlGo">Continue</button>
     <button class="wl-skip" id="wlSkip">Skip</button>
@@ -3888,7 +4081,11 @@ document.querySelectorAll('.vs').forEach(b=>{
     if(v==='new'){
       if(typeof maybeWelcome==='function') maybeWelcome();
       if(typeof coachStart==='function') setTimeout(coachStart,420);
-    }else if(typeof coachStop==='function') coachStop();
+      if(typeof hintStart==='function')  setTimeout(hintStart,420);
+    }else{
+      if(typeof coachStop==='function') coachStop();
+      if(typeof hintStop==='function')  hintStop();
+    }
   });
 });
 
@@ -6314,9 +6511,10 @@ function startedTyping(){
   clearTimeout(ghostTimer);
   ghost.textContent='';
   askText.placeholder=PLACEHOLDER;    /* back to the plain hint if they clear it */
-  /* they are writing — the coaching is over, and it should not be seen to
-     linger a moment past the first keystroke */
+  /* they are writing — the coaching is over, and neither half of it should be
+     seen to linger a moment past the first keystroke */
   coachStop();
+  hintStop();
 }
 /* type -> hold -> erase -> next. Only ever runs on an untouched, empty field. */
 function runGhost(){
@@ -6379,7 +6577,7 @@ function closeWelcome(){
 /* One answer per question. Pressing the chosen one again takes it back — the
    whole card is skippable, so an answered question has to be un-answerable
    too, or the only way out of a mis-tap is the Skip link. */
-['wlDo','wlWhen'].forEach(id=>{
+['wlDo'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{
     const chip=e.target.closest('.wl-chip');
     if(!chip) return;
@@ -6398,7 +6596,7 @@ document.getElementById('wlGo').addEventListener('click',e=>{
     const first=n.split(/\s+/)[0];
     /* only the name moves — the greeting around it is markup now, and the
        green span has to survive being called something else */
-    document.querySelectorAll('.v-welcome .who, .v-greet .who').forEach(el=>{
+    document.querySelectorAll('.ask-name .who').forEach(el=>{
       el.textContent=first;
     });
   }
@@ -6701,10 +6899,17 @@ function coachStart(){
   if(document.getElementById('home').dataset.view!=='new') return;
   if(!document.getElementById('home').classList.contains('on')) return;
   coachGo(0,true);
-  if(REDUCED){coachTimer=-1;coachDone=true;return}   /* one stop, standing still */
+  if(REDUCED){coachTimer=-1;coachDone=true;hintStart();return}  /* one stop, standing still */
   coachTimer=setInterval(()=>{
     if(coachOver) return;   /* they are reading it — do not move it mid-sentence */
-    if(coachAt>=COACH_STOPS.length-1){ coachDone=true; coachStop(); return }
+    if(coachAt>=COACH_STOPS.length-1){
+      coachDone=true; coachStop();
+      /* the hand-off: the line under the card comes up as the bubble goes, so
+         the instruction is never off the page — but not on the same frame, or
+         the two are briefly both there and it reads as a duplicate */
+      setTimeout(hintStart,380);
+      return;
+    }
     coachGo(coachAt+1);
   },3400*SPEED);
 }
@@ -6740,12 +6945,77 @@ addEventListener('resize',()=>{
   coachRz=setTimeout(()=>coachPlace(COACH_STOPS[coachAt],true),140);
 });
 
-/* the coach belongs to the home screen and to nothing else */
+/* ============================================================
+   THE HINT — what the coach leaves behind, under the card
+   ============================================================ */
+/* The bubble is a visitor: it walks its two stops and retires, and the page is
+   then back to a blank box with nothing on it that says what to do. This picks
+   up at that moment, shows who is waiting, and names the button that reaches
+   them — over and over, because it is the only instruction left and somebody
+   who looks up two minutes later should still find it running.
+
+   Nearly all of it is CSS now. The one thing that cannot be, and so the only
+   thing here, is where the real button sits: it is in a different row of a
+   different flexbox, so the ring that answers the line is measured and handed
+   down each time the hint goes up or the window changes shape. */
+const hintEl=document.getElementById('askHint');
+
+function hintAim(){
+  const go=document.getElementById('askGo');
+  if(!go) return;
+  const h=hintEl.getBoundingClientRect();
+  if(!h.width) return;                   /* not laid out yet — nothing to measure */
+  const g=go.getBoundingClientRect();
+  /* the button's middle, which is where the ring goes, in the hint's own
+     coordinates — the ring is the hint's child and the button is not */
+  hintEl.style.setProperty('--px',(g.left+g.width/2-h.left).toFixed(1)+'px');
+  hintEl.style.setProperty('--py',(g.top +g.height/2-h.top ).toFixed(1)+'px');
+}
+
+function hintStart(){
+  /* it is the coach's second half, so it never speaks before the coach has
+     finished — which also makes it safe to call from anywhere */
+  if(!coachDone||touched||askText.value.trim()) return;
+  const home=document.getElementById('home');
+  if(home.dataset.view!=='new'||!home.classList.contains('on')) return;
+  hintAim();                             /* measure it before anyone sees it */
+  hintEl.classList.add('on');
+  hintLit(true);
+}
+
+function hintStop(){ hintEl.classList.remove('on'); hintLit(false) }
+
+/* The hint and the button are one thing said twice, so they light and go dark
+   together — the collar is never on without the sentence that explains it. */
+function hintLit(on){
+  const ring=document.querySelector('.askwrap .cta-ring');
+  if(ring) ring.classList.toggle('lit',on);
+}
+
+/* The card is centred and fluid, so the ring is remeasured rather than
+   remembered. Watching the card itself rather than the window catches the
+   things a resize event does not: the tools row reflowing when the project
+   and session pickers appear, and the webfont landing and moving everything
+   down a pixel. */
+let hintRz;
+const hintReaim=()=>{
+  if(!hintEl.classList.contains('on')) return;
+  clearTimeout(hintRz);
+  hintRz=setTimeout(hintAim,140);
+};
+addEventListener('resize',hintReaim);
+if(window.ResizeObserver){
+  const ro=new ResizeObserver(hintReaim);
+  const card=document.querySelector('.askwrap .ask');
+  if(card) ro.observe(card);
+}
+
+/* both of them belong to the home screen and to nothing else */
 const _show=show;
 show=function(id){
   _show(id);
-  if(id==='home'){ if(!touched) setTimeout(coachStart,420); }
-  else coachStop();
+  if(id==='home'){ if(!touched){ setTimeout(coachStart,420); setTimeout(hintStart,420); } }
+  else { coachStop(); hintStop(); }
 };
 
 
@@ -6973,7 +7243,19 @@ function sendAsMessage(){
 }
 if(askSend) askSend.addEventListener('click',e=>{e.stopPropagation();sendAsMessage()});
 
+/* The two counts on the returning view's jump row, kept honest as sessions and
+   projects are created during the demo. The row itself is not on this branch's
+   home page — the box replaced it — so both lookups miss and this does nothing;
+   it is kept, and kept guarded, because main still calls it from four places
+   and a bare call to a function that is not there stops the script dead. */
+function paintJump(){
+  const s=document.getElementById('rjSess'), p=document.getElementById('rjProj');
+  if(s) s.textContent=SESS_ORDER.length;
+  if(p) p.textContent=PROJ_ORDER.length;
+}
+
 /* ---- boot ---- */
+paintJump();
 renderProjects();
 renderEngineers();
 renderHomeRecent();
