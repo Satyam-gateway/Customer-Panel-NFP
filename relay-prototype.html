@@ -852,12 +852,18 @@ body.hascalls .scope-wrap{display:inline-flex}
    button, set in the sentence at the size of a word, says the same thing
    standing still and survives being read in any order.
 
-   It loops, because once the bubble has gone it is the only instruction left
-   and somebody who looks up two minutes later should still find it running.
-   It sits under the starters: out of the way, and the last thing the eye
-   passes on its way back up to the box. */
+   It used to loop — fade out, fade back in, over and over — on the theory that
+   somebody who looked up two minutes later should find it running. What that
+   actually did was make the one standing instruction on the page blink, which
+   is both harder to read and easier to distrust. So it arrives once and then
+   simply stays.
+
+   And because the three are people rather than decoration, they behave like
+   it: hover one and it steps out of the stack and says what a click would do,
+   click one and their profile opens. It sits under the starters: out of the
+   way, and the last thing the eye passes on its way back up to the box. */
 .askhint{
-  position:relative;                    /* the ring on the real button hangs off this */
+  position:relative;                    /* the hover card is placed against this */
   display:flex;flex-direction:column;align-items:center;gap:10px;
   /* a clear gap under the starters — this is a different kind of thing from the
      three buttons above it, and butted up against them it read as a fourth row
@@ -868,45 +874,96 @@ body.hascalls .scope-wrap{display:inline-flex}
 .askhint.on{opacity:1}
 
 /* the faces and the fact, on one line: three people and what is true of them */
-.hint-who{display:flex;align-items:center;gap:11px}
+.hint-who{display:flex;align-items:center;gap:13px}
+/* Stacked, the way a roster is: overlapping says "a group of them" in less
+   room than three separate portraits, and a group is the point — there is
+   more than one person waiting. */
 .hint-faces{display:flex;align-items:center}
 /* bigger than the rosters elsewhere on purpose — these are the whole argument
    for pressing the button, and small they were three smudges. At this size you
    can see that they are three particular people rather than three avatars. */
 .hint-faces .av{
-  width:44px;height:44px;font-size:14.5px;margin-left:-12px;
+  width:44px;height:44px;font-size:14.5px;margin-left:-12px;z-index:1;
+  padding:0;font-family:inherit;cursor:pointer;
   border:2.5px solid var(--card);box-shadow:0 2px 7px rgba(20,24,26,.13);
-  opacity:0;transform:translateY(8px) scale(.82);
+  transition:transform .2s var(--spring),box-shadow .2s var(--ease);
 }
 .hint-faces .av:first-child{margin-left:0}
 .hint-faces .av[data-dot]::after{width:12px;height:12px}
+/* Under the pointer, one of them steps out of the stack: it comes up over the
+   two beside it, lifts clear of the line, and puts on a green collar. That is
+   what says it is a thing you can press before you have pressed it — and it
+   has to leave the stack to say it, because a face with a neighbour's chin
+   over its cheek cannot be highlighted, only partly highlighted. */
+.hint-faces .av:hover,
+.hint-faces .av:focus-visible{
+  transform:translateY(-6px) scale(1.14);
+  box-shadow:0 12px 22px -8px rgba(20,24,26,.36),0 0 0 3.5px rgba(var(--accent-rgb),.5);
+  outline:none;z-index:5;
+}
 
 .hint-eng{
   font-size:12.5px;font-weight:600;color:var(--live);white-space:nowrap;
-  opacity:0;transform:translateY(3px);
 }
 
-/* nothing animates until it is on the page, so the loop always begins at its
-   beginning rather than wherever the clock happened to be */
+/* The one piece of motion left, and it happens once: the three of them arrive
+   left to right as the hint comes up, so it reads as a group turning up rather
+   than a group that was always there. `backwards` and not `forwards` on
+   purpose — the fill has to let go at the end, or the final frame's transform
+   would sit on top of the hover lift forever. */
 .askhint.on .hint-faces .av{
-  animation:hintFace calc(5.2s * var(--speed)) var(--spring) infinite;
+  animation:hintPop calc(.42s * var(--speed)) var(--spring) backwards;
 }
-/* one after another, left to right: a group arriving, not a group appearing */
-.askhint.on .hint-faces .av:nth-child(2){animation-delay:calc(.12s * var(--speed))}
-.askhint.on .hint-faces .av:nth-child(3){animation-delay:calc(.24s * var(--speed))}
-@keyframes hintFace{
-  0%       {opacity:0;transform:translateY(8px) scale(.82)}
-  8%       {opacity:1;transform:translateY(-1px) scale(1.05)}
-  13%,86%  {opacity:1;transform:translateY(0)    scale(1)}
-  95%,100% {opacity:0;transform:translateY(8px) scale(.82)}
+.askhint.on .hint-faces .av:nth-child(2){animation-delay:calc(.07s * var(--speed))}
+.askhint.on .hint-faces .av:nth-child(3){animation-delay:calc(.14s * var(--speed))}
+@keyframes hintPop{
+  from{opacity:0;transform:translateY(8px) scale(.82)}
+  to  {opacity:1;transform:none}
 }
 
-.askhint.on .hint-eng{animation:hintSay calc(5.2s * var(--speed)) var(--ease) infinite}
-@keyframes hintSay{
-  0%,11%   {opacity:0;transform:translateY(3px)}
-  21%,86%  {opacity:1;transform:translateY(0)}
-  95%,100% {opacity:0;transform:translateY(3px)}
+.askhint.on .hint-eng{animation:hintRise calc(.4s * var(--speed)) var(--ease) backwards}
+@keyframes hintRise{
+  from{opacity:0;transform:translateY(3px)}
+  to  {opacity:1;transform:none}
 }
+
+/* ---- the label that comes up when you hover a face ----
+   This used to be a whole card: big photo, name, what they do, how long they
+   take to answer. It was a page about a person, thrown over the starters, in
+   answer to somebody merely moving the pointer across a row — and their photo
+   was already under the pointer, so the card's biggest element was a copy of
+   the thing it was covering. All the hover has to say is what happens if you
+   keep going, so that is all it says now. The rest of it is a click away, and
+   this is the sentence that tells you so.
+
+   It is laid out and measured at all times and only hidden with `visibility`,
+   because it is positioned from the face it belongs to and a `display:none`
+   box has no width to centre. Its pointer-events stay off: it is an answer to
+   a hover, not somewhere to move the pointer to, and letting the pointer land
+   on it would only take the pointer off the face and close it. */
+.hint-tip{
+  position:absolute;left:0;top:0;z-index:20;white-space:nowrap;
+  font-size:11.5px;font-weight:650;color:var(--accent-deep);
+  padding:6px 12px;border-radius:999px;
+  background:var(--accent-bg);border:1px solid var(--accent-line);
+  box-shadow:0 8px 18px -10px rgba(20,24,26,.3);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateY(5px) scale(.96);transform-origin:50% 100%;
+  transition:opacity .14s var(--ease),transform .2s var(--spring),visibility .14s;
+}
+.hint-tip.on{opacity:1;visibility:visible;transform:none}
+/* the tail, which is what ties the label to the particular face under it */
+.hint-tip::after{
+  content:"";position:absolute;left:var(--tail,50%);bottom:-4.5px;
+  width:8px;height:8px;margin-left:-4px;transform:rotate(45deg);
+  background:var(--accent-bg);
+  border-right:1px solid var(--accent-line);border-bottom:1px solid var(--accent-line);
+}
+
+/* said to a screen reader, drawn for nobody: the name of the button that the
+   line below draws rather than names */
+.hint-sr{position:absolute;width:1px;height:1px;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap}
 
 /* ---- the line that names the button ----
    One line, standing still under the faces, with the button drawn into the
@@ -924,7 +981,6 @@ body.hascalls .scope-wrap{display:inline-flex}
   background:var(--card);border:1px solid var(--accent-line);
   box-shadow:0 1px 3px rgba(20,24,26,.06);
   pointer-events:none;              /* it names a button — never eat that click */
-  opacity:0;transform:translateY(3px);
 }
 .hint-say{font-size:13px;color:var(--muted);line-height:1}
 .hint-say b{font-weight:650;color:var(--accent-deep)}
@@ -942,71 +998,53 @@ body.hascalls .scope-wrap{display:inline-flex}
 }
 .hint-call svg{width:11px;height:11px;display:block}
 
-.askhint.on .hint-fly{animation:hintSay calc(5.2s * var(--speed)) var(--ease) infinite}
-/* a beat behind the green line above it, so the two read top to bottom */
-.askhint.on .hint-fly{animation-delay:calc(.10s * var(--speed))}
-
-/* One ring on the real button, a beat after the line has been read: the line
-   draws the button, and then the button it drew answers. That is the whole job
-   the arrow used to do, done once and quietly, without anything crossing the
-   card to do it. Its position is the one thing JS still measures. */
-.hint-ping{
-  position:absolute;left:0;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
-  border-radius:999px;border:2px solid var(--accent);pointer-events:none;
-  opacity:0;z-index:5;
-  transform:translate(var(--px,0px),var(--py,0px)) scale(.7);
-}
-.askhint.on .hint-ping{animation:hintPing calc(5.2s * var(--speed)) var(--ease) infinite}
-@keyframes hintPing{
-  0%,44%   {opacity:0;  transform:translate(var(--px,0px),var(--py,0px)) scale(.7)}
-  50%      {opacity:.65;transform:translate(var(--px,0px),var(--py,0px)) scale(.9)}
-  72%,100% {opacity:0;  transform:translate(var(--px,0px),var(--py,0px)) scale(1.9)}
+/* a beat behind the faces above it, so the two read top to bottom */
+.askhint.on .hint-fly{
+  animation:hintRise calc(.4s * var(--speed)) var(--ease) backwards;
+  animation-delay:calc(.2s * var(--speed));
 }
 
-/* ---- and the button lights up while the hint is talking ----
-   The line below draws the button; this is the button admitting it. The collar
-   is on for the whole time the hint is up, not just for a beat, because the
-   point is that the eye can leave the sentence, come back anywhere on the card,
-   and still land on the one green thing. It swells once a loop on the same beat
-   as the ring, so the two read as one gesture rather than two.
+/* ---- and the button wears a collar while the hint is up ----
+   The line below draws the button; this is the button admitting it. It used to
+   swell once every loop, on the same beat as a ring that flew out of the hint.
+   Both of those are gone with the loop: what is left is a standing collar, on
+   for exactly as long as the sentence that explains it, so the eye can leave
+   the sentence, come back anywhere on the card, and still land on the one
+   green thing.
 
    The collar lives on the wrapper, not the button: .golive already spends its
-   own box-shadow on ctaBreathe, and a second animation on the same property
+   own box-shadow on ctaBreathe, and a second rule on the same property there
    would simply delete the first. It goes the moment the pointer arrives — once
    you have found it, it has nothing left to say. */
 .cta-ring.lit{
   border-radius:999px;
-  box-shadow:0 0 0 3px rgba(var(--accent-rgb),.20);
-  animation:ctaLit calc(5.2s * var(--speed)) var(--ease) infinite;
-}
-@keyframes ctaLit{
-  0%,40%   {box-shadow:0 0 0 3px  rgba(var(--accent-rgb),.20)}
-  50%      {box-shadow:0 0 0 10px rgba(var(--accent-rgb),.30)}
-  72%,100% {box-shadow:0 0 0 3px  rgba(var(--accent-rgb),.20)}
+  box-shadow:0 0 0 3px rgba(var(--accent-rgb),.22);
 }
 /* brighter, wider pool of green behind it than the resting halo */
 .cta-ring.lit .halo{
   inset:-16px;
   background:radial-gradient(closest-side,rgba(var(--accent-rgb),.44),rgba(var(--accent-rgb),0));
 }
-.cta-ring.lit:hover{animation:none;box-shadow:none}
+.cta-ring.lit:hover{box-shadow:none}
 
 @media (prefers-reduced-motion:reduce){
   /* the bubble stops touring and simply stands by the box with the one
      instruction that matters — the words are the point, the walk was sugar */
   .coach{transition:opacity .001ms !important}
   .coach-dots{display:none}
-  /* and below it nothing arrives and nothing fades: the faces are simply
-     there, and so is the line under them with the button drawn into it. That
-     line was always the load-bearing part — the looping was only there to
-     catch an eye that had wandered off. */
+  /* and below it nothing arrives: the faces are simply there, and so is the
+     line under them with the button drawn into it. The hovered face keeps its
+     collar and its place at the front of the stack — that is the highlight,
+     and it is not movement — but it stops jumping out of the line to get
+     there, and its label appears rather than grows. */
   .askhint{transition:opacity .001ms !important}
-  .hint-faces .av{opacity:1;transform:none}
-  .hint-eng{opacity:1;transform:none}
-  .askhint.on .hint-fly{animation:none;opacity:1;transform:none}
-  .hint-ping{display:none}
-  /* the collar stays — it is the highlight, not the motion */
-  .cta-ring.lit{animation:none;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.24)}
+  .askhint.on .hint-faces .av,
+  .askhint.on .hint-eng,
+  .askhint.on .hint-fly{animation:none}
+  .hint-faces .av:hover,
+  .hint-faces .av:focus-visible{transform:none}
+  .hint-tip{transition:opacity .001ms,visibility .001ms;transform:none}
+  .hint-tip.on{transform:none}
   .rise{animation:none}
   .hold{opacity:1}
 }
@@ -2235,30 +2273,44 @@ body.hascalls .scope-wrap{display:inline-flex}
 
             <!-- Hidden until the coach above has finished and gone, and
                  then the part it never said: who is actually on the other
-                 end. Three of the engineers, live, the fact of it in words,
-                 and under them one line that names the button which reaches
-                 them — by drawing it, in the middle of the sentence, at the
-                 size of a word. The real button rings once a beat later, so
-                 the picture and the thing it is a picture of introduce each
-                 other. It loops for as long as the box is empty and goes at
-                 the first keystroke. All of it is decoration to a screen
-                 reader, so the label carries the whole sentence instead. -->
-            <div class="askhint" id="askHint" role="img"
-                 aria-label="Engineers are available now — click the call button on the chat screen to connect to one of them">
-              <span class="hint-who" aria-hidden="true">
+                 end. Three engineers who are free this minute, the fact of it
+                 in words, and under them one line that names the button which
+                 reaches them — by drawing it, in the middle of the sentence,
+                 at the size of a word.
+
+                 It arrives once and stays put for as long as the box is empty,
+                 and goes at the first keystroke. The three faces are real
+                 buttons: hover one and it steps out of the stack, click one
+                 for their profile, which the document-level [data-person]
+                 handler opens in the same drawer as every other face in the
+                 app. They are the three live people in PEOPLE — not a fixed
+                 cast — because the line beside them claims they are available
+                 and their own dots would give a busy one away. -->
+            <div class="askhint" id="askHint">
+              <span class="hint-who">
                 <span class="hint-faces">
-                  <span class="av" data-dot="live">SJ</span>
-                  <span class="av" data-dot="live">PN</span>
-                  <span class="av" data-dot="live">MI</span>
+                  <button type="button" class="av" data-person="sj" data-dot="live"
+                          style="background:#00875A" aria-label="Satyam Jha, available now — open profile">SJ</button>
+                  <button type="button" class="av" data-person="pn" data-dot="live"
+                          style="background:#2456C8" aria-label="Priya Nair, available now — open profile">PN</button>
+                  <button type="button" class="av" data-person="ks" data-dot="live"
+                          style="background:#6D3BD4" aria-label="Kabir Shah, available now — open profile">KS</button>
                 </span>
                 <span class="hint-eng">Engineers available</span>
               </span>
-              <span class="hint-fly" aria-hidden="true">
+
+              <!-- one label, moved to whichever face is under the pointer.
+                   The faces already carry their own names for a screen reader,
+                   which never hovers anything, so this is drawn and not read. -->
+              <span class="hint-tip" id="hintTip" aria-hidden="true">Click to open profile</span>
+
+              <span class="hint-fly">
                 <span class="hint-say"><b>Click</b></span>
-                <span class="hint-call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                <span class="hint-call" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                <!-- the glyph above is a picture of the button; this is its name -->
+                <span class="hint-sr">the call button</span>
                 <span class="hint-say">on the chat screen to connect to them</span>
               </span>
-              <span class="hint-ping" aria-hidden="true"></span>
             </div>
           </div>
         </div>
@@ -6635,26 +6687,69 @@ addEventListener('resize',()=>{
 /* The bubble is a visitor: it walks its two stops and retires, and the page is
    then back to a blank box with nothing on it that says what to do. This picks
    up at that moment, shows who is waiting, and names the button that reaches
-   them — over and over, because it is the only instruction left and somebody
-   who looks up two minutes later should still find it running.
+   them — once, and then it stays put until the first keystroke.
 
-   Nearly all of it is CSS now. The one thing that cannot be, and so the only
-   thing here, is where the real button sits: it is in a different row of a
-   different flexbox, so the ring that answers the line is measured and handed
-   down each time the hint goes up or the window changes shape. */
+   The standing part is all CSS, including the highlight on a hovered face.
+   What is left here is the one thing CSS cannot do: put the hover label over
+   whichever of the three faces the pointer is actually on. */
 const hintEl=document.getElementById('askHint');
+const hintTip=document.getElementById('hintTip');
 
-function hintAim(){
-  const go=document.getElementById('askGo');
-  if(!go) return;
-  const h=hintEl.getBoundingClientRect();
-  if(!h.width) return;                   /* not laid out yet — nothing to measure */
-  const g=go.getBoundingClientRect();
-  /* the button's middle, which is where the ring goes, in the hint's own
-     coordinates — the ring is the hint's child and the button is not */
-  hintEl.style.setProperty('--px',(g.left+g.width/2-h.left).toFixed(1)+'px');
-  hintEl.style.setProperty('--py',(g.top +g.height/2-h.top ).toFixed(1)+'px');
+/* Whoever is actually free, rather than three names written into the markup.
+   The line next to them says "Engineers available" and each of them wears a
+   status dot, so a busy face parked here would contradict the sentence it is
+   standing next to. Three, because three fit the row; if fewer are live the
+   row is simply shorter, and the ones written into the HTML are the fallback
+   for the day nobody is. */
+function hintCast(){
+  const live=Object.keys(PEOPLE).filter(k=>PEOPLE[k].d==='live').slice(0,3);
+  if(!live.length) return;
+  const faces=hintEl.querySelectorAll('.hint-faces .av');
+  faces.forEach((el,n)=>{
+    const k=live[n];
+    if(!k){el.remove();return}
+    const p=PEOPLE[k];
+    el.dataset.person=k;
+    el.setAttribute('data-dot',p.d);
+    el.style.background=p.c;
+    el.setAttribute('aria-label',p.n+', available now — open profile');
+    paintAvatar(el,p.i);
+  });
 }
+hintCast();   /* after the load-time sweep, which paints by initials alone */
+
+/* The label is centred over the face and sits above it, and its tail is nudged
+   to the face's middle rather than the label's — at the ends of the row the
+   label runs out of hint to be centred in and has to slide back inside, and a
+   tail left at 50% would then be pointing at nobody.
+
+   The face is measured where it actually is, mid-hover: it has lifted six
+   pixels and grown, so the gap is taken from the risen face and the label sits
+   the same distance above whichever one is up. */
+function hintTipAt(av){
+  /* it is never display:none, so it can be measured whether it is up or not */
+  const h=hintEl.getBoundingClientRect(), r=av.getBoundingClientRect();
+  const w=hintTip.offsetWidth, ht=hintTip.offsetHeight;
+  const mid=r.left+r.width/2-h.left;
+  const left=Math.max(0,Math.min(h.width-w,mid-w/2));
+  hintTip.style.left=left.toFixed(1)+'px';
+  hintTip.style.top =(r.top-h.top-ht-12).toFixed(1)+'px';
+  hintTip.style.setProperty('--tail',(mid-left).toFixed(1)+'px');
+  hintTip.classList.add('on');
+}
+function hintTipOff(){ hintTip.classList.remove('on') }
+
+/* pointer for the pointer, focus for the keyboard — the label is the same
+   answer to the same question asked two ways. Clicking is handled far away by
+   the document's [data-person] listener, the way every other face in the app
+   is; the label only has to get out of the drawer's way when it fires. */
+hintEl.querySelectorAll('.hint-faces .av').forEach(av=>{
+  av.addEventListener('pointerenter',()=>hintTipAt(av));
+  av.addEventListener('focus',()=>hintTipAt(av));
+  av.addEventListener('pointerleave',hintTipOff);
+  av.addEventListener('blur',hintTipOff);
+  av.addEventListener('click',hintTipOff);
+});
 
 function hintStart(){
   /* it is the coach's second half, so it never speaks before the coach has
@@ -6662,36 +6757,17 @@ function hintStart(){
   if(!coachDone||touched||askText.value.trim()) return;
   const home=document.getElementById('home');
   if(home.dataset.view!=='new'||!home.classList.contains('on')) return;
-  hintAim();                             /* measure it before anyone sees it */
   hintEl.classList.add('on');
   hintLit(true);
 }
 
-function hintStop(){ hintEl.classList.remove('on'); hintLit(false) }
+function hintStop(){ hintEl.classList.remove('on'); hintTipOff(); hintLit(false) }
 
 /* The hint and the button are one thing said twice, so they light and go dark
    together — the collar is never on without the sentence that explains it. */
 function hintLit(on){
   const ring=document.querySelector('.askwrap .cta-ring');
   if(ring) ring.classList.toggle('lit',on);
-}
-
-/* The card is centred and fluid, so the ring is remeasured rather than
-   remembered. Watching the card itself rather than the window catches the
-   things a resize event does not: the tools row reflowing when the project
-   and session pickers appear, and the webfont landing and moving everything
-   down a pixel. */
-let hintRz;
-const hintReaim=()=>{
-  if(!hintEl.classList.contains('on')) return;
-  clearTimeout(hintRz);
-  hintRz=setTimeout(hintAim,140);
-};
-addEventListener('resize',hintReaim);
-if(window.ResizeObserver){
-  const ro=new ResizeObserver(hintReaim);
-  const card=document.querySelector('.askwrap .ask');
-  if(card) ro.observe(card);
 }
 
 /* both of them belong to the home screen and to nothing else */
