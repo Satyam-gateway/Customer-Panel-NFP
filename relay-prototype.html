@@ -348,7 +348,10 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
 /* ---------- home: quiet sections ---------- */
 .quiet{margin-top:28px}
-.quiet-h{font-size:12px;font-weight:700;color:var(--faint);margin-bottom:10px}
+/* The heading now has a way out beside it, so it is a row rather than a word:
+   the label on the left, the link to the rest on the right, pushed apart. */
+.quiet-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font-size:12px;font-weight:700;color:var(--faint);margin-bottom:10px}
 .strips{display:flex;flex-direction:column;gap:7px}
 .strip{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
   background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
@@ -1208,9 +1211,10 @@ body.hascalls .scope-wrap{display:inline-flex}
 .recent-h{display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:14px 18px;border-bottom:1px solid var(--line-soft)}
 .recent-h b{font-size:13.5px}
-.recent-h .lnk{font-size:12px;color:var(--live);font-weight:600;background:none;border:0;
+/* the same link on the returning view's heading — one way out, described once */
+.recent-h .lnk,.quiet-h .lnk{font-size:12px;color:var(--live);font-weight:600;background:none;border:0;
   font-family:inherit;cursor:pointer;padding:0}
-.recent-h .lnk:hover{text-decoration:underline}
+.recent-h .lnk:hover,.quiet-h .lnk:hover{text-decoration:underline}
 
 .cred{display:flex;align-items:center;gap:13px;margin-top:10px;padding:13px 16px;
   background:var(--line-soft);border-radius:var(--r-md)}
@@ -2330,7 +2334,18 @@ body.hascalls .scope-wrap{display:inline-flex}
       <div class="only-ret">
 
       <div class="quiet">
-        <div class="quiet-h">Recent sessions</div>
+        <!-- One session, not a list of them. The home page is for the thing you
+             came back to carry on with, and that is the last one — a second and
+             third row underneath it are a filing cabinet, and there is already a
+             screen that is a filing cabinet. So the rest of them are a link
+             rather than rows: same words and same place as the first-run panel
+             uses, because it is the same way out to the same screen. The count
+             is written here for the page to load with and kept true by
+             renderHomeRecent, which runs whenever the list changes. -->
+        <div class="quiet-h">
+          <span>Recent sessions</span>
+          <button class="lnk" data-go="sessions">See all <span id="sessAll">8</span></button>
+        </div>
         <div class="strips">
           <button class="strip" data-session="s-checkout">
             <div class="av" data-dot="live" style="background:#00875A">SJ</div>
@@ -2339,14 +2354,6 @@ body.hascalls .scope-wrap{display:inline-flex}
               <span class="strip-sub">Palm Seas &middot; flagged by Satyam on Tuesday</span>
             </div>
             <span class="btn sm solid" data-continue="s-checkout">Continue the session</span>
-          </button>
-          <button class="strip" data-session="s-ios">
-            <div class="av" data-dot="off" style="background:#9AA1A6">AD</div>
-            <div class="strip-main">
-              <b>iOS build breaks after every dependency update</b>
-              <span class="strip-sub">TrackFit &middot; flagged by Arjun on 17 Sep</span>
-            </div>
-            <span class="btn sm solid" data-continue="s-ios">Continue the session</span>
           </button>
         </div>
       </div>
@@ -6058,6 +6065,13 @@ function createProject(name){
 
 /* ---- recent sessions, shown under the ask box once you have had a call ---- */
 function renderHomeRecent(){
+  /* The returning view's panel is written into the HTML rather than built here,
+     and shows the one session you came back for. The only part of it that can
+     go stale is the number on its "See all" link, so that part is kept here,
+     where every change to the session list already passes through. */
+  const all=document.getElementById('sessAll');
+  if(all) all.textContent=SESS_ORDER.length;
+
   const el=document.getElementById('homeRecent');
   if(!el) return;
   /* only calls made in this run — a first-time customer has none until they call */
