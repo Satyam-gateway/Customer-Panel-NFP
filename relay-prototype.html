@@ -1415,22 +1415,6 @@ body.hascalls .scope-wrap{display:inline-flex}
 .ts-f{padding:9px 14px;border-top:1px solid var(--line);
   font-size:11px;color:var(--faint);background:var(--card)}
 
-/* ---------- home: matching an engineer ---------- */
-.match{border:1px solid var(--line);border-radius:var(--r-md);background:var(--paper);padding:17px 19px}
-.match-q{font-size:12.5px;color:var(--muted);line-height:1.6;max-width:66ch;
-  border-left:2px solid var(--line);padding-left:13px;margin-bottom:16px}
-.match-w{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--muted);padding:6px 0}
-.match-w .dotpulse{width:9px;height:9px;border-radius:50%;background:var(--live);flex:none;
-  animation:pulse 1.4s infinite}
-.match-hit{display:flex;align-items:center;gap:14px;animation:mpop .2s ease-out}
-.match-hit .mh-b{flex:1;min-width:0}
-.mh-n{font-size:15px;font-weight:600;letter-spacing:-.01em}
-.mh-r{font-size:12.5px;color:var(--muted);margin-top:3px}
-.mh-k{font-size:12px;color:var(--faint);margin-top:7px}
-.match-acts{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:14px;
-  border-top:1px solid var(--line)}
-.match-acts .sp{flex:1}
-
 /* ---------- modal: add a session to a project ---------- */
 .modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;
   padding:26px;background:rgba(20,24,26,.34)}
@@ -1680,12 +1664,12 @@ body.hascalls .scope-wrap{display:inline-flex}
 .hp-foot p{font-size:12.5px;color:var(--muted);margin-bottom:10px}
 
 /* ---------- profile ---------- */
-.av.xxl{width:86px;height:86px;font-size:28px}
-.av.xxl[data-dot]::after{width:17px;height:17px;border-width:3px}
+.av.xxl{width:60px;height:60px;font-size:20px}
+.av.xxl[data-dot]::after{width:14px;height:14px;border-width:2.5px}
 .me.on{background:var(--rail-on)}
 
-.pf-tabs{display:flex;gap:7px;align-items:center;margin:-6px 0 20px;
-  padding-bottom:15px;border-bottom:1px solid var(--line)}
+.pf-tabs{display:flex;gap:7px;align-items:center;margin:-6px 0 14px;
+  padding-bottom:11px;border-bottom:1px solid var(--line)}
 .pf-tab{font-size:13px;font-weight:600;color:var(--muted);padding:6px 14px;
   border-radius:999px;transition:background .12s,color .12s}
 .pf-tab:hover{background:var(--line-soft);color:var(--ink)}
@@ -1693,62 +1677,65 @@ body.hascalls .scope-wrap{display:inline-flex}
 .pf-panel{display:none}
 .pf-panel.on{display:block}
 
-.pf-vis{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);
-  background:var(--line-soft);border-radius:var(--r-sm);padding:9px 13px;margin-bottom:28px}
-.pf-vis b{color:var(--ink);font-weight:600}
-.pf-vis svg{width:15px;height:15px;stroke:var(--faint);fill:none;stroke-width:1.7;flex:none}
+/* the "engineers see this" note rides along with the identity actions rather
+   than taking a strip of its own — same reminder, no extra row */
+.pf-vis{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--faint);
+  margin-left:4px}
+.pf-vis svg{width:14px;height:14px;stroke:var(--faint);fill:none;stroke-width:1.7;flex:none}
 
 /* identity */
-.pf-id{display:flex;gap:24px;margin-bottom:36px}
-.pf-name{font-family:"Bricolage Grotesque",sans-serif;font-size:29px;font-weight:600;letter-spacing:-.02em}
-.pf-role{font-size:14.5px;color:var(--muted);margin-top:3px}
-.pf-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--faint);margin-top:10px}
+.pf-id{display:flex;gap:17px;margin-bottom:20px}
+.pf-name{font-family:"Bricolage Grotesque",sans-serif;font-size:23px;font-weight:600;letter-spacing:-.02em}
+.pf-role{font-size:13.5px;color:var(--muted);margin-top:2px}
+.pf-meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--faint);margin-top:7px}
 .pf-meta i{font-style:normal;color:var(--line)}
-.pf-bio{font-size:14.5px;line-height:1.65;margin-top:15px;max-width:60ch}
-.pf-acts{display:flex;gap:8px;margin-top:17px;align-items:center}
+.pf-bio{font-size:13.5px;line-height:1.55;margin-top:9px;max-width:82ch}
+.pf-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 .pf-st{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
   border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px 5px 9px}
 .pf-st:hover{background:var(--line-soft)}
 .pf-st .e{font-size:13px;line-height:1}
 
 /* your team */
-.team{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:9px}
+/* auto-fit, not auto-fill: four engineers stay on one row down to a fairly
+   narrow window, and the row never leaves an empty track hanging off the end */
+.team{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px}
 .tm{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:14px 15px;display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  padding:10px 12px;display:flex;gap:9px;align-items:flex-start;width:100%;text-align:left;
   transition:border-color .12s,box-shadow .12s,transform .12s}
 .tm:hover{box-shadow:var(--shadow);transform:translateY(-1px);border-color:#CFD5D6}
-.tm-n{font-weight:600;font-size:14px}
-.tm-s{font-size:12.5px;color:var(--muted);margin-top:2px}
-.tm-k{font-size:12px;color:var(--faint);margin-top:7px;line-height:1.45}
-.team-more{font-size:13px;color:var(--muted);margin-top:12px}
+.tm-n{font-weight:600;font-size:13.5px}
+.tm-s{font-size:12px;color:var(--muted);margin-top:1px}
+.tm-k{font-size:11.5px;color:var(--faint);margin-top:5px;line-height:1.4}
+.team-more{font-size:13px;color:var(--muted);margin-top:10px}
 .team-more b{font-weight:600;color:var(--ink)}
 
 /* project + contract cards */
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:9px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:7px}
 .pc{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:15px 16px;text-align:left;width:100%;
+  padding:11px 13px;text-align:left;width:100%;
   transition:border-color .12s,box-shadow .12s,transform .12s}
 .pc:hover{box-shadow:var(--shadow);transform:translateY(-1px);border-color:#CFD5D6}
-.pc-t{font-weight:600;font-size:14.5px;letter-spacing:-.005em}
-.pc-s{font-size:12.5px;color:var(--muted);margin-top:4px}
-.pc-f{display:flex;align-items:center;gap:8px;margin-top:14px}
-.pc-f .av{width:22px;height:22px;font-size:9px}
+.pc-t{font-weight:600;font-size:13.5px;letter-spacing:-.005em}
+.pc-s{font-size:12px;color:var(--muted);margin-top:3px}
+.pc-f{display:flex;align-items:center;gap:8px;margin-top:10px}
+.pc-f .av{width:20px;height:20px;font-size:8.5px}
 .pc-f .pill{margin-left:auto}
 
 /* ground rules */
-.rules{display:flex;flex-direction:column;gap:7px}
-.rule{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
-  border-radius:var(--r-md);padding:12px 14px}
-.rule-i{width:22px;height:22px;border-radius:6px;background:var(--stop-bg);color:var(--stop);
-  display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
-.rule-t{font-size:13.5px;flex:1}
+.rules{display:flex;flex-direction:column;gap:6px}
+.rule{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:9px 12px}
+.rule-i{width:20px;height:20px;border-radius:6px;background:var(--stop-bg);color:var(--stop);
+  display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.rule-t{font-size:13px;flex:1}
 .rule-x{color:var(--faint);font-size:16px;line-height:1;padding:3px 7px;border-radius:4px;flex:none}
 .rule-x:hover{background:var(--stop-bg);color:var(--stop)}
 .rule.add{border-style:dashed;color:var(--muted);font-size:13.5px;font-weight:600;
   justify-content:flex-start;gap:9px;cursor:pointer}
 .rule.add:hover{border-color:var(--muted);color:var(--ink)}
-.rule-new{display:flex;align-items:center;gap:12px;background:var(--card);
-  border:1px solid var(--ink);border-radius:var(--r-md);padding:11px 12px 11px 14px}
+.rule-new{display:flex;align-items:center;gap:10px;background:var(--card);
+  border:1px solid var(--ink);border-radius:var(--r-md);padding:8px 10px 8px 12px}
 .rule-new input{flex:1;min-width:0;font:inherit;font-size:13.5px;color:var(--ink);
   border:none;outline:none;background:none}
 .rule-new input::placeholder{color:var(--faint)}
@@ -1766,22 +1753,189 @@ body.hascalls .scope-wrap{display:inline-flex}
 
 .xp.four{grid-template-columns:repeat(4,1fr)}
 
+/* the profile page is a reference sheet, not a reading page — it should fit
+   without a scroll, so everything shared with the rest of the app gets a
+   tighter setting here only */
+.pf-split{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.pf-split{grid-template-columns:1fr;gap:0}}
+
+#profile .band{margin-bottom:18px}
+#profile .pf-split .band:last-child{margin-bottom:0}
+#profile .band-h{margin-bottom:8px}
+#profile .xp{gap:7px}
+#profile .xp-c{padding:9px 12px}
+#profile .xp-n{font-size:19px}
+#profile .xp-l{font-size:11.5px;margin-top:1px}
+#profile .av.lg{width:36px;height:36px;font-size:12.5px}
+#profile .av.lg[data-dot]::after{width:11px;height:11px}
+
 /* settings */
-.fld{display:flex;align-items:center;gap:18px;padding:13px 0;border-top:1px solid var(--line-soft)}
+.fld{display:flex;align-items:center;gap:18px;padding:10px 0;border-top:1px solid var(--line-soft)}
 .fld:first-child{border-top:none}
 .fld-l{font-size:13.5px;font-weight:600;width:170px;flex:none}
 .fld-v{font-size:13.5px;color:var(--muted);flex:1}
-.conn{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);
-  border-radius:var(--r-md);padding:13px 15px;margin-bottom:7px}
-.conn-i{width:30px;height:30px;border-radius:7px;background:var(--line-soft);display:grid;
-  place-items:center;font-size:11px;font-weight:700;color:var(--muted);flex:none}
+.conn{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-md);padding:10px 13px;margin-bottom:6px}
+.conn-i{width:28px;height:28px;border-radius:7px;background:var(--line-soft);display:grid;
+  place-items:center;font-size:10.5px;font-weight:700;color:var(--muted);flex:none}
 .conn-n{font-weight:600;font-size:13.5px}
-.conn-s{font-size:12.5px;color:var(--faint);margin-top:1px}
+.conn-s{font-size:12px;color:var(--faint);margin-top:1px}
 .conn-b{margin-left:auto;display:flex;gap:7px;flex:none}
 .conn[data-state="on"] .conn-s::before{content:"";width:6px;height:6px;border-radius:50%;
   background:var(--live);display:inline-block;margin-right:7px;vertical-align:1px}
 
 .empty{text-align:center;padding:60px 20px;color:var(--faint)}
+
+/* ============================================================
+   SECTION BAR — sticky, on Projects and Sessions and their detail
+   pages. It holds the back button that used to sit loose above the
+   page, the name of whatever you have open, and the one action that
+   makes a new thing. It bleeds over the screen's own padding so it
+   covers the content sliding under it.
+   ============================================================ */
+/* the strip is only there to hide what scrolls under it — the bar itself
+   is the pill sitting on top of it */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  margin:-34px -40px 16px;padding:14px 40px 12px;
+  background:var(--paper);
+}
+.tb-in{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:7px 8px 7px 18px;min-height:48px;
+  transition:box-shadow .18s var(--ease), border-color .18s var(--ease);
+}
+.topbar.stuck .tb-in{box-shadow:var(--shadow-lift);border-color:#D6DDDE}
+
+/* inside the pill the back button drops its own outline — one surface, not two */
+.topbar .back{margin-bottom:0;padding:6px 12px 6px 10px;font-size:13px;max-width:220px;
+  background:none;border:none;border-radius:999px;color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;display:block;line-height:1.6;flex:none}
+.topbar .back:hover{background:var(--line-soft);color:var(--ink)}
+.tb-div{width:1px;height:20px;background:var(--line);flex:none}
+
+/* the name block takes the slack; the name itself sits at its natural width
+   so what follows it stays right alongside, not flung to the far end */
+.tb-name{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:8px}
+.tb-name b{flex:0 1 auto;min-width:0;
+  font-family:"Bricolage Grotesque","Public Sans",sans-serif;font-weight:600;
+  font-size:16px;letter-spacing:-.012em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-name .tb-sub{font-size:12.5px;color:var(--muted);white-space:nowrap;
+  flex:0 6 auto;min-width:0;overflow:hidden}
+.tb-name .tb-sub::before{content:"\00b7";color:var(--faint);margin-right:7px}
+
+.tb-sp{flex:1;min-width:8px}
+.tb-new{display:inline-flex;align-items:center;gap:7px;flex:none;
+  padding:9px 17px 9px 14px;border-radius:999px;font-weight:600;font-size:13px;
+  border:1px solid var(--accent-line);background:var(--accent-bg);color:var(--accent);
+  transition:background .12s,border-color .12s,color .12s}
+.tb-new:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.tb-plus{font-size:16px;line-height:1;font-weight:600;margin-top:-1px}
+
+/* ---------- a stack of the people who have been in ---------- */
+.faces{display:inline-flex;align-items:center;flex:none}
+.faces .av{width:26px;height:26px;font-size:9.5px;border:2px solid var(--card);margin-left:-8px;
+  transition:transform .12s var(--ease)}
+.faces .av:first-child{margin-left:0}
+.faces .av:hover{transform:translateY(-2px);z-index:2}
+.faces .av.more{background:var(--line-soft);color:var(--muted);font-weight:700;font-size:10px}
+.faces.tight .av{width:22px;height:22px;font-size:8.5px;margin-left:-7px}
+
+/* ---------- start a call, wherever a project offers it ---------- */
+.callb{display:inline-flex;align-items:center;gap:7px;flex:none;white-space:nowrap;
+  border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent)}
+.callb:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.callb svg{width:13px;height:13px;flex:none}
+
+/* ---------- the most recent project, opened out in the list ---------- */
+.plead{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:var(--r-md);overflow:hidden;
+  transition:border-color .12s, box-shadow .12s}
+.plead:hover{box-shadow:var(--shadow)}
+.plead-open{display:block;width:100%;text-align:left;padding:15px 18px 0;cursor:pointer}
+.plead-h{display:flex;align-items:flex-start;gap:14px}
+.plead-m{flex:1;min-width:0}
+.plead-t{font-weight:600;font-size:16px;letter-spacing:-.012em}
+.plead-s{color:var(--muted);font-size:13px;margin-top:3px}
+.plead-tag{font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--accent);
+  background:var(--accent-bg);border-radius:999px;padding:4px 10px;flex:none;margin-top:2px}
+.plead-sum{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px}
+.plead-sum-h{font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.05em;
+  display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.plead-sum-h .stamp{margin-left:auto;font-weight:500;letter-spacing:0;font-size:11px}
+.plead-sum p{font-size:13px;line-height:1.62;color:var(--ink);max-width:76ch}
+.plead-stands{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:11px}
+.plead-stands b{color:var(--ink);font-weight:700;font-size:11.5px;display:block;margin-bottom:2px}
+.plead-f{display:flex;align-items:center;gap:10px;padding:13px 18px;margin-top:13px;
+  border-top:1px solid var(--line-soft);background:var(--paper)}
+.plead-none{font-size:12.5px;color:var(--faint)}
+.plead-acts{display:flex;align-items:center;gap:8px;margin-left:auto}
+
+/* ---------- the count, now beside the section title ---------- */
+#projects .page-h h1,#sessions .page-h h1{display:flex;align-items:center;gap:13px}
+.ph-n{font-family:"Public Sans",sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:0;color:var(--ink);background:var(--line-soft);
+  padding:4px 12px;border-radius:999px;line-height:1.2}
+
+/* ---------- who has been in, in the project summary card ---------- */
+.psum{position:relative}
+.psum-h{flex-wrap:wrap;row-gap:6px;min-height:32px}
+.psum-faces{display:flex;align-items:center;gap:10px;margin-left:auto}
+.psum-faces .lab{font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.04em}
+.psum-faces .av{width:32px;height:32px;font-size:11.5px;margin-left:-9px}
+.psum-faces .av:first-child{margin-left:0}
+.proj-h .callb{padding:8px 15px;border-radius:999px}
+
+/* ---------- the overflow menu on a project row ---------- */
+.rowdots{display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:30px;height:30px;border-radius:50%;color:var(--muted);font-size:16px;
+  font-weight:700;line-height:1;letter-spacing:1.5px;text-indent:1.5px;cursor:pointer;
+  transition:background .12s,color .12s}
+.rowdots:hover,.rowdots.on{background:var(--line-soft);color:var(--ink)}
+.pmenu{position:fixed;z-index:120;min-width:178px;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--r-md);padding:5px;
+  box-shadow:var(--shadow-lift);animation:pmin .13s var(--ease)}
+@keyframes pmin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.pmenu-i{display:block;width:100%;text-align:left;font-size:13px;font-weight:600;
+  padding:8px 11px;border-radius:var(--r-sm);color:var(--ink)}
+.pmenu-i:hover{background:var(--line-soft)}
+.pmenu-i.danger{color:var(--stop)}
+.pmenu-i.danger:hover{background:var(--stop-bg)}
+
+.btn.danger{background:var(--stop);color:#fff;border-color:var(--stop)}
+.btn.danger:hover{background:#A82922;border-color:#A82922}
+.del-list{margin-top:14px;border:1px solid var(--line);border-radius:var(--r-md);
+  max-height:158px;overflow:auto;text-align:left}
+.del-i{display:flex;align-items:center;gap:10px;padding:9px 13px;font-size:13px;
+  border-bottom:1px solid var(--line-soft)}
+.del-i:last-child{border-bottom:none}
+.del-i b{flex:1;min-width:0;font-weight:500;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.del-i span{font-size:11.5px;color:var(--faint);flex:none}
+
+/* ---------- new project / scoped call cards ---------- */
+.m-lab{display:block;font-size:11.5px;font-weight:700;color:var(--muted);
+  margin:16px 0 0;text-align:left}
+.m-lab+.m-input{margin-top:6px}
+.m-ta{width:100%;font:inherit;font-size:14px;color:var(--ink);margin-top:16px;
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 14px;resize:vertical;min-height:88px;line-height:1.55}
+.m-ta:focus{outline:none;border-color:var(--live);box-shadow:0 0 0 3px var(--live-bg);background:var(--card)}
+.m-who{display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:var(--r-md);padding:12px 14px;margin-top:4px}
+.m-who .m-who-n{font-weight:600;font-size:14px}
+.m-who .m-who-s{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+@media (max-width:760px){
+  .topbar{margin:-34px -20px 14px;padding:12px 20px 10px}
+  .tb-in{padding-left:14px}
+  .topbar .back{max-width:108px}
+  .tb-name .tb-sub{display:none}   /* the name wins the space it needs */
+  .plead-f{flex-wrap:wrap}
+  .plead-acts{margin-left:0;width:100%}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -2612,8 +2766,16 @@ body.hascalls .scope-wrap{display:inline-flex}
 
     <!-- ============ SESSIONS ============ -->
     <section class="screen" id="sessions">
+      <div class="topbar">
+        <div class="tb-in">
+          <button class="back" data-go="home">&larr; Home</button>
+          <span class="tb-sp"></span>
+          <button class="tb-new" data-newsession><span class="tb-plus">+</span>New session</button>
+        </div>
+      </div>
+
       <div class="page-h">
-        <h1>Sessions</h1>
+        <h1>Sessions<span class="ph-n" id="phSessN">8</span></h1>
         <p>Each session is one thread of work. A session can hold several calls.</p>
       </div>
 
@@ -2628,7 +2790,15 @@ body.hascalls .scope-wrap{display:inline-flex}
 
     <!-- ============ SESSION DETAIL ============ -->
     <section class="screen" id="session">
-      <button class="back" id="sessBack" data-go="sessions">&larr; All sessions</button>
+      <div class="topbar">
+        <div class="tb-in">
+          <button class="back" id="sessBack" data-go="sessions">&larr; All sessions</button>
+          <span class="tb-div"></span>
+          <div class="tb-name"><b id="tbSessName">Session</b><span class="tb-sub" id="tbSessSub"></span></div>
+          <span class="tb-sp"></span>
+          <button class="tb-new" data-newsession><span class="tb-plus">+</span>New session</button>
+        </div>
+      </div>
       <div id="sessDetail"></div>
     </section>
 
@@ -2910,8 +3080,16 @@ body.hascalls .scope-wrap{display:inline-flex}
 
     <!-- ============ PROJECTS ============ -->
     <section class="screen" id="projects">
+      <div class="topbar">
+        <div class="tb-in">
+          <button class="back" data-go="home">&larr; Home</button>
+          <span class="tb-sp"></span>
+          <button class="tb-new" data-newproject><span class="tb-plus">+</span>New project</button>
+        </div>
+      </div>
+
       <div class="page-h">
-        <h1>Projects</h1>
+        <h1>Projects<span class="ph-n" id="phProjN">4</span></h1>
         <p>Everything you are working on, and who is on it</p>
       </div>
 
@@ -2922,7 +3100,15 @@ body.hascalls .scope-wrap{display:inline-flex}
 
     <!-- ============ PROJECT DETAIL ============ -->
     <section class="screen" id="project">
-      <button class="back" data-go="projects">&larr; All projects</button>
+      <div class="topbar">
+        <div class="tb-in">
+          <button class="back" data-go="projects">&larr; All projects</button>
+          <span class="tb-div"></span>
+          <div class="tb-name"><b id="tbProjName">Project</b><span class="tb-sub" id="tbProjSub"></span></div>
+          <span class="tb-sp"></span>
+          <button class="tb-new" data-newproject><span class="tb-plus">+</span>New project</button>
+        </div>
+      </div>
       <div id="projDetail"></div>
     </section>
 
@@ -2936,11 +3122,6 @@ body.hascalls .scope-wrap{display:inline-flex}
 
       <!-- ---------- PROFILE TAB ---------- -->
       <div class="pf-panel on" id="pfProfile">
-
-        <div class="pf-vis">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.8 12S5.4 5.2 12 5.2 22.2 12 22.2 12 18.6 18.8 12 18.8 1.8 12 1.8 12z"/><circle cx="12" cy="12" r="3.1"/></svg>
-          <span><b>This is what your engineers see.</b></span>
-        </div>
 
         <div class="pf-id">
           <div class="av xxl" data-dot="live" style="background:#6D3BD4">RM</div>
@@ -2956,6 +3137,10 @@ body.hascalls .scope-wrap{display:inline-flex}
             <div class="pf-acts">
               <button class="pf-st" id="pfStatus"><span class="e">&#128994;</span>Online</button>
               <button class="btn sm" id="pfEdit">Edit profile</button>
+              <span class="pf-vis">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1.8 12S5.4 5.2 12 5.2 22.2 12 22.2 12 18.6 18.8 12 18.8 1.8 12 1.8 12z"/><circle cx="12" cy="12" r="3.1"/></svg>
+                This is what your engineers see
+              </span>
             </div>
           </div>
         </div>
@@ -3018,7 +3203,9 @@ body.hascalls .scope-wrap{display:inline-flex}
           <div class="pgrid" id="projCards"></div>
         </div>
 
-        <!-- contracts -->
+        <!-- contracts + ground rules share a row: both are short, and neither
+             needs the full width to read -->
+        <div class="pf-split">
         <div class="band">
           <div class="band-h"><h2>Contracts</h2><span class="n">2</span></div>
           <div class="pgrid">
@@ -3045,7 +3232,7 @@ body.hascalls .scope-wrap{display:inline-flex}
         <div class="band">
           <div class="band-h">
             <h2>Ground rules</h2>
-            <span class="note">Shown to every engineer before they start</span>
+            <span class="note">Every engineer sees these first</span>
           </div>
           <div class="rules" id="pfRules">
             <div class="rule">
@@ -3055,6 +3242,7 @@ body.hascalls .scope-wrap{display:inline-flex}
             </div>
             <button class="rule add" id="pfAddRule">+&nbsp; Add a rule</button>
           </div>
+        </div>
         </div>
 
       </div>
@@ -3344,7 +3532,7 @@ document.getElementById('helpFab').addEventListener('click',e=>{
 });
 document.getElementById('drawerX').addEventListener('click',closeDrawer);
 document.getElementById('scrim').addEventListener('click',closeDrawer);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeHelp()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeHelp();closeProjMenu()}});
 
 /* ---------- avatars ---------- */
 function face(o){
@@ -3827,41 +4015,23 @@ setRail(savedRail);
 
 const PROJECTS={
   palmseas:{n:'Palm Seas', stack:['Next.js','Stripe','Supabase','Vercel'],
-    sub:'3 sessions &middot; last call Tuesday with Satyam', side:'<span class="pill turn">Quote ready</span>',
     blurb:'A booking site for a diving school. You are building it; Relay engineers come in when you get stuck and leave once it is working again.',
     stands:'Checkout times out on cold starts. A temporary fix is live, but the underlying design needs rebuilding.',
     waiting:'Satyam has quoted the rebuild at &euro;3,200. Nothing starts until you decide.'},
   epicmail:{n:'Epicmail', stack:['Rails','Postgres','Sidekiq','Mailgun'],
-    sub:'2 sessions &middot; Priya asked you a question 2 hours ago', side:'<span class="pill turn">Needs a reply</span>',
     blurb:'A campaign tool you run for a handful of clients. Small, but it sends real mail, so quiet failures are expensive.',
     stands:'Bounced campaign emails were being dropped silently. Logging is in, so you can see it happening now.',
     waiting:'Priya wants to know whether bounces should retry or just be reported to you. She is holding the quote until you answer.'},
   trackfit:{n:'TrackFit', stack:['React Native','Expo','Firebase'],
-    sub:'1 session &middot; last call 17 Sep with Arjun', side:'<span class="pill mute">Quiet</span>',
     blurb:'A fitness tracker you took over from another developer. Most of your Relay time here goes on builds and releases rather than features.',
     stands:'The iOS certificate had expired and builds were failing. Arjun regenerated it and showed you how to do it yourself.',
     waiting:'Nothing today. Meera has a kickoff booked for the sync rewrite on Mon 29 Sep.'},
   yopbox:{n:'YopBox', stack:['Astro','Cloudflare'],
-    sub:'No sessions yet', side:'<span class="btn sm go">Get help</span>',
     blurb:'The newest of your projects. Nothing has gone wrong yet, so no engineer has been in.',
     stands:'Nothing has needed an engineer yet.',
     waiting:'Nothing.'}
 };
 let PROJ_ORDER=['palmseas','epicmail','trackfit','yopbox'];
-
-function renderProjRows(){
-  const el=document.getElementById('projRows');
-  if(!el) return;
-  el.innerHTML=PROJ_ORDER.map(k=>{
-    const P=PROJECTS[k];
-    const live=SESS_ORDER.filter(s=>SESSIONS[s].proj===k).length;
-    const sub=P.sub || (live?plural(live,'session')+' &middot; just created':'No sessions yet');
-    return '<button class="row flat" data-project="'+k+'">'+
-      '<div class="row-main"><div class="row-title">'+P.n+'</div>'+
-      '<div class="row-sub">'+sub+'</div></div>'+
-      '<div class="row-side">'+(P.side||'<span class="pill mute">New</span>')+'</div></button>';
-  }).join('');
-}
 
 /* a session is one thread of work. it holds one or more calls. */
 const SESSIONS={
@@ -4099,6 +4269,8 @@ function renderSessFeed(){
   document.getElementById('sfAll').textContent=sessKeys('all').length;
   document.getElementById('sfProj').textContent=sessKeys('project').length;
   document.getElementById('sfLoose').textContent=sessKeys('loose').length;
+  const tn=document.getElementById('phSessN');
+  if(tn) tn.textContent=sessKeys('all').length;
 }
 
 /* ---------- one call inside a session ---------- */
@@ -4181,6 +4353,12 @@ function renderSession(key,mode){
   const from=document.querySelector('.screen.on');
   if(from && from.id!=='session')
     sessBackTo=(from.id==='project' && currentProject) ? currentProject : null;
+
+  /* the bar at the top carries the session name once you are inside */
+  const tbn=document.getElementById('tbSessName');
+  if(tbn) tbn.textContent=s.t;
+  const tbs=document.getElementById('tbSessSub');
+  if(tbs) tbs.textContent=s.proj&&PROJECTS[s.proj] ? PROJECTS[s.proj].n : 'One-off';
 
   document.getElementById('sessDetail').innerHTML=
     '<div class="sx-h">'+
@@ -4375,17 +4553,25 @@ function renderProject(key){
   keys.forEach(k=>{const w=SESSIONS[k].who; tally[w]=(tally[w]||0)+1});
   const knows=Object.keys(tally).map(w=>fName(w)+' ('+plural(tally[w],'session')+')').join(', ');
   const mins=keys.reduce((a,k)=>a+sessMins(SESSIONS[k]),0);
+  const faces=projTally(key);
+
+  /* the bar at the top carries the name once you are inside */
+  const tbn=document.getElementById('tbProjName');
+  if(tbn) tbn.textContent=P.n;
+  const tbs=document.getElementById('tbProjSub');
+  if(tbs) tbs.textContent=keys.length?plural(keys.length,'session'):'no sessions yet';
 
   document.getElementById('projDetail').innerHTML=
     '<div class="proj-h">'+
       '<div><h1>'+P.n+'</h1>'+
         '<div class="stack">'+P.stack.map(t=>'<span>'+t+'</span>').join('')+'</div></div>'+
+      '<button class="btn callb" data-projcall="'+key+'">'+PHONE_IC+'Start a call</button>'+
     '</div>'+
     '<div class="psum'+(P.flash?' fresh':'')+'">'+
       '<div class="psum-h">'+SPARK+'<span>PROJECT SUMMARY</span>'+
-        '<span class="stamp">Written by Relay from '+
-        (keys.length?plural(keys.length,'session'):'no sessions yet')+
-        (P.upd?' &middot; updated '+P.upd:'')+'</span></div>'+
+        (faces.length?'<span class="psum-faces"><span class="lab">WHO HAS BEEN IN</span>'+
+          facesHtml(faces,5)+'</span>':'')+
+      '</div>'+
       '<p>'+P.blurb+'</p>'+
       '<div class="psum-grid">'+
         '<div><b>Where it stands</b><span>'+P.stands+'</span></div>'+
@@ -4399,13 +4585,55 @@ function renderProject(key){
         (mins?' &middot; '+mins+' min in total':'')+'</div>'+
       (keys.length?keys.map(sessRow).join('')
         :'<div class="pj-empty"><b>No sessions yet</b>'+
-         '<span>Nothing has gone wrong here. When it does, the session lands on this page.</span></div>')+
+         '<span>Nothing has gone wrong here. Start a call and the session &mdash; and the '+
+         'summary Relay writes from it &mdash; lands on this page.</span>'+
+         '<button class="btn callb" data-projcall="'+key+'" style="margin-top:12px">'+
+         PHONE_IC+'Start a call</button></div>')+
     '</div>';
 
   paintIn(document.getElementById('projDetail'));
   show('project');
   P.flash=false;
 }
+
+/* ---------- who has been inside a project ---------- */
+
+/* every engineer who has taken a session here, busiest first */
+function projTally(k){
+  const keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===k);
+  const t={};
+  keys.forEach(x=>{const w=SESSIONS[x].who; t[w]=(t[w]||0)+1});
+  return Object.keys(t).sort((a,b)=>t[b]-t[a]).map(w=>({k:w,n:t[w]}));
+}
+/* whoever took the most recent session — the one a new call goes to */
+function projLead(k){
+  const keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===k);
+  return keys.length ? SESSIONS[keys[0]].who : null;
+}
+function facesHtml(list,max,tight){
+  max=max||4;
+  const shown=list.slice(0,max), rest=list.length-shown.length;
+  return '<span class="faces'+(tight?' tight':'')+'">'+
+    shown.map(e=>{
+      const p=PEOPLE[e.k];
+      return '<span class="av" data-person="'+e.k+'" data-dot="'+p.d+'" style="background:'+p.c+
+        '" title="'+escHtml(p.n+' — '+plural(e.n,'session')+' on this project')+'">'+p.i+'</span>';
+    }).join('')+
+    (rest>0?'<span class="av more" title="'+rest+' more">+'+rest+'</span>':'')+
+    '</span>';
+}
+
+const PHONE_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '+
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+  '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 '+
+  '2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 '+
+  '0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+
+/* spans, not buttons — these sit inside the row button on the list */
+const callChip=k=>'<span class="btn sm callb" role="button" tabindex="0" data-projcall="'+k+
+  '" title="Call the engineer who took the last session here">'+PHONE_IC+'Start a call</span>';
+const dotsChip=k=>'<span class="rowdots" role="button" tabindex="0" data-projmenu="'+k+
+  '" title="More" aria-label="More actions">&middot;&middot;&middot;</span>';
 
 /* ---------- the two project lists, rendered so a new one shows up ---------- */
 function projSub(k){
@@ -4414,13 +4642,56 @@ function projSub(k){
   const s=SESSIONS[keys[0]];
   return plural(keys.length,'session')+' &middot; last call '+s.last+' with '+fName(s.who);
 }
+
+/* the project you touched last opens out, so the page starts with something
+   to read rather than a stack of identical names */
+function projLeadHtml(k){
+  const P=PROJECTS[k], faces=projTally(k);
+  const sess=SESS_ORDER.filter(x=>SESSIONS[x].proj===k).length;
+  return '<div class="plead">'+
+    '<button class="plead-open" data-project="'+k+'">'+
+      '<div class="plead-h">'+
+        '<div class="plead-m"><div class="plead-t">'+P.n+'</div>'+
+          '<div class="plead-s">'+projSub(k)+'</div></div>'+
+        '<span class="plead-tag">MOST RECENT</span>'+
+      '</div>'+
+      '<div class="plead-sum">'+
+        '<div class="plead-sum-h">'+SPARK+'<span>PROJECT SUMMARY</span></div>'+
+        '<p>'+P.blurb+'</p>'+
+        '<div class="plead-stands"><b>Where it stands</b>'+P.stands+'</div>'+
+      '</div>'+
+    '</button>'+
+    '<div class="plead-f">'+
+      (faces.length?facesHtml(faces,4)
+        :'<span class="plead-none">No engineer has been in yet</span>')+
+      '<span class="plead-acts">'+
+        '<span class="btn sm" role="button" tabindex="0" data-project="'+k+'">Open project</span>'+
+        callChip(k)+
+        dotsChip(k)+
+      '</span>'+
+    '</div></div>';
+}
+
 function renderProjects(){
-  const keys=Object.keys(PROJECTS);
+  const keys=PROJ_ORDER.filter(k=>PROJECTS[k]);
   const rows=document.getElementById('projRows');
-  if(rows) rows.innerHTML=keys.map(k=>
-    '<button class="row flat" data-project="'+k+'">'+
-      '<div class="row-main"><div class="row-title">'+PROJECTS[k].n+'</div>'+
-      '<div class="row-sub">'+projSub(k)+'</div></div></button>').join('');
+  if(rows){
+    rows.innerHTML=keys.map((k,i)=>{
+      if(i===0) return projLeadHtml(k);
+      const faces=projTally(k);
+      return '<button class="row flat" data-project="'+k+'">'+
+        '<div class="row-main"><div class="row-title">'+PROJECTS[k].n+'</div>'+
+        '<div class="row-sub">'+projSub(k)+'</div></div>'+
+        '<span class="row-side">'+
+          (faces.length?facesHtml(faces,3,true):'')+
+          callChip(k)+
+          dotsChip(k)+
+        '</span></button>';
+    }).join('');
+    paintIn(rows);
+  }
+  const tn=document.getElementById('phProjN');
+  if(tn) tn.textContent=keys.length;
 
   const cards=document.getElementById('projCards');
   if(cards){
@@ -4445,7 +4716,7 @@ let pkSess=null, pkPick=null, pkNew=false, pkDone=null;
 
 function renderPicker(){
   document.getElementById('pkList').innerHTML=
-    Object.keys(PROJECTS).map(k=>{
+    PROJ_ORDER.filter(k=>PROJECTS[k]).map(k=>{
       const P=PROJECTS[k];
       return '<button class="pk'+(pkPick===k?' on':'')+'" data-pk="'+k+'">'+
         '<div class="pk-b"><div class="pk-n">'+P.n+'</div>'+
@@ -4500,6 +4771,7 @@ function pickerConfirm(){
     const stack=(document.getElementById('pkStack').value||'')
       .split(',').map(t=>t.trim()).filter(Boolean);
     key='p'+Date.now().toString(36);
+    PROJ_ORDER=[key].concat(PROJ_ORDER);
     PROJECTS[key]={
       n:name,
       stack:stack.length?stack:['Stack not set yet'],
@@ -4541,81 +4813,10 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&pkNew){e.preventDefault(); pickerConfirm()}
 });
 
-/* ================= home: describe a problem, get matched ================= */
-const MATCH=[
-  {re:/ios|android|build|app store|expo|react native|certificate/i, w:'ad', s:'React Native and mobile releases'},
-  {re:/mail|email|spam|bounce|smtp|campaign|deliver/i,              w:'pn', s:'Rails and email delivery'},
-  {re:/s3|aws|bill|cost|storage|bucket|pipeline|data/i,             w:'ks', s:'AWS and data pipelines'},
-  {re:/css|design|layout|front.?end|component|figma/i,              w:'md', s:'front-end and design systems'},
-  {re:/.*/,                                                          w:'sj', s:'Next.js, Stripe and checkout'}
-];
-function matchFor(txt){return MATCH.find(m=>m.re.test(txt))}
-
-function findEngineer(btn){
-  const ask=btn.closest('.ask'), ta=ask.querySelector('textarea');
-  const txt=(ta.value||'').trim();
-  if(!txt){ta.focus(); toast('Tell us what is going wrong first — a sentence is enough'); return}
-
-  const m=matchFor(txt), p=PEOPLE[m.w], first=fName(m.w);
-  const field=ask.querySelector('.ask-field'), note=ask.querySelector('.ask-note');
-  const panel=document.createElement('div');
-  panel.className='match';
-  panel.innerHTML='<div class="match-q">'+escHtml(txt)+'</div>'+
-    '<div class="match-w"><span class="dotpulse"></span>'+
-    '<span>Reading what you wrote&hellip;</span></div>';
-  field.replaceWith(panel);
-  if(note) note.remove();
-
-  setTimeout(()=>{
-    const w=panel.querySelector('.match-w span:last-child');
-    if(w) w.textContent='Looking for someone who works in '+m.s+'…';
-  },900);
-
-  setTimeout(()=>{
-    panel.innerHTML='<div class="match-q">'+escHtml(txt)+'</div>'+
-      '<div class="match-hit">'+
-        '<div class="av lg" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
-        '<div class="mh-b"><div class="mh-n">'+p.n+'</div>'+
-          '<div class="mh-r">'+p.r+'</div>'+
-          '<div class="mh-k">Works in '+m.s+' &middot; has handled this kind of thing before</div></div>'+
-      '</div>'+
-      '<div class="match-acts"><span class="sp"></span>'+
-        '<button class="btn" data-rematch>Someone else</button>'+
-        '<button class="btn go" data-startmatch="'+m.w+'">Start the call with '+first+'</button>'+
-      '</div>';
-    paintIn(panel);
-    panel.dataset.q=txt;
-    toast('Matched with '+first+' — he is free now');
-  },2100);
-}
-
-/* a match turns into a real session you can call into */
-function sessionFromMatch(who,txt){
-  const first=fName(who);
-  const title=txt.length>52?txt.slice(0,52).replace(/\s+\S*$/,'')+'…':txt;
-  const key='s'+Date.now().toString(36);
-  SESSIONS[key]={
-    t:escHtml(title), proj:null, who:who, state:'open',
-    started:'Today', last:'Just now', grp:'This week', ago:'just now', msgs:[], calls:[],
-    sum:'You described this in your own words and Relay matched you with '+first+
-        '. Nothing has happened yet — Relay writes this summary when your first call ends.'
-  };
-  SESS_ORDER=[key].concat(SESS_ORDER);
-  renderSessFeed();
-  renderSession(key);
-  setTimeout(()=>sessionCall(),400);
-}
-
-/* Home's ask box is hidden in the "returning" demo view — reveal it before focusing */
+/* the one ask card lives on home now — send people to it and put the cursor in it */
 function openAsk(){
   show('home');
-  const vis=()=>[...document.querySelectorAll('#home .ask textarea')].find(t=>t.offsetParent);
-  let ta=vis();
-  if(!ta){
-    document.getElementById('home').dataset.view='assist';
-    document.querySelectorAll('.vs').forEach(v=>v.classList.toggle('on',v.dataset.view==='assist'));
-    ta=vis();
-  }
+  const ta=document.getElementById('askText');
   if(ta){ta.scrollIntoView({block:'center'}); ta.focus()}
 }
 
@@ -4679,6 +4880,10 @@ document.addEventListener('click',e=>{
 
 /* ---------- wiring ---------- */
 document.addEventListener('click',e=>{
+  /* a face opens the person. The handler above already did that — this one
+     must not also open the row the face is standing in. */
+  if(e.target.closest('[data-person]')) return;
+
   /* session Back, when it points at a project rather than the feed */
   if(e.target.closest('#sessBack') && sessBackTo && PROJECTS[sessBackTo]){
     e.stopPropagation();
@@ -4702,6 +4907,22 @@ document.addEventListener('click',e=>{
     renderSession(cont.dataset.continue,'continue');
     return;
   }
+
+  /* the chips sit inside the project row — they have to win over it */
+  const pm=e.target.closest('[data-projmenu]');
+  if(pm){e.stopPropagation();openProjMenu(pm,pm.dataset.projmenu);return}
+
+  const pd=e.target.closest('[data-projdel]');
+  if(pd){e.stopPropagation();confirmDeleteProject(pd.dataset.projdel);return}
+
+  closeProjMenu();   /* any other click puts the menu away */
+
+  const pc=e.target.closest('[data-projcall]');
+  if(pc){e.stopPropagation();startProjectCall(pc.dataset.projcall);return}
+
+  /* the two + buttons in the section bars */
+  if(e.target.closest('[data-newproject]')){e.stopPropagation();newProjectCard();return}
+  if(e.target.closest('[data-newsession]')){e.stopPropagation();newSessionCard();return}
 
   const pj=e.target.closest('[data-project]');
   if(pj){e.stopPropagation();renderProject(pj.dataset.project);return}
@@ -4746,6 +4967,18 @@ document.addEventListener('click',e=>{
 
 renderSessFeed();
 renderProjects();
+
+/* the section bar only grows its edge once there is something under it */
+(function(){
+  const main=document.querySelector('.main');
+  const sync=()=>{
+    const stuck=main.scrollTop>6;
+    document.querySelectorAll('.topbar').forEach(b=>b.classList.toggle('stuck',stuck));
+    closeProjMenu();   /* it is pinned to the viewport, so it cannot ride along */
+  };
+  main.addEventListener('scroll',sync,{passive:true});
+  sync();
+})();
 
 /* ================= notifications ================= */
 const nScreen=document.getElementById('notifs');
@@ -5112,6 +5345,12 @@ document.addEventListener('click',e=>{
   if(label==='Open'){toast('Opening attachment');return}
 });
 
+/* ================= home page (from customer-NFP) =================
+   Their ask card, call flow, welcome, entrance and coach. Rewired where it
+   touched things main has since rebuilt: renderProjects() for the project
+   list, PROJ_ORDER for ordering, and sessions created with the summary and
+   thread fields the session page now reads. */
+
 /* ================= connect to an engineer → call → project ================= */
 const DEMO_ENGINEER='sj';                 /* who picks up in the demo */
 const mScrim=document.getElementById('mScrim');
@@ -5149,6 +5388,13 @@ function stopCallTimer(){
 const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 
 /* ---- step 1: the call ---- */
+
+/* Where the call came from, and so where the session it makes should land.
+   null  → the home ask box: ask afterwards whether to keep it as a project
+   {proj}→ started from a project: it files itself there, no question asked
+   {oneoff:true} → "+ New session": it stays a one-off */
+let callScope=null;
+
 function startMatch(field){
   const ta=field.querySelector('textarea');
   const problem=(ta?ta.value:'').trim();
@@ -5157,15 +5403,21 @@ function startMatch(field){
     toast('Tell us what is wrong first — a line or two is plenty');
     return;
   }
-  const p=PEOPLE[DEMO_ENGINEER], first=fName(DEMO_ENGINEER);
+  callScope=null;
+  beginCall(problem,DEMO_ENGINEER);
+}
+
+function beginCall(problem,who,note){
+  const p=PEOPLE[who], first=fName(who);
   callSecs=0;
-  pending={problem:problem, mins:0, who:DEMO_ENGINEER};
+  pending={problem:problem, mins:0, who:who};
+  const sub=note||'Works in your stack &middot; has fixed this before';
 
   openModal(
     '<div class="m-top">'+
       '<div class="av" data-dot="live" style="background:'+p.c+'">'+p.i+'</div>'+
       '<div><h3 style="margin:0">'+p.n+'</h3>'+
-      '<p style="font-size:12.5px">Works in your stack &middot; has fixed this before</p></div>'+
+      '<p style="font-size:12.5px">'+sub+'</p></div>'+
     '</div>'+
     '<div class="call-state"><span class="dotpulse2"></span><span id="cState">Connecting you to '+first+'&hellip;</span></div>'+
     '<div class="call-timer" id="cTimer">00:00</div>'+
@@ -5193,11 +5445,29 @@ function endDemoCall(){
   if(!connected){
     closeModal();
     toast('Call cancelled — nothing was billed');
-    pending=null;
+    pending=null; callScope=null;
     return;
   }
   pending.mins=Math.max(1,Math.round(callSecs/60));
+
+  /* a call that already knows where it belongs skips the question */
+  const sc=callScope; callScope=null;
+  if(sc && sc.proj && PROJECTS[sc.proj]){addToProject(sc.proj); return}
+  if(sc && sc.oneoff){keepAsOneOff(); return}
   offerProject();
+}
+
+/* the session stands on its own — you can still file it later from its page */
+function keepAsOneOff(){
+  const k=sessionFromCall(null);
+  pending=null;
+  closeModal();
+  renderSessFeed();
+  paintJump();
+  renderHomeRecent();
+  renderSession(k);
+  toast('Kept as a one-off session — you can file it under a project later');
+  return k;
 }
 
 function offerProject(){
@@ -5241,7 +5511,7 @@ function addToProject(key){
   P.sub=plural(live,'session')+' &middot; just now with '+who;
   pending=null;
   closeModal();
-  renderProjRows();
+  renderProjects();
   renderSessFeed();
   renderHomeRecent();
   renderProject(key);
@@ -5273,10 +5543,13 @@ function sessionFromCall(projKey){
   const title=problem.length>52 ? problem.slice(0,52).trim()+'…' : problem;
   SESSIONS[key]={
     t:title, proj:projKey, who:who, state:'open',
-    started:'Just now', last:'Just now', grp:'This week',
-    open:[],
+    started:'Today', last:'Just now', grp:'This week', ago:'just now',
+    msgs:[],
+    sum:'You described this in your own words and '+first+' picked it up on the spot. On a '+
+        plural(pending.mins,'minute')+' call you went through what is actually happening and '+
+        'agreed the next step before anything gets built.',
     calls:[{
-      h:'First look at this', when:'Just now', mins:pending.mins,
+      h:'First look at it', when:'Today', mins:pending.mins,
       p:'You described the problem and '+first+' picked it up. This is the write-up from that call.',
       out:[['ok','Walked through what you are seeing'],
            ['ok','Agreed the next step before anything gets built']],
@@ -5290,6 +5563,215 @@ function sessionFromCall(projKey){
   return key;
 }
 
+/* ============================================================
+   THREE DOORS THAT DO NOT START AT THE HOME BOX
+   — "Start a call" on a project, which goes to the engineer who
+     took the last session there
+   — "+ New project", which needs no call at all
+   — "+ New session", which starts a one-off
+   ============================================================ */
+
+const freeKey=()=>PEOPLE[DEMO_ENGINEER].d==='live'
+  ? DEMO_ENGINEER
+  : (Object.keys(PEOPLE).find(k=>PEOPLE[k].d==='live')||DEMO_ENGINEER);
+
+/* ---- a call that already belongs to a project ---- */
+function startProjectCall(key){
+  const P=PROJECTS[key]; if(!P) return;
+  const lead=projLead(key), who=lead||freeKey(), p=PEOPLE[who], first=fName(who);
+  const mine=projTally(key).find(e=>e.k===who);
+
+  const line = lead
+    ? 'Took the last session on '+escHtml(P.n)+
+      (mine?' &middot; '+plural(mine.n,'session')+' here':'')
+    : 'No one has been in yet &mdash; '+first+' works in your stack';
+
+  openModal(
+    '<h3>Start a call &middot; '+escHtml(P.n)+'</h3>'+
+    '<div class="m-who">'+
+      '<div class="av lg" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+      '<div><div class="m-who-n">'+p.n+'</div><div class="m-who-s">'+line+'</div></div>'+
+    '</div>'+
+    '<textarea class="m-ta" id="scText" data-focus placeholder="What is happening? A line or two is plenty."></textarea>'+
+    '<div class="m-help">'+
+      (lead?'If '+first+' is in a call we pull the next engineer who already knows this project. '
+           :'')+
+      'The meter starts when they pick up, and the session files itself under '+escHtml(P.n)+'.'+
+    '</div>'+
+    '<div class="m-acts">'+
+      '<button class="btn" id="scCancel">Cancel</button>'+
+      '<button class="btn go" id="scGo">Start a call</button>'+
+    '</div>');
+
+  document.getElementById('scGo').dataset.proj=key;
+}
+
+function scopedCallGo(){
+  const btn=document.getElementById('scGo'); if(!btn) return;
+  const key=btn.dataset.proj, ta=document.getElementById('scText');
+  const problem=(ta?ta.value:'').trim();
+  if(!problem){
+    if(ta) ta.focus();
+    toast('Tell them what is wrong first — a line or two is plenty');
+    return;
+  }
+  const P=PROJECTS[key], lead=projLead(key), who=lead||freeKey();
+  const mine=projTally(key).find(e=>e.k===who);
+  callScope={proj:key};
+  beginCall(problem,who, lead
+    ? 'On '+escHtml(P.n)+(mine?' &middot; '+plural(mine.n,'session')+' here':'')
+    : 'First call on '+escHtml(P.n));
+}
+
+/* ---- deleting a project takes everything filed under it ---- */
+function closeProjMenu(){
+  const m=document.getElementById('projMenu');
+  if(m) m.remove();
+  document.querySelectorAll('.rowdots.on').forEach(d=>d.classList.remove('on'));
+}
+function openProjMenu(btn,key){
+  const open=btn.classList.contains('on');
+  closeProjMenu();
+  if(open) return;                                 /* second click closes it */
+  btn.classList.add('on');
+  const m=document.createElement('div');
+  m.className='pmenu'; m.id='projMenu';
+  m.innerHTML='<button class="pmenu-i danger" data-projdel="'+key+'">Delete project</button>';
+  document.body.appendChild(m);
+  const r=btn.getBoundingClientRect(), w=m.offsetWidth, h=m.offsetHeight;
+  m.style.left=Math.max(12,Math.min(r.right-w,innerWidth-w-12))+'px';
+  m.style.top=(r.bottom+h+12>innerHeight ? r.top-h-6 : r.bottom+6)+'px';
+}
+
+function confirmDeleteProject(key){
+  const P=PROJECTS[key]; if(!P) return;
+  closeProjMenu();
+  const keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===key);
+  const calls=keys.reduce((a,k)=>a+SESSIONS[k].calls.length,0);
+  const mins=keys.reduce((a,k)=>a+sessMins(SESSIONS[k]),0);
+
+  openModal(
+    '<h3>Delete &ldquo;'+escHtml(P.n)+'&rdquo;?</h3>'+
+    '<p>'+(keys.length
+      ? 'This deletes the project and all '+plural(keys.length,'session')+' on it, including '+
+        'their '+plural(calls,'call')+' and transcripts &mdash; '+mins+' minutes of work in total. '+
+        'This cannot be undone.'
+      : 'Nothing is filed under this project yet, so only the project itself goes.')+'</p>'+
+    (keys.length?'<div class="del-list">'+keys.map(k=>{
+      const s=SESSIONS[k];
+      return '<div class="del-i"><b>'+s.t+'</b><span>'+plural(s.calls.length,'call')+'</span></div>';
+    }).join('')+'</div>':'')+
+    '<div class="m-acts">'+
+      '<button class="btn" id="dpCancel">Cancel</button>'+
+      '<button class="btn danger" id="dpGo">Delete project</button>'+
+    '</div>');
+  document.getElementById('dpGo').dataset.key=key;
+}
+
+function deleteProject(key){
+  const P=PROJECTS[key]; if(!P) return;
+  const keys=SESS_ORDER.filter(x=>SESSIONS[x].proj===key);
+
+  keys.forEach(k=>{delete SESSIONS[k]});
+  SESS_ORDER=SESS_ORDER.filter(k=>SESSIONS[k]);
+  NEW_SESS=NEW_SESS.filter(k=>SESSIONS[k]);
+  delete PROJECTS[key];
+  PROJ_ORDER=PROJ_ORDER.filter(k=>k!==key);
+
+  /* nothing may be left pointing at what just went */
+  if(currentProject===key) currentProject=null;
+  if(sessBackTo===key) sessBackTo=null;
+  if(currentSession && !SESSIONS[currentSession]) currentSession=null;
+
+  closeModal();
+  renderProjects();
+  renderSessFeed();
+  paintJump();
+  renderHomeRecent();
+  show('projects');
+  toast(keys.length
+    ? 'Deleted “'+P.n+'” — '+plural(keys.length,'session')+' went with it'
+    : 'Deleted “'+P.n+'”');
+}
+
+/* ---- a project with no call behind it ---- */
+function newProjectCard(){
+  openModal(
+    '<h3>New project</h3>'+
+    '<p>Name it and it exists. Relay writes the summary from the sessions filed under it, '+
+    'so the page fills out from the first call &mdash; you do not need one to start.</p>'+
+    '<input class="m-input" id="npName" data-focus maxlength="40" placeholder="e.g. Harbour Booking">'+
+    '<label class="m-lab" for="npStack">What it is built with &mdash; optional</label>'+
+    '<input class="m-input" id="npStack" maxlength="70" placeholder="Next.js, Postgres, Vercel">'+
+    '<div class="m-acts">'+
+      '<button class="btn" id="npCancel">Cancel</button>'+
+      '<button class="btn go" id="npSave">Create project</button>'+
+    '</div>');
+}
+
+function createBlankProject(name,stackStr){
+  const clean=(name||'').trim();
+  if(!clean){
+    const f=document.getElementById('npName');
+    if(f) f.focus();
+    toast('Give the project a name first');
+    return;
+  }
+  const stack=(stackStr||'').split(',').map(t=>t.trim()).filter(Boolean);
+  const base=clean.toLowerCase().replace(/[^a-z0-9]+/g,'')||'project';
+  let key=base, i=2;
+  while(PROJECTS[key]) key=base+(i++);
+
+  PROJECTS[key]={
+    n:clean,
+    stack:stack.length?stack:['Stack not set yet'],
+    blurb:'You started this one yourself. Relay writes this summary from the sessions filed '+
+          'under it, so it fills out from the first call an engineer takes here.',
+    stands:'Nothing has needed an engineer yet &mdash; this is a clean page.',
+    waiting:'Nothing yet.',
+    upd:'just now', flash:true
+  };
+  PROJ_ORDER=[key].concat(PROJ_ORDER);
+
+  closeModal();
+  renderProjects();
+  paintJump();
+  renderProject(key);
+  toast('“'+clean+'” created — start a call on it whenever something comes up');
+  return key;
+}
+
+/* ---- a session that belongs to nothing ---- */
+function newSessionCard(){
+  const who=freeKey(), p=PEOPLE[who], first=fName(who);
+  openModal(
+    '<h3>Start a one-off session</h3>'+
+    '<div class="m-who">'+
+      '<div class="av lg" data-dot="'+p.d+'" style="background:'+p.c+'">'+p.i+'</div>'+
+      '<div><div class="m-who-n">'+p.n+'</div>'+
+      '<div class="m-who-s">'+p.r+'</div></div>'+
+    '</div>'+
+    '<textarea class="m-ta" id="nsText" data-focus placeholder="My payment page keeps timing out and I have no idea why..."></textarea>'+
+    '<div class="m-help">This one stays on its own &mdash; it will not be filed under a project. '+
+    'You can move it onto one later from the session page.</div>'+
+    '<div class="m-acts">'+
+      '<button class="btn" id="nsCancel">Cancel</button>'+
+      '<button class="btn go" id="nsGo">Start a call</button>'+
+    '</div>');
+}
+
+function newSessionGo(){
+  const ta=document.getElementById('nsText');
+  const problem=(ta?ta.value:'').trim();
+  if(!problem){
+    if(ta) ta.focus();
+    toast('Tell us what is wrong first — a line or two is plenty');
+    return;
+  }
+  callScope={oneoff:true};
+  beginCall(problem,freeKey(),'One-off session &middot; not on a project');
+}
+
 function createProject(name){
   const clean=(name||'').trim();
   if(!clean){toast('Give the project a name first');return}
@@ -5298,9 +5780,7 @@ function createProject(name){
   while(PROJECTS[key]) key=base+(i++);
 
   PROJECTS[key]={
-    n:clean, stack:[],
-    sub:'1 session &middot; just now with '+fName(pending.who),
-    side:'<span class="pill mute">New</span>',
+    n:clean, stack:['Stack not set yet'],
     blurb:'Created from your call with '+fName(pending.who)+'. Everything about this lands here from now on.',
     stands:pending.problem,
     waiting:'Nothing yet — '+fName(pending.who)+' has the summary written up.'
@@ -5310,7 +5790,7 @@ function createProject(name){
   const sKey=sessionFromCall(key);
   pending=null;
   closeModal();
-  renderProjRows();
+  renderProjects();
   renderSessFeed();
   renderHomeRecent();
   renderProject(key);
@@ -5422,16 +5902,25 @@ document.addEventListener('click',e=>{
     createProject(document.getElementById('pName').value);
     return;
   }
-  if(e.target.closest('#pSkip')){
+  if(e.target.closest('#pSkip')){e.stopPropagation();keepAsOneOff();return}
+
+  /* --- the three cards opened from the section bars and project rows --- */
+  if(e.target.closest('#scGo')){e.stopPropagation();scopedCallGo();return}
+  if(e.target.closest('#nsGo')){e.stopPropagation();newSessionGo();return}
+  if(e.target.closest('#npSave')){
     e.stopPropagation();
-    const k=sessionFromCall(null);
-    pending=null;
-    closeModal();
-    renderSessFeed();
-    renderHomeRecent();
-    renderSession(k);
-    toast('Kept as a one-off session — you can file it under a project later');
+    createBlankProject(document.getElementById('npName').value,
+                       document.getElementById('npStack').value);
     return;
+  }
+  if(e.target.closest('#dpGo')){
+    e.stopPropagation();
+    deleteProject(document.getElementById('dpGo').dataset.key);
+    return;
+  }
+  if(e.target.closest('#scCancel')||e.target.closest('#nsCancel')||
+     e.target.closest('#npCancel')||e.target.closest('#dpCancel')){
+    e.stopPropagation(); closeModal(); return;
   }
 });
 
@@ -5440,6 +5929,19 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.id==='pName'){
     e.preventDefault();
     createProject(e.target.value);
+  }
+  if(e.key==='Enter'&&(e.target.id==='npName'||e.target.id==='npStack')){
+    e.preventDefault();
+    createBlankProject(document.getElementById('npName').value,
+                       document.getElementById('npStack').value);
+  }
+  /* the call chips are spans so they can live inside a row button — give them
+     the keyboard back */
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&
+     e.target.matches('[data-projcall][role="button"], [data-project][role="button"], '+
+                      '[data-projmenu][role="button"]')){
+    e.preventDefault();
+    e.target.click();
   }
   if(e.key==='Escape'&&mWrap.classList.contains('on')&&mCard.dataset.locked!=='1'){
     closeModal();
@@ -6275,8 +6777,20 @@ function sendAsMessage(){
 }
 if(askSend) askSend.addEventListener('click',e=>{e.stopPropagation();sendAsMessage()});
 
+/* The two counts on the returning view's jump row, kept honest as sessions and
+   projects are created during the demo. The row itself is not on this branch's
+   home page — the box replaced it — so both lookups miss and this does nothing;
+   it is kept, and kept guarded, because main still calls it from four places
+   and a bare call to a function that is not there stops the script dead. */
+function paintJump(){
+  const s=document.getElementById('rjSess'), p=document.getElementById('rjProj');
+  if(s) s.textContent=SESS_ORDER.length;
+  if(p) p.textContent=PROJ_ORDER.length;
+}
+
 /* ---- boot ---- */
-renderProjRows();
+paintJump();
+renderProjects();
 renderEngineers();
 renderHomeRecent();
 paintScope();

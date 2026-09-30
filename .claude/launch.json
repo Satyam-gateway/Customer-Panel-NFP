@@ -30,6 +30,16 @@
         "8767"
       ],
       "port": 8767
+    },
+    {
+      "name": "relay-nav",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8773"
+      ],
+      "port": 8773
     }
   ]
 }
