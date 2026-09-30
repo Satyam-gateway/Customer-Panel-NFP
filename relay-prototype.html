@@ -6122,14 +6122,16 @@ function addToProject(key){
 }
 
 /* ---- step 3: name it ---- */
+/* The field used to open with the first two words of what you said already
+   typed into it, which only ever produced "Checkout is", "My payment" or
+   "Session with" — a name nobody would keep, sitting there to be deleted
+   before the real one can be written. It opens empty now, like the other
+   new-project card, with the example left in the placeholder. */
 function askProjectName(){
-  const guess=pending.problem.split(/[\.\,\n]/)[0].trim().split(/\s+/).slice(0,2)
-                .join(' ').replace(/[^\w\s-]/g,'');
   openModal(
     '<h3>Name this project</h3>'+
     '<p>Pick something you will recognise later. You can rename it at any time.</p>'+
-    '<input class="m-input" id="pName" data-focus maxlength="40" placeholder="e.g. Palm Seas" value="'+
-      escHtml(guess.charAt(0).toUpperCase()+guess.slice(1))+'">'+
+    '<input class="m-input" id="pName" data-focus maxlength="40" placeholder="e.g. Palm Seas">'+
     '<div class="m-help">The call you just had, its summary and any files move under it.</div>'+
     '<div class="m-acts">'+
       '<button class="btn" id="pBack">Back</button>'+
