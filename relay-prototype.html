@@ -1937,6 +1937,229 @@ body.hascalls .scope-wrap{display:inline-flex}
   .plead-acts{margin-left:0;width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ================= LIVE CALL ================= */
+#call{position:fixed;left:var(--rail);top:0;right:0;bottom:0;z-index:35;display:none;flex-direction:column;background:var(--paper)}
+#call.on{display:flex}
+.c-i{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.c-seg{display:inline-flex;padding:2px;border-radius:999px;background:#242B2F}
+.c-seg button{padding:3px 11px;border-radius:999px;color:#C9CFD3;white-space:nowrap}
+.c-seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600}
+.c-app{flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
+
+.c-head{display:flex;align-items:center;gap:16px;padding:16px 24px 4px}
+.c-head h1{font-size:21px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-sub{font-size:12.5px;color:var(--muted)}
+.c-head .c-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.c-stackp{display:flex}
+.c-stackp .av{width:30px;height:30px;box-shadow:0 0 0 2px var(--paper);margin-left:-4px}
+.c-stackp .av:first-child{margin-left:0}
+.c-livepill{display:inline-flex;align-items:center;gap:7px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--live-bg);color:var(--live)}
+.c-livepill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--live);animation:c-blink 1.6s infinite}
+@keyframes c-blink{50%{opacity:.35}}
+.c-timer{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:18px;font-variant-numeric:tabular-nums}
+.c-danger{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r-sm);background:var(--stop);color:#fff;font-weight:600;font-size:13px}
+.c-danger:hover{background:#A82A24}
+
+.c-tabrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 24px 10px}
+.c-tabs{display:flex;gap:6px}
+.c-tab{padding:6px 18px;border:1px solid transparent;border-radius:999px;color:var(--muted);font-weight:600}
+.c-tab:hover{color:var(--ink)}
+.c-tab[aria-selected="true"]{border-color:var(--live);background:var(--live-bg);color:var(--live)}
+.c-meta{display:flex;align-items:center;gap:16px;font-size:12.5px;color:var(--muted)}
+.c-wave{display:inline-flex;align-items:center;gap:2px;height:14px;margin-right:6px;vertical-align:middle}
+.c-wave i{width:2.5px;height:100%;border-radius:2px;background:var(--live);animation:c-w 1s ease-in-out infinite}
+.c-wave i:nth-child(2){animation-delay:.15s}.c-wave i:nth-child(3){animation-delay:.3s}.c-wave i:nth-child(4){animation-delay:.45s}
+@keyframes c-w{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.c-conn{display:inline-flex;align-items:center;gap:6px}
+.c-conn i{display:inline-flex;align-items:flex-end;gap:2px}
+.c-conn i b{width:3px;background:var(--live);border-radius:1px}
+
+.c-body{display:grid;grid-template-columns:minmax(0,1fr) auto;min-height:0;position:relative}
+.c-stage{position:relative;min-height:0;min-width:0;padding:2px 24px 14px;display:flex;flex-direction:column;gap:10px}
+.c-banner{flex:none;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:var(--r-md);background:var(--moving-bg);color:var(--moving);font-weight:600;font-size:13px}
+.c-banner .btn{margin-left:auto}
+.c-lay{flex:1;min-height:0;position:relative;display:flex}
+
+/* tiles */
+.c-tile{position:relative;min-height:0;min-width:0;border-radius:18px;overflow:hidden;cursor:default;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 42%,#0d1214),color-mix(in srgb,var(--c) 16%,#0d1214))}
+.c-tile::after{content:"";position:absolute;inset:0;border-radius:inherit;border:2px solid transparent;pointer-events:none;transition:border-color .2s}
+.c-tile.speaking::after{border-color:var(--live)}
+.c-ava{position:absolute;inset:0;display:grid;place-items:center}
+.c-face{position:relative;display:block;border-radius:50%;background:var(--c);flex:none}
+.c-ava .c-face{width:clamp(72px,30%,168px);aspect-ratio:1;box-shadow:0 0 0 4px rgba(255,255,255,.14)}
+.c-tile.speaking .c-ava .c-face{animation:c-ring 1.6s ease-out infinite}
+@keyframes c-ring{0%{box-shadow:0 0 0 4px rgba(255,255,255,.14),0 0 0 4px rgba(0,135,90,.6)}100%{box-shadow:0 0 0 4px rgba(255,255,255,.14),0 0 0 30px rgba(0,135,90,0)}}
+.c-sil{position:absolute;left:50%;bottom:-2%;width:min(58%,300px);transform:translateX(-50%);opacity:.9}
+.c-chip{position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);padding:5px 10px 5px 8px;border-radius:999px;background:rgba(10,14,16,.6);backdrop-filter:blur(8px);color:#fff;font-size:12.5px}
+.c-chip .c-i{width:14px;height:14px}
+.c-chip .c-off{color:#FF8A80}
+.c-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.45)}
+.c-name:hover{border-bottom-color:#fff}
+.c-role{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.c-role.eng{background:var(--live-bg);color:var(--live)}
+.c-role.me{background:var(--contract-bg);color:var(--contract)}
+.c-role.sup{background:var(--turn-bg);color:var(--turn)}
+.c-obs{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--turn-bg);color:var(--turn);font-size:11.5px;font-weight:700}
+.c-obs .c-i{width:13px;height:13px}
+.c-pinb{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(10,14,16,.6);backdrop-filter:blur(8px);color:#fff;opacity:0;transition:opacity .15s,background .15s}
+.c-pinb .c-i{width:16px;height:16px}
+.c-tile:hover .c-pinb,.c-pinb.on,.c-pinb:focus-visible{opacity:1}
+.c-pinb:hover{background:rgba(10,14,16,.85)}
+.c-pinb.on{background:var(--live)}
+.c-tile.sm .c-ava .c-face{width:clamp(40px,32%,72px)}
+.c-tile.sm .c-chip{left:8px;bottom:8px;padding:3px 8px 3px 6px;font-size:11.5px}
+.c-tile.sm .c-role{display:none}
+.c-tile.sm .c-obs{top:8px;left:8px;font-size:10.5px;padding:2px 8px}
+.c-tile.sm .c-pinb{top:8px;right:8px;width:28px;height:28px}
+
+/* gallery + focus */
+.c-gal{display:grid;width:100%;gap:14px;grid-auto-rows:minmax(0,1fr);align-content:center}
+.c-gal.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.c-gal.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.c-st{display:grid;width:100%;gap:14px;grid-template-columns:minmax(0,1fr) clamp(200px,21%,264px);grid-template-rows:minmax(0,1fr)}
+.c-st.solo{grid-template-columns:minmax(0,1fr)}
+.c-main{min-height:0;min-width:0;display:flex}
+.c-main>.c-tile,.c-main>.c-screen{flex:1}
+.c-col{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.c-col>.c-tile{flex:none;aspect-ratio:16/10}
+.c-pip{position:absolute;right:16px;bottom:16px;width:clamp(150px,20%,240px);aspect-ratio:16/10;border-radius:14px;box-shadow:var(--shadow-lift);z-index:3;touch-action:none;cursor:grab}
+.c-pip .c-tile{position:absolute;inset:0;border-radius:14px}
+
+/* shared screen */
+.c-screen{display:flex;flex-direction:column;min-height:0;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.c-scrh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--paper)}
+.c-dots{display:flex;gap:6px}
+.c-dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.c-file{font:600 12.5px ui-monospace,SFMono-Regular,Menlo,monospace}
+.c-scrh .pill{margin-left:auto}
+.c-code{flex:1;min-height:0;overflow:hidden;padding:12px 0;font:13px/1.85 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;position:relative}
+.c-ln{display:flex;padding-right:16px;white-space:pre}
+.c-ln i{width:52px;flex:none;text-align:right;padding-right:16px;color:var(--faint);font-style:normal;user-select:none}
+.c-ln.hot{background:var(--turn-bg);box-shadow:inset 3px 0 0 var(--turn)}
+.c-k{color:var(--contract)}.c-s{color:var(--live)}.c-c{color:var(--faint)}.c-f{color:var(--moving)}
+.c-cursor{position:absolute;left:44%;top:56%;display:flex;align-items:flex-start;gap:2px;pointer-events:none}
+.c-cursor svg{width:18px;height:18px;fill:var(--live);stroke:#fff;stroke-width:1.5}
+.c-cursor span{margin-top:14px;padding:2px 8px;border-radius:6px;background:var(--live);color:#fff;font:700 11px "Public Sans",sans-serif}
+.c-term{flex:none;background:var(--ink);color:#C9CFD3;padding:10px 16px 12px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace}
+.c-term small{color:var(--muted);font-size:11px;display:block;margin-bottom:2px}
+.c-term .bad{color:#FF8A80}.c-term .ok{color:#7BF0BE}
+.c-page{flex:1;min-height:0;display:grid;place-items:center;background:var(--paper);padding:20px}
+.c-pay{width:min(360px,100%);background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;box-shadow:var(--shadow)}
+.c-pay h4{font:600 18px "Bricolage Grotesque",sans-serif;margin-bottom:14px}
+.c-pay .row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line-soft)}
+.c-pay .go{margin-top:14px;width:100%;padding:11px;border-radius:var(--r-sm);background:var(--ink);color:#fff;font-weight:600;text-align:center}
+.c-pay .err{margin-top:12px;padding:9px 12px;border-radius:var(--r-sm);background:var(--stop-bg);color:var(--stop);font-size:12.5px;font-weight:600}
+.c-thumb .c-ava{flex-direction:column}
+.c-thumb .c-ti{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center}
+.c-thumb .c-ti .c-i{width:22px;height:22px}
+
+/* controls */
+.c-ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:10px 24px 16px}
+.c-ctl .c-l{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);min-width:0}
+.c-ctl .c-l b{color:var(--ink);font-weight:600;white-space:nowrap}
+.c-mid{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-lift)}
+.c-ctl .c-rr{display:flex;justify-content:flex-end;gap:8px}
+.c-cb{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--line-soft);color:var(--ink);transition:background .12s,transform .1s;position:relative}
+.c-cb:hover{background:var(--line)}
+.c-cb:active{transform:scale(.95)}
+.c-cb.off{background:var(--stop-bg);color:var(--stop)}
+.c-cb.on{background:var(--live-bg);color:var(--live)}
+.c-cb.end{width:auto;padding:0 20px;gap:8px;border-radius:999px;background:var(--stop);color:#fff;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center}
+.c-cb.end:hover{background:#A82A24}
+.c-cb.sq{border-radius:var(--r-md);width:42px;height:42px;background:var(--card);border:1px solid var(--line)}
+.c-cb.sq.on{background:var(--live-bg);border-color:var(--live)}
+.c-cb .c-dot{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--moving);box-shadow:0 0 0 2px var(--card)}
+.c-sep{width:1px;height:26px;background:var(--line)}
+
+/* side panel */
+.c-drawer{width:0;overflow:hidden;background:var(--card);border-left:1px solid var(--line);min-height:0}
+.c-drawer.open{width:352px}
+.c-dw{width:352px;height:100%;display:flex;flex-direction:column;min-height:0}
+.c-dwh{display:flex;align-items:center;gap:8px;padding:14px 16px 10px}
+.c-dwh .c-seg{background:var(--line-soft)}
+.c-dwh .c-seg button{color:var(--muted)}
+.c-dwh .c-seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.c-x{margin-left:auto;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.c-x:hover{background:var(--line-soft)}
+.c-msgs{flex:1;min-height:0;overflow:auto;padding:6px 16px;display:flex;flex-direction:column;gap:12px}
+.c-msg{display:flex;gap:9px;max-width:92%}
+.c-msg.me{align-self:flex-end;flex-direction:row-reverse}
+.c-msg .b{padding:8px 12px;border-radius:14px;background:var(--line-soft);font-size:13px}
+.c-msg.me .b{background:var(--ink);color:#fff}
+.c-msg small{display:block;font-size:11px;color:var(--faint);margin-bottom:2px}
+.c-free{align-self:center;font-size:11.5px;color:var(--faint);background:var(--line-soft);padding:2px 10px;border-radius:999px}
+.c-compose{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--line)}
+.c-compose input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:var(--r-sm);font:inherit;background:var(--paper)}
+.c-scroll{flex:1;min-height:0;overflow:auto;padding:6px 16px 18px}
+
+/* cards + summary */
+.c-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:16px 18px}
+.c-card h3{font-size:15px;margin-bottom:10px}
+.c-eye{font-size:12px;font-weight:700;color:var(--faint);margin-bottom:8px}
+.c-tags{display:flex;flex-wrap:wrap;gap:6px}
+.c-tags span{padding:2px 10px;border-radius:999px;background:var(--line-soft);font-size:12px;font-weight:600;color:var(--muted)}
+.c-ecard{display:flex;flex-direction:column;gap:12px}
+.c-ecard .top{display:flex;gap:14px;align-items:center}
+.c-ecard .top .c-face{width:64px;height:64px}
+.c-ecard h3{font-size:18px;margin:0}
+.c-ecard p{font-size:13px;color:var(--muted);line-height:1.55}
+.c-li{list-style:none;display:flex;flex-direction:column;gap:8px}
+.c-li li{display:flex;gap:9px;font-size:13px}
+.c-li .ok{color:var(--live);font-weight:700}.c-li .wa{color:var(--turn);font-weight:700}
+.c-empty{font-size:13px;color:var(--muted)}
+.c-sum{grid-column:1;min-height:0;overflow:auto;padding:4px 24px 24px}
+.c-sumin{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:16px;align-items:start}
+.c-sum h2{font-size:26px;font-weight:600;margin-bottom:4px}
+.c-lede{color:var(--muted);margin-bottom:16px}
+.c-stk{display:flex;flex-direction:column;gap:16px}
+.c-tl{list-style:none;display:flex;flex-direction:column}
+.c-tl li{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft);align-items:center;font-size:13px}
+.c-tl li:first-child{border-top:0}
+.c-tl .when{margin-left:auto;color:var(--faint);font-size:12px}
+.c-back{position:absolute;right:24px;bottom:18px;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--ink);color:#fff;box-shadow:var(--shadow-lift);z-index:5;font-weight:600;font-size:13px}
+.c-back .av{width:26px;height:26px}
+.c-back .t{background:rgba(255,255,255,.14);padding:1px 8px;border-radius:999px;font-variant-numeric:tabular-nums}
+
+/* hover profile */
+.c-pop{position:fixed;z-index:60;width:304px;padding:16px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-lift);display:none}
+.c-pop.on{display:block}
+.c-pop .c-pinb{opacity:1;position:absolute;top:12px;right:12px;background:var(--line-soft);color:var(--ink);backdrop-filter:none;width:32px;height:32px}
+.c-pop .c-pinb:hover{background:var(--line)}
+.c-pop .c-pinb.on{background:var(--live);color:#fff}
+.c-pop .top{display:flex;gap:12px;align-items:center;padding-right:38px;margin-bottom:10px}
+.c-pop .top .c-face{width:56px;height:56px}
+.c-pop h4{font:600 16px "Bricolage Grotesque",sans-serif;letter-spacing:-.01em}
+.c-pop .st{font-size:12px;color:var(--muted)}
+.c-pop p{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.c-pop .c-tags{margin-bottom:12px}
+.c-pop .foot{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--live);font-weight:600}
+.c-pop .foot .btn{margin-left:auto}
+
+/* connecting, ended, toast, modal */
+.c-center{display:grid;place-items:center;padding:24px;text-align:center}
+.c-center .c-face{width:112px;height:112px;margin:0 auto 18px}
+.c-center.conn .c-face{animation:c-ring 1.6s ease-out infinite}
+.c-center h2{font-size:24px;margin-bottom:6px}
+.c-center p{color:var(--muted);margin-bottom:18px}
+.c-toast{position:absolute;top:110px;left:50%;transform:translate(-50%,-90px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;padding:9px 16px 9px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow-lift);font-size:13px;font-weight:600;z-index:8;transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .2s}
+.c-toast.show{transform:translate(-50%,0);opacity:1}
+.c-toast .av{width:26px;height:26px}
+.c-modalwrap{position:absolute;inset:0;background:rgba(20,24,26,.4);display:none;place-items:center;z-index:70}
+.c-modalwrap.on{display:grid}
+.c-modal{width:min(400px,92vw);background:var(--card);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow-lift)}
+.c-modal h3{font-size:20px;margin-bottom:6px}
+.c-modal p{color:var(--muted);margin-bottom:18px}
+.c-modal .row{display:flex;gap:10px;justify-content:flex-end}
+.c-mini{position:fixed;left:16px;bottom:76px;z-index:36;display:none;align-items:center;gap:9px;padding:7px 14px 7px 8px;border-radius:999px;background:var(--ink);color:#fff;box-shadow:var(--shadow-lift);font-weight:600;font-size:12.5px}
+.c-mini.on{display:flex}
+.c-mini .av{width:24px;height:24px}
+.c-mini .t{font-variant-numeric:tabular-nums;opacity:.8}
+.nav-item.in-call::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--live);margin-left:auto;animation:c-blink 1.6s infinite}
+@media (prefers-reduced-motion:reduce){#call *{animation:none!important;transition:none!important}}
+.c-mini .t,.c-back .t{font:600 12.5px "Public Sans",sans-serif}
+
 </style>
 </head>
 <body>
@@ -5183,7 +5406,7 @@ document.querySelectorAll('.thread .composer').forEach(c=>{
 });
 
 /* start a call ----------------------------------------- */
-function startCall(thread){
+function startThreadCall(thread){
   if(thread.querySelector('.callbar')) return;
   const info=infoOf(thread);
   const bar=document.createElement('div');
@@ -5280,7 +5503,7 @@ function writeSummary(thread,mins){
 document.querySelectorAll('.thread .btn.go').forEach(b=>{
   b.addEventListener('click',e=>{
     e.stopPropagation();
-    const t=threadOf(b); if(t) startCall(t);
+    const t=threadOf(b); if(t) startThreadCall(t);
   });
 });
 
@@ -6770,5 +6993,491 @@ document.getElementById('meSub').textContent='No calls yet';
 markEntrance();
 if(!maybeWelcome()) revealDashboard();
 </script>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ci-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="ci-mic-off" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M4 4l16 16"/></symbol>
+  <symbol id="ci-cam" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10l5-3v10l-5-3z"/></symbol>
+  <symbol id="ci-cam-off" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10l5-3v10l-5-3zM4 4l16 16"/></symbol>
+  <symbol id="ci-share" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M9.5 10.5L12 8l2.5 2.5M12 8v5"/></symbol>
+  <symbol id="ci-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="ci-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></symbol>
+  <symbol id="ci-end" viewBox="0 0 24 24"><path d="M3 14c5-5 13-5 18 0l-2.5 2.5-3-1.5v-2.5a9 9 0 0 0-7 0V15l-3 1.5z"/></symbol>
+  <symbol id="ci-pin" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></symbol>
+  <symbol id="ci-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="ci-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7z"/></symbol>
+  <symbol id="ci-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+
+<div id="call" role="dialog" aria-label="Live session">
+  <div class="c-app" id="cApp"></div>
+  <div class="c-pop" id="cPop"></div>
+  <div class="c-modalwrap" id="cModal">
+    <div class="c-modal">
+      <h3>End this session?</h3>
+      <p>The clock stops now and your summary starts building. You can keep chatting afterwards.</p>
+      <div class="row"><button class="btn" data-cact="keep">Keep going</button><button class="c-danger" data-cact="end">End session</button></div>
+    </div>
+  </div>
+</div>
+<button class="c-mini" id="cMini" data-cact="return"></button>
+
+
+<script>
+/* LIVE CALL — ported from the call-flow branch */
+/* ================= LIVE CALL ================= */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const ic = (n, st) => `<svg class="c-i"${st ? ` style="${st}"` : ""}><use href="#ci-${n}"/></svg>`;
+  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+
+  const TAGS = {
+    sj: ["Next.js", "TypeScript", "Stripe", "Postgres"],
+    pn: ["Infrastructure", "Backups", "Monitoring"],
+    md: ["Front-end", "Design systems"],
+    ad: ["React Native", "iOS", "Android"],
+    ks: ["Pipelines", "Warehouses", "SQL"]
+  };
+  const OPEN = {
+    sj: [["wa", "Checkout does too much in one request"], ["wa", "No retry handling on failed payments"], ["ok", "Function timeout raised to 30s"]]
+  };
+  const SUP_BIO = "Watching this session to make sure you get a good outcome. Can step in if it helps.";
+
+  const C = {
+    on: false, min: false, phase: "idle", key: "sj", n: 2, tab: "call",
+    mic: true, cam: true, engCam: true, engShare: false, meShare: false,
+    drawer: null, pin: null, speaking: "eng", pip: { x: 0, y: 0 }, sec: 0,
+    ended: false, unread: false, msgs: []
+  };
+
+  const sharing = () => C.engShare || C.meShare;
+  const ids = () => (C.n === 3 ? ["eng", "me", "sup"] : ["eng", "me"]);
+
+  function ppl() {
+    const e = PEOPLE[C.key];
+    const sk = C.key === "md" ? "ks" : "md";
+    const s = PEOPLE[sk];
+    return {
+      eng: { id: "eng", key: C.key, name: e.n, first: e.n.split(" ")[0], ini: e.i, c: e.c, role: "Engineer", status: e.r, bio: e.b, tags: TAGS[C.key] || [], extra: C.key === "sj" ? "12 sessions together" : "" },
+      me: { id: "me", key: null, name: "Rohan Mehta", first: "You", ini: "RM", c: "#6D3BD4", role: "You", status: "34.8 minutes used", bio: "", tags: [], extra: "" },
+      sup: { id: "sup", key: sk, name: s.n, first: s.n.split(" ")[0], ini: s.i, c: s.c, role: "Supervisor", status: "Supervisor, listening in", bio: SUP_BIO, tags: [], extra: "" }
+    };
+  }
+
+  const face = (p, st) => `<span class="c-face" data-face="${p.ini}" style="--c:${p.c};${st || ""}"></span>`;
+  const paint = () => $$("#call [data-face]").forEach(el => paintAvatar(el, el.dataset.face));
+
+  function focusId() {
+    const list = [...ids(), ...(sharing() ? ["screen"] : [])];
+    if (C.pin && list.includes(C.pin)) return C.pin;
+    return sharing() ? "screen" : null;
+  }
+
+  const silhouette = c => `<svg class="c-sil" viewBox="0 0 200 160" aria-hidden="true"><ellipse cx="100" cy="176" rx="82" ry="70" fill="${c}" opacity=".55"/><circle cx="100" cy="64" r="34" fill="${c}" opacity=".7"/></svg>`;
+
+  function pinBtn(id, pinned) {
+    return `<button class="c-pinb ${pinned ? "on" : ""}" data-act="pin" data-id="${id}" title="${pinned ? "Unpin" : "Pin to focus"}" aria-label="${pinned ? "Unpin" : "Pin to focus"}">${ic("pin")}</button>`;
+  }
+
+  function tile(id, small) {
+    const P = ppl(), p = P[id];
+    const camOn = id === "eng" ? C.engCam : id === "me" ? C.cam : false;
+    const muted = id === "me" ? !C.mic : id === "sup";
+    return `<div class="c-tile ${small ? "sm" : ""} ${C.speaking === id ? "speaking" : ""}" data-id="${id}" style="--c:${p.c}">
+      ${camOn ? silhouette(p.c) : `<div class="c-ava">${face(p)}</div>`}
+      ${id === "sup" ? `<div class="c-obs">${ic("eye")}Listening in</div>` : ""}
+      ${pinBtn(id, C.pin === id)}
+      <div class="c-chip">${ic(muted ? "mic-off" : "mic").replace('class="c-i"', muted ? 'class="c-i c-off"' : 'class="c-i"')}<span class="c-name" data-id="${id}">${id === "me" ? "You" : p.name}</span>${id !== "me" ? `<em class="c-role ${id}" style="font-style:normal">${p.role}</em>` : ""}</div>
+    </div>`;
+  }
+
+  const CODE = [
+    [38, `<span class="c-k">export async function</span> <span class="c-f">POST</span>(req: Request) {`],
+    [39, `  <span class="c-k">const</span> { cartId } = <span class="c-k">await</span> req.<span class="c-f">json</span>()`],
+    [40, `  <span class="c-k">const</span> cart = <span class="c-k">await</span> <span class="c-f">loadCart</span>(cartId)`],
+    [41, `  <span class="c-k">const</span> intent = <span class="c-k">await</span> stripe.paymentIntents.<span class="c-f">create</span>({`],
+    [42, `    amount: cart.total,`],
+    [43, `    currency: <span class="c-s">"usd"</span>,`],
+    [44, `  })`],
+    [45, `  <span class="c-k">await</span> <span class="c-f">reserveStock</span>(cart.items) <span class="c-c">// holds the request open</span>`, 1],
+    [46, `  <span class="c-k">await</span> <span class="c-f">sendReceipt</span>(cart.email)`],
+    [47, `  <span class="c-k">return</span> Response.<span class="c-f">json</span>({ id: intent.id })`],
+    [48, `}`]
+  ];
+
+  function screenNode(small) {
+    const P = ppl();
+    const mine = !C.engShare;
+    const owner = mine ? "Your screen" : `${P.eng.first}'s screen`;
+    if (small) {
+      return `<div class="c-tile sm c-thumb" data-id="screen" style="--c:#2456C8">
+        <div class="c-ava"><div class="c-ti">${ic("share")}</div></div>
+        ${pinBtn("screen", false)}
+        <div class="c-chip"><span>${owner}</span></div></div>`;
+    }
+    if (mine) {
+      return `<div class="c-screen"><div class="c-scrh"><span class="c-dots"><i></i><i></i><i></i></span><span class="c-file">palmseas.co/checkout</span>
+        <span class="pill live">You are sharing</span><button class="btn sm" data-act="stopshare">Stop sharing</button></div>
+        <div class="c-page"><div class="c-pay"><h4>Complete your order</h4>
+          <div class="row"><span>Palm Seas tote</span><span>$64.00</span></div>
+          <div class="row"><span>Shipping</span><span>$20.00</span></div>
+          <div class="go">Pay $84.00</div>
+          <div class="err">Request timed out. Please try again.</div></div></div></div>`;
+    }
+    return `<div class="c-screen"><div class="c-scrh"><span class="c-dots"><i></i><i></i><i></i></span><span class="c-file">app/api/checkout/route.ts</span>
+      <span class="pill live">${P.eng.first} is sharing</span></div>
+      <div class="c-code">${CODE.map(([n, h, hot]) => `<div class="c-ln ${hot ? "hot" : ""}"><i>${n}</i><span>${h}</span></div>`).join("")}
+        <div class="c-cursor"><svg viewBox="0 0 24 24"><path d="M4 3l16 7-7 2-2 7z"/></svg><span>${P.eng.first}</span></div></div>
+      <div class="c-term"><small>Function logs</small><div class="bad">POST /api/checkout 504 30012ms</div><div class="ok">POST /api/checkout 200 1840ms</div></div></div>`;
+  }
+
+  function item(id, small) { return id === "screen" ? screenNode(small) : tile(id, small); }
+
+  function layoutHTML() {
+    const list = ids();
+    const f = focusId();
+    if (!f) return `<div class="c-gal n${C.n}">${list.map(i => tile(i)).join("")}</div>`;
+    const all = [...list, ...(sharing() ? ["screen"] : [])];
+    const rest = all.filter(i => i !== f);
+    if (all.length === 2) {
+      return `<div class="c-st solo"><div class="c-main">${item(f)}</div></div><div class="c-pip" id="cPip" style="transform:translate(${C.pip.x}px,${C.pip.y}px)">${item(rest[0], true)}</div>`;
+    }
+    return `<div class="c-st"><div class="c-main">${item(f)}</div><div class="c-col">${rest.map(i => item(i, true)).join("")}</div></div>`;
+  }
+
+  function eCard(p) {
+    return `<div class="c-ecard"><div class="top">${face(p)}<div><h3>${p.name}</h3><span class="pill live">On this call</span></div></div>
+      <p>${p.bio}</p><div class="c-tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div></div>`;
+  }
+
+  function openList() {
+    const o = OPEN[C.key];
+    if (!o) return `<p class="c-empty">Nothing left open with ${ppl().eng.first} yet.</p>`;
+    return `<ul class="c-li">${o.map(([k, t]) => `<li><span class="${k}">${k === "ok" ? "✓" : "!"}</span>${t}</li>`).join("")}</ul>`;
+  }
+
+  function drawerHTML() {
+    const d = C.drawer, P = ppl();
+    if (!d) return "";
+    const head = `<div class="c-dwh"><span class="c-seg"><button data-act="dw" data-v="chat" aria-pressed="${d === "chat"}">Chat</button><button data-act="dw" data-v="info" aria-pressed="${d === "info"}">Engineer</button></span><button class="c-x" data-act="dw" data-v="close" aria-label="Close panel">${ic("x")}</button></div>`;
+    if (d === "chat") {
+      return `<div class="c-dw">${head}<div class="c-msgs" id="cMsgs"><span class="c-free">Chat time is free</span>${C.msgs.map(m => `<div class="c-msg ${m.me ? "me" : ""}"><div class="av" data-face="${m.me ? "RM" : P.eng.ini}" style="background:${m.me ? "#6D3BD4" : P.eng.c}"></div><div><small>${m.me ? "You" : P.eng.first}, ${m.t}</small><div class="b">${m.x}</div></div></div>`).join("")}</div>
+        <form class="c-compose" id="cForm"><input id="cIn" placeholder="Message ${P.eng.first}" aria-label="Message"><button class="btn go" aria-label="Send">${ic("send")}</button></form></div>`;
+    }
+    return `<div class="c-dw">${head}<div class="c-scroll"><div class="c-card" style="margin-bottom:14px">${eCard(P.eng)}</div><div class="c-card"><div class="c-eye">Left open from your last calls</div>${openList()}</div></div></div>`;
+  }
+
+  function summaryHTML() {
+    const P = ppl();
+    const past = C.key === "sj"
+      ? `<li><div class="av" data-face="SJ" style="background:#00875A"></div><span>Checkout timing out on Palm Seas</span><span class="when">Tue, 23 Sep, 18 min</span></li><li><div class="av" data-face="PN" style="background:#2456C8"></div><span>Epicmail bounce handling</span><span class="when">Mon, 22 Sep, 7 min</span></li>`
+      : "";
+    return `<div class="c-sum"><div class="c-sumin"><div class="c-stk">
+      <div><h2 class="display">Session with ${P.eng.first}</h2><p class="c-lede">Notes build here while you talk. Nothing you need to write down.</p></div>
+      <div class="c-card"><h3>So far this session</h3><p class="c-empty"><span class="c-wave"><i></i><i></i><i></i><i></i></span>Listening. Key points and decisions will appear as they come up.</p></div>
+      <div class="c-card"><h3>Left open from your last calls</h3>${openList()}</div>
+      <div class="c-card"><h3>Sessions</h3><ul class="c-tl"><li><span class="pill live">Live</span><span>Today with ${P.eng.first}</span><span class="when c-timer2">${fmt(C.sec)} so far</span></li>${past}</ul></div>
+    </div><div class="c-stk"><div class="c-card">${eCard(P.eng)}</div>
+      <div class="c-card"><h3>Files</h3><p class="c-empty">Nothing shared yet.</p><button class="btn sm" style="margin-top:10px" data-act="noop">Add file</button></div></div></div></div>`;
+  }
+
+  function render() {
+    const root = $("#cApp");
+    const P = ppl();
+    const mini = $("#cMini");
+    mini.innerHTML = `<span class="av" data-face="${P.eng.ini}" style="background:${P.eng.c}"></span>${P.eng.first}<span class="t c-timer">${fmt(C.sec)}</span>Return to call`;
+    $("#call").classList.toggle("on", C.on && !C.min);
+    mini.classList.toggle("on", C.on && C.min);
+    $$(".nav-item").forEach(n => n.classList.toggle("in-call", C.on && n.dataset.go === "sessions"));
+    if (!C.on) return;
+
+    if (C.phase === "connecting") {
+      root.innerHTML = `<div class="c-center conn" style="grid-row:1/-1">${(() => { const p = P.eng; return `<div>${face(p)}<h2 class="display">Connecting you to ${p.name}</h2><p>Getting your camera and microphone ready.</p><button class="btn" data-cact="cancel">Cancel</button></div>`; })()}</div>`;
+      paint(); paintMini(); return;
+    }
+    if (C.ended) {
+      root.innerHTML = `<div class="c-center" style="grid-row:1/-1"><div class="c-card" style="max-width:440px;padding:32px">${face(P.eng)}<h2 class="display">Session ended</h2><p>${fmt(C.sec)} with ${P.eng.first}. Your summary is being prepared and will show up under Calls.</p><div style="display:flex;gap:10px;justify-content:center"><button class="btn" data-cact="rejoin">Rejoin session</button><button class="btn go" data-cact="close">Back to Relay</button></div></div></div>`;
+      paint(); paintMini(); return;
+    }
+
+    const inCall = C.tab === "call";
+    const stack = ids().map(i => `<div class="av" data-face="${P[i].ini}" style="background:${P[i].c}" title="${P[i].name}"></div>`).join("");
+    const head = `<header class="c-head"><div style="min-width:0"><h1>Session with ${P.eng.first}</h1><div class="c-sub">${C.n === 3 ? `with ${P.eng.first}, ${P.sup.first} is listening in as supervisor` : `with ${P.eng.name}`}</div></div>
+      <div class="c-r"><div class="c-stackp">${stack}</div><span class="c-livepill">On call</span><span class="c-timer">${fmt(C.sec)}</span><button class="c-danger" data-cact="ask">${ic("end")}End session</button></div></header>`;
+    const tabs = `<div class="c-tabrow"><div class="c-tabs" role="tablist"><button class="c-tab" role="tab" data-act="tab" data-v="call" aria-selected="${inCall}">Call</button><button class="c-tab" role="tab" data-act="tab" data-v="summary" aria-selected="${!inCall}">Summary</button></div>
+      <div class="c-meta"><span><span class="c-wave"><i></i><i></i><i></i><i></i></span>Transcribing</span><span class="c-conn"><i><b style="height:5px"></b><b style="height:8px"></b><b style="height:11px"></b></i>Good</span></div></div>`;
+    const stage = inCall
+      ? `<div class="c-stage">${C.meShare && !C.engShare ? "" : C.meShare ? `<div class="c-banner">${ic("share")}You are also sharing your screen<button class="btn sm" data-act="stopshare">Stop sharing</button></div>` : ""}<div class="c-lay">${layoutHTML()}</div></div>`
+      : summaryHTML() + `<button class="c-back" data-act="tab" data-v="call"><span class="av" data-face="${P.eng.ini}" style="background:${P.eng.c}"></span>${P.eng.first}<span class="t c-timer">${fmt(C.sec)}</span>Back to call</button>`;
+    const ctl = `<div class="c-ctl"><div class="c-l"><b>Session with ${P.eng.first}</b><span>${C.n} in the session</span></div>
+      <div class="c-mid"><button class="c-cb ${C.mic ? "" : "off"}" data-act="mic" title="Microphone (M)">${ic(C.mic ? "mic" : "mic-off")}</button>
+        <button class="c-cb ${C.cam ? "" : "off"}" data-act="cam" title="Camera (V)">${ic(C.cam ? "cam" : "cam-off")}</button>
+        <button class="c-cb ${C.meShare ? "on" : ""}" data-act="share" title="Share screen (S)">${ic("share")}</button><span class="c-sep"></span>
+        <button class="c-cb end" data-cact="ask">${ic("end")}Leave</button></div>
+      <div class="c-rr"><button class="c-cb sq ${C.drawer === "chat" ? "on" : ""}" data-act="dw" data-v="${C.drawer === "chat" ? "close" : "chat"}" title="Chat (C)">${ic("chat")}${C.unread && C.drawer !== "chat" ? '<span class="c-dot"></span>' : ""}</button>
+        <button class="c-cb sq ${C.drawer === "info" ? "on" : ""}" data-act="dw" data-v="${C.drawer === "info" ? "close" : "info"}" title="Engineer (I)">${ic("info")}</button></div></div>`;
+    root.innerHTML = head + tabs + `<div class="c-body">${stage}<aside class="c-drawer ${C.drawer ? "open" : ""}">${drawerHTML()}</aside></div>` + ctl;
+    paint(); paintMini(); wirePip();
+    const m = $("#cMsgs"); if (m) m.scrollTop = m.scrollHeight;
+  }
+  function paintMini() { $$("#cMini [data-face]").forEach(el => paintAvatar(el, el.dataset.face)); }
+
+  function wirePip() {
+    const pip = $("#cPip");
+    if (!pip) return;
+    let sx, sy, ox, oy, drag = false, moved = false;
+    pip.addEventListener("pointerdown", e => { if (e.target.closest("[data-act]")) return; drag = true; moved = false; sx = e.clientX; sy = e.clientY; ox = C.pip.x; oy = C.pip.y; pip.setPointerCapture(e.pointerId); pip.style.cursor = "grabbing"; });
+    pip.addEventListener("pointermove", e => {
+      if (!drag) return;
+      const box = pip.parentElement.getBoundingClientRect(), r = pip.getBoundingClientRect();
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+      C.pip.x = Math.min(0, Math.max(-(box.width - r.width - 32), ox + dx));
+      C.pip.y = Math.min(0, Math.max(-(box.height - r.height - 32), oy + dy));
+      pip.style.transform = `translate(${C.pip.x}px,${C.pip.y}px)`;
+    });
+    pip.addEventListener("pointerup", () => { drag = false; pip.style.cursor = "grab"; });
+  }
+
+  /* ---------- hover profile ---------- */
+  let popT;
+  function showPop(nameEl) {
+    const P = ppl(), id = nameEl.dataset.id, p = P[id], pop = $("#cPop");
+    const pinned = C.pin === id;
+    pop.dataset.id = id;
+    pop.innerHTML = `${pinBtn(id, pinned)}
+      <div class="top">${face(p)}<div><h4>${p.name}</h4><span class="st">${p.status}</span></div></div>
+      ${p.bio ? `<p>${p.bio}</p>` : ""}
+      ${p.tags.length ? `<div class="c-tags">${p.tags.map(t => `<span>${t}</span>`).join("")}</div>` : ""}
+      ${p.key || p.extra ? `<div class="foot">${p.extra ? `<span>${p.extra}</span>` : ""}${p.key ? `<button class="btn sm" data-act="profile" data-key="${p.key}">View full profile</button>` : ""}</div>` : ""}`;
+    pop.classList.add("on");
+    pop.style.visibility = "hidden";
+    const r = nameEl.getBoundingClientRect(), h = pop.offsetHeight;
+    const left = Math.min(Math.max(12, r.left - 8), innerWidth - pop.offsetWidth - 12);
+    let top = r.top - h - 10;
+    if (top < 12) top = r.bottom + 10;
+    pop.style.left = left + "px"; pop.style.top = top + "px"; pop.style.visibility = "";
+    $$("[data-face]", pop).forEach(el => paintAvatar(el, el.dataset.face));
+  }
+  const hidePop = () => $("#cPop").classList.remove("on");
+
+  /* ---------- actions ---------- */
+  function toast(html) {
+    let t = $("#cToast");
+    if (!t) { t = document.createElement("div"); t.id = "cToast"; t.className = "c-toast"; $("#call").appendChild(t); }
+    t.innerHTML = html; t.classList.add("show");
+    $$("[data-face]", t).forEach(el => paintAvatar(el, el.dataset.face));
+    clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 3200);
+  }
+  const now = () => { const d = new Date(); return `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`; };
+
+  function connect() {
+    C.phase = "connecting"; C.ended = false; render();
+    clearTimeout(connect.h);
+    connect.h = setTimeout(() => {
+      C.phase = "live"; C.sec = 0; C.tab = "call"; C.drawer = null; C.pin = null;
+      const p = ppl().eng;
+      C.msgs = [{ t: now(), x: `Hi Rohan, I am here. What are we looking at today?` }];
+      C.unread = true; render();
+      toast(`<span class="av" data-face="${p.ini}" style="background:${p.c}"></span>${p.name} joined`);
+      clearTimeout(connect.sup); clearTimeout(connect.shr);
+      connect.sup = setTimeout(() => { if (C.phase === "live" && !C.ended) setN(3); }, 7000);
+      connect.shr = setTimeout(() => {
+        if (C.phase !== "live" || C.ended) return;
+        C.engShare = true; render();
+        toast(`<span class="av" data-face="${p.ini}" style="background:${p.c}"></span>${p.first} is sharing their screen`);
+      }, 16000);
+    }, 1500);
+  }
+  window.startCall = function (key) {
+    if (C.on && !C.ended && C.phase === "live") { C.min = false; render(); return; }
+    Object.assign(C, { on: true, min: false, key: PEOPLE[key] ? key : "sj", n: 2, engShare: false, meShare: false, engCam: true, pin: null, tab: "call", drawer: null, speaking: "eng", pip: { x: 0, y: 0 } });
+    C.mic = true; C.cam = true;
+    connect();
+  };
+  function setN(n) {
+    const grew = n === 3 && C.n === 2;
+    C.n = n;
+    if (n === 2 && C.pin === "sup") C.pin = null;
+    render();
+    if (grew) { const s = ppl().sup; toast(`<span class="av" data-face="${s.ini}" style="background:${s.c}"></span>${s.name} (supervisor) joined and is listening in`); }
+  }
+  /* ---------- hand the finished session back to the panel ----------
+     The old small-modal flow ended by writing a summary and filing the
+     session under a project. That logic still lives in the main script, and
+     it only needs `pending` filled in, so we fill it in and call it. */
+  function fileSession(secs) {
+    const f = window.__callFiling || {};
+    window.__callFiling = null;
+    if (secs < 1) return;                       /* nobody picked up — nothing billed */
+    if (typeof pending === "undefined") return; /* main script absent — nothing to file into */
+
+    /* no "what is wrong?" box any more, so the first thing you said in the
+       call's own chat becomes the session title, then the typed sheet text,
+       then a plain fallback */
+    const mine = C.msgs.find(m => m.me);
+    const problem =
+      (mine && mine.x.replace(/&(amp|lt|gt);/g, m => ({ "&amp;": "&", "&lt;": "<", "&gt;": ">" }[m]))) ||
+      (f.problem && f.problem.trim()) ||
+      ("Session with " + ppl().eng.first);
+
+    pending = { problem: problem, mins: Math.max(1, Math.round(secs / 60)), who: C.key };
+    try { setHasCalls(true); } catch (_) {}
+
+    if (f.proj && typeof PROJECTS !== "undefined" && PROJECTS[f.proj]) { addToProject(f.proj); return; }
+    if (f.oneoff) { keepAsOneOff(); return; }
+    offerProject();
+  }
+
+  function closeCall() { clearTimeout(connect.sup); clearTimeout(connect.shr); C.on = false; C.min = false; C.phase = "idle"; render(); }
+
+  /* ---------- where a call was started from ----------
+     Every "Start a call" in the panel lands here. We work out who is being
+     called and what the session belongs to, so that when the call ends it
+     can be filed exactly where the old flow would have filed it. */
+  const INI = { SJ: "sj", PN: "pn", MI: "md", AD: "ad", KS: "ks" };
+  const someoneFree = () => {
+    try { return freeKey(); } catch (_) { return "sj"; }
+  };
+
+  function contextFor(btn) {
+    /* a project's own call button — goes to whoever took the last session */
+    const pc = btn.closest("[data-projcall]");
+    if (pc) {
+      const k = pc.dataset.projcall;
+      let who = null;
+      try { who = projLead(k); } catch (_) {}
+      return { who: who || someoneFree(), proj: k };
+    }
+    /* the open session's call button */
+    if (btn.closest(".sx-call") || btn.classList.contains("sx-call")) {
+      try {
+        const s = SESSIONS[currentSession];
+        if (s) return { who: s.who, proj: s.proj || null };
+      } catch (_) {}
+      return { who: someoneFree(), proj: null };
+    }
+    /* the engineer drawer */
+    if (btn.closest("#drawer")) {
+      let k = null;
+      try { k = drPerson; } catch (_) {}
+      return { who: k || window.__drawerKey || someoneFree(), proj: null, fromDrawer: true };
+    }
+    /* the project sheet, if anything still opens it */
+    if (btn.id === "scGo") {
+      const k = btn.dataset.proj;
+      const ta = document.getElementById("scText");
+      let who = null;
+      try { who = projLead(k); } catch (_) {}
+      return { who: who || someoneFree(), proj: k || null, problem: ta ? ta.value : "", modal: true };
+    }
+    /* the new-session sheet — a one-off that belongs to no project */
+    if (btn.id === "nsGo") {
+      const ta = document.getElementById("nsText");
+      return { who: someoneFree(), proj: null, oneoff: true, problem: ta ? ta.value : "", modal: true };
+    }
+    /* a chat thread — the person the thread is with */
+    const th = btn.closest(".thread");
+    if (th) {
+      const tagged = th.querySelector("[data-person]");
+      if (tagged) return { who: tagged.dataset.person, proj: null };
+      try {
+        const info = infoOf(th);
+        if (info && INI[info.initials]) return { who: INI[info.initials], proj: null };
+      } catch (_) {}
+    }
+    return { who: someoneFree(), proj: null };
+  }
+
+  document.addEventListener("click", e => {
+    const startBtn = e.target.closest('button, span[role="button"]');
+    if (startBtn && !startBtn.closest("#call") &&
+        /^(\u260e\s*)?Start a call$/.test(startBtn.textContent.trim())) {
+      e.stopPropagation();
+      e.preventDefault();
+      const ctx = contextFor(startBtn);
+      window.__callFiling = ctx;
+      if (ctx.fromDrawer) { try { closeDrawer(); } catch (_) {} }
+      if (ctx.modal)      { try { closeModal();  } catch (_) {} }
+      startCall(ctx.who);
+      return;
+    }
+    const go = e.target.closest("[data-go]");
+    if (go && C.on && !C.min && !go.closest("#call")) { C.min = true; render(); }
+
+    const d = e.target.closest("#call [data-cact], #cMini[data-cact]");
+    if (d) {
+      const a = d.dataset.cact;
+      if (a === "ask") $("#cModal").classList.add("on");
+      else if (a === "keep") $("#cModal").classList.remove("on");
+      else if (a === "end") { $("#cModal").classList.remove("on"); C.ended = true; C.drawer = null; render(); }
+      else if (a === "rejoin") connect();
+      else if (a === "close") { const s = C.sec; closeCall(); fileSession(s); }
+      else if (a === "cancel") { window.__callFiling = null; closeCall(); }
+      else if (a === "return") { C.min = false; render(); }
+      return;
+    }
+    const t = e.target.closest("#call [data-act], #cPop [data-act]");
+    if (!t) return;
+    const a = t.dataset.act, v = t.dataset.v;
+    if (a === "pin") { const id = t.dataset.id; C.pin = C.pin === id ? null : id; hidePop(); render(); }
+    else if (a === "tab") { C.tab = v; render(); }
+    else if (a === "mic") { C.mic = !C.mic; render(); }
+    else if (a === "cam") { C.cam = !C.cam; render(); }
+    else if (a === "share") { C.meShare = !C.meShare; if (!sharing() && C.pin === "screen") C.pin = null; render(); }
+    else if (a === "stopshare") { C.meShare = false; if (!sharing() && C.pin === "screen") C.pin = null; render(); }
+    else if (a === "dw") { C.drawer = v === "close" ? null : v; if (v === "chat") C.unread = false; render(); }
+    else if (a === "profile") { hidePop(); window.__drawerKey = t.dataset.key; openPerson(t.dataset.key); }
+  }, true);
+
+  document.addEventListener("submit", e => {
+    if (e.target.id !== "cForm") return;
+    e.preventDefault();
+    const i = $("#cIn"), v = i.value.trim();
+    if (!v) return;
+    C.msgs.push({ me: true, t: now(), x: v.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])) });
+    render(); $("#cIn").focus();
+  });
+
+  document.addEventListener("mouseover", e => {
+    const n = e.target.closest("#call .c-name");
+    if (n) { clearTimeout(popT); showPop(n); }
+    else if (e.target.closest("#cPop")) clearTimeout(popT);
+  });
+  document.addEventListener("mouseout", e => {
+    if (e.target.closest("#call .c-name, #cPop")) popT = setTimeout(hidePop, 200);
+  });
+
+  document.addEventListener("keydown", e => {
+    if (!C.on || C.min || C.phase !== "live" || e.target.matches("input,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (k === "m") { C.mic = !C.mic; render(); }
+    else if (k === "v") { C.cam = !C.cam; render(); }
+    else if (k === "s") { C.meShare = !C.meShare; if (!sharing() && C.pin === "screen") C.pin = null; render(); }
+    else if (k === "c") { C.drawer = C.drawer === "chat" ? null : "chat"; if (C.drawer) C.unread = false; render(); }
+    else if (k === "i") { C.drawer = C.drawer === "info" ? null : "info"; render(); }
+    else if (e.key === "Escape") { $("#cModal").classList.remove("on"); hidePop(); }
+  });
+
+  setInterval(() => {
+    if (!C.on || C.phase !== "live" || C.ended) return;
+    C.sec++;
+    $$(".c-timer").forEach(t => { t.textContent = fmt(C.sec); });
+    $$(".c-timer2").forEach(t => { t.textContent = `${fmt(C.sec)} so far`; });
+  }, 1000);
+  setInterval(() => {
+    if (!C.on || C.phase !== "live" || C.ended || C.min) return;
+    const pool = ["eng", "eng", "eng", "me", "eng"].filter(i => i !== "me" || C.mic);
+    C.speaking = pool[Math.floor(Math.random() * pool.length)];
+    $$("#call .c-tile").forEach(t => t.classList.toggle("speaking", t.dataset.id === C.speaking));
+  }, 2600);
+
+  const origOpen = window.openPerson;
+  window.openPerson = function (k) { window.__drawerKey = k; return origOpen(k); };
+})();
+
+</script>
+
 </body>
 </html>

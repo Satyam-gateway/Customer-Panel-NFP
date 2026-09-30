@@ -2,6 +2,15 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "relay-node",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "serve.js",
+        "8790"
+      ],
+      "port": 8790
+    },
+    {
       "name": "relay",
       "runtimeExecutable": "python",
       "runtimeArgs": [
