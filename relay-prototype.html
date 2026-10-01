@@ -2223,8 +2223,8 @@ body.hascalls .scope-wrap{display:inline-flex}
 
 /* gallery + focus */
 .c-gal{display:grid;width:100%;height:100%;max-height:660px;gap:16px;margin:auto;grid-auto-rows:minmax(0,1fr)}
-.c-gal.n2{max-width:1240px;grid-template-columns:repeat(2,minmax(0,1fr))}
-.c-gal.n3{max-width:1500px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.c-gal.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.c-gal.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .c-st{display:grid;width:100%;gap:14px;grid-template-columns:minmax(0,1fr) clamp(200px,21%,264px);grid-template-rows:minmax(0,1fr)}
 .c-st.solo{grid-template-columns:minmax(0,1fr)}
 .c-main{min-height:0;min-width:0;display:flex}
@@ -2327,11 +2327,11 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tl .when{margin-left:auto;color:var(--faint);font-size:12px}
 .c-cols{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:16px;align-items:start}
 .c-side{position:sticky;top:0}
-.c-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:18px}
+.c-hero{display:flex;align-items:center;margin:6px 0 14px}
 .c-hero h2{margin-bottom:6px}
 .c-steps2{display:flex;align-items:center;list-style:none}
 .c-steps2 li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--faint)}
-.c-steps2 li+li::before{content:"";width:34px;height:2px;background:var(--line);margin:0 10px}
+.c-steps2 li+li::before{content:"";width:22px;height:2px;background:var(--line);margin:0 10px}
 .c-steps2 .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;background:var(--line-soft);color:var(--muted);flex:none}
 .c-steps2 li.on{color:var(--ink)}
 .c-steps2 li.on .n{background:var(--live);color:#fff}
@@ -2353,6 +2353,28 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-kv{display:flex;flex-direction:column;gap:14px}
 .c-kv b{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
 .c-kv span,.c-kv p{font-size:13px;color:var(--ink);line-height:1.55}
+.c-sum{padding:4px 24px 24px}
+.c-sumin{display:block!important;max-width:none!important;margin:0!important}
+.c-chatp{width:360px;background:var(--card);border-left:1px solid var(--line);min-height:0;display:flex}
+.c-body:has(.c-chatp) .c-back{right:384px}
+.c-utabs{display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.c-utabs button{padding:8px 2px 11px;font-size:13.5px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.c-utabs button:hover{color:var(--ink)}
+.c-utabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--live)}
+.c-notes{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+.c-doc{padding:22px 26px;min-height:420px}
+.c-doc .c-draft{gap:26px}
+.c-doc .c-draft h4{font-size:13px;margin-bottom:8px}
+.c-doc .c-draft p{font-size:14.5px;line-height:1.65}
+.c-doc .c-skel i{height:12px}
+.c-mynotes{width:100%;min-height:170px;resize:vertical;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;font:inherit;font-size:13.5px;line-height:1.55;background:var(--paper);color:var(--ink)}
+.c-mynotes:focus{outline:2px solid var(--live-bg);border-color:var(--live)}
+.c-wide{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start}
+.c-wide .c-full{grid-column:1/-1}
+.c-wide .c-tags{display:flex;flex-wrap:wrap;gap:6px}
+.c-drop{display:flex;flex-direction:column;align-items:center;gap:8px;padding:38px 20px;border:1.5px dashed var(--line);border-radius:var(--r-md);text-align:center}
+.c-drop p{font-weight:600;font-size:14px}
+.c-drop span{font-size:13px;color:var(--muted)}
 .c-eyebrow{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
 .c-card>p.c-body{font-size:13.5px;line-height:1.6;color:var(--ink);margin-bottom:14px}
 .c-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
@@ -7592,7 +7614,7 @@ if(!maybeWelcome()) revealDashboard();
     on: false, min: false, phase: "idle", key: "sj", n: 2, tab: "call",
     mic: true, cam: true, engCam: true, engShare: false, meShare: false,
     drawer: null, pin: null, speaking: "eng", pip: { x: 0, y: 0 }, sec: 0,
-    ended: false, unread: false, msgs: [], sx: "ctx"
+    ended: false, unread: false, msgs: [], sx: "notes", myNotes: ""
   };
 
   const sharing = () => C.engShare || C.meShare;
@@ -7733,60 +7755,90 @@ if(!maybeWelcome()) revealDashboard();
     return { kind: document.body.classList.contains("hascalls") ? "new" : "first" };
   }
 
-  function notesCard() {
-    const live = NOTES.filter(([t]) => C.sec >= t);
-    const body = live.length
+  const esc = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const liveNotes = () => NOTES.filter(([t]) => C.sec >= t);
+  const liveBadge = () => (liveNotes().length ? liveNotes().length + " so far" : "Listening");
+
+  function liveInner() {
+    const live = liveNotes();
+    return live.length
       ? `<ul class="c-tlv">${live.map(([t, x]) => `<li><time>${fmt(t)}</time><i></i><span>${x}</span></li>`).join("")}</ul>`
       : `<p class="c-empty"><span class="c-wave"><i></i><i></i><i></i><i></i></span>Listening. Key points and decisions will appear as they come up.</p>`;
-    return `<div class="c-card"><div class="c-hd"><h3>Live notes</h3><span class="c-badge">${live.length ? live.length + " so far" : "Listening"}</span></div>${body}</div>`;
   }
 
-  function draftCard(sc) {
-    const live = NOTES.filter(([t]) => C.sec >= t).map(n => n[1]);
+  function draftInner(sc) {
+    const live = liveNotes().map(n => n[1]);
     const skel = '<div class="c-skel" aria-hidden="true"><i></i><i></i></div>';
     const found = live.length ? `<p>${live.slice(0, 2).join(". ")}.</p>` : skel;
     const agreed = live.length > 2 ? `<p>${live[2]}.</p>` : skel;
     const steps = sc.kind === "project" ? NEXT[sc.key] || [] : [];
     const next = steps.length ? `<ul class="c-li">${steps.map(t => `<li><span class="wa">&bull;</span>${t}</li>`).join("")}</ul>` : skel;
-    return `<div class="c-card"><div class="c-hd"><h3>Summary draft</h3><span class="c-badge">Finished when you end the call</span></div>
-      <div class="c-draft"><div><h4>What is happening</h4>${found}</div><div><h4>What was agreed</h4>${agreed}</div><div><h4>Next steps</h4>${next}</div></div></div>`;
+    return `<div><h4>What is happening</h4>${found}</div><div><h4>What was agreed</h4>${agreed}</div><div><h4>Next steps</h4>${next}</div>`;
+  }
+
+  function refreshLive() {
+    const l = $("#cLive"), d = $("#cDraft"), n = $("#cLiveN");
+    if (l) l.innerHTML = liveInner();
+    if (d) d.innerHTML = draftInner(scope());
+    if (n) n.textContent = liveBadge();
   }
 
   function stepper(sc) {
     const where = sc.kind === "project" ? PROJECTS[sc.key].n : sc.kind === "session" ? "This session" : "Your choice";
-    return `<ol class="c-steps2"><li class="on"><span class="n">1</span><span>On the call<small>${fmt(C.sec)}</small></span></li>
-      <li><span class="n">2</span><span>Summary written<small>When you end</small></span></li>
-      <li><span class="n">3</span><span>Filed<small>${where}</small></span></li></ol>`;
+    return `<ol class="c-steps2"><li class="on"><span class="n">1</span><span>On the call</span></li>
+      <li><span class="n">2</span><span>Summary written when you end</span></li>
+      <li><span class="n">3</span><span>Filed: ${where}</span></li></ol>`;
   }
 
-  function ctxPanel(sc) {
-    const P = ppl();
-    if (C.sx === "eng") {
-      return `${eCard(P.eng)}${sc.kind === "first" ? "" : `<div class="c-kv" style="margin-top:18px"><b>Left open from your last calls</b></div>${openList()}`}`;
-    }
-    if (C.sx === "files") return `<p class="c-empty">Nothing shared yet.</p><button class="btn sm" style="margin-top:10px" data-act="noop">Add file</button>`;
+  function notesTab(sc) {
+    return `<div class="c-notes"><div class="c-card c-doc"><div class="c-hd"><h3>Summary draft</h3><span class="c-badge">Finished when you end the call</span></div><div class="c-draft" id="cDraft">${draftInner(sc)}</div></div>
+      <div class="c-stk"><div class="c-card"><div class="c-hd"><h3>Live notes</h3><span class="c-badge" id="cLiveN">${liveBadge()}</span></div><div id="cLive">${liveInner()}</div></div>
+      <div class="c-card"><div class="c-hd"><h3>Your notes</h3><span class="c-badge">Only you see these</span></div><textarea class="c-mynotes" id="cMy" placeholder="Jot anything down. It stays with this session.">${esc(C.myNotes)}</textarea></div></div></div>`;
+  }
+
+  function contextTab(sc) {
     if (sc.kind === "project") {
-      const Pj = PROJECTS[sc.key];
-      const rows = SESS_ORDER.filter(k => SESSIONS[k].proj === sc.key).slice(0, 3).map(k => {
-        const S = SESSIONS[k], m = sessMins(S);
-        return `<li><span>${S.t}</span><span class="when">${S.last}${m ? `, ${m} min` : ""}</span></li>`;
+      const Pj = PROJECTS[sc.key], next = NEXT[sc.key] || [];
+      const rows = SESS_ORDER.filter(k => SESSIONS[k].proj === sc.key).map(k => {
+        const S = SESSIONS[k], p = PEOPLE[S.who], m = sessMins(S);
+        return `<li><div class="av" data-face="${p.i}" style="background:${p.c}"></div><span>${S.t}</span><span class="when">${S.last}${m ? `, ${m} min` : ""}</span></li>`;
       }).join("");
-      return `<div class="c-kv"><p>${Pj.blurb}</p><div><b>Where it stands</b><span>${Pj.stands}</span></div><div><b>Waiting on you</b><span>${Pj.waiting}</span></div>
-        <div><b>Earlier sessions</b><ul class="c-tl">${rows}</ul></div></div>`;
+      return `<div class="c-wide"><div class="c-card"><div class="c-eyebrow">About ${Pj.n}</div><p class="c-body">${Pj.blurb}</p><div class="c-tags">${Pj.stack.map(t => `<span>${t}</span>`).join("")}</div></div>
+        <div class="c-card"><div class="c-kv"><div><b>Where it stands</b><span>${Pj.stands}</span></div><div><b>Waiting on you</b><span>${Pj.waiting}</span></div></div></div>
+        <div class="c-card"><div class="c-eyebrow">Next steps</div>${next.length ? `<ul class="c-li">${next.map(t => `<li><span class="wa">&bull;</span>${t}</li>`).join("")}</ul>` : '<p class="c-empty">Nothing yet.</p>'}</div>
+        <div class="c-card c-full"><h3>Sessions in ${Pj.n}</h3><ul class="c-tl"><li><span class="pill live">Live</span><span>Today with ${ppl().eng.first}</span><span class="when c-timer2">${fmt(C.sec)} so far</span></li>${rows}</ul></div></div>`;
     }
     if (sc.kind === "session") {
       const S = SESSIONS[sc.key];
-      return `<div class="c-kv"><div><b>Session so far</b><p>${S.sum}</p></div><div><b>This call</b><span>Call ${(S.calls || []).length + 1} of this session. The summary is rewritten when it ends.</span></div></div>`;
+      return `<div class="c-wide"><div class="c-card c-full"><div class="c-eyebrow">Session summary</div><h3>${S.t}</h3><p class="c-body">${S.sum}</p></div>
+        <div class="c-card"><div class="c-kv"><div><b>This call</b><span>Call ${(S.calls || []).length + 1} of this session. The summary is rewritten when it ends.</span></div></div></div></div>`;
     }
-    return `<div class="c-kv"><div><b>${sc.kind === "first" ? "Your first session" : "Not in a project yet"}</b><p>When you end the call, Relay writes the summary and asks if it belongs to a project. Pick one and its project summary picks this session up. Skip, and it stays a session of its own.</p></div></div>`;
+    return `<div class="c-wide"><div class="c-card c-full"><div class="c-eyebrow">${sc.kind === "first" ? "Your first session" : "Not in a project yet"}</div><h3>What happens when you end the call</h3>
+      <ol class="c-steps"><li><span><b>Relay writes the summary</b> from everything said on the call.</span></li><li><span><b>You choose where it lives.</b> Keep it in a project and the project summary picks it up. Skip, and it stays a session of its own.</span></li><li><span><b>It shows on your home page</b> with the sessions you had recently.</span></li></ol></div></div>`;
+  }
+
+  function engineerTab(sc) {
+    return `<div class="c-wide"><div class="c-card">${eCard(ppl().eng)}</div>${sc.kind === "first" ? "" : `<div class="c-card"><h3>Left open from your last calls</h3>${openList()}</div>`}</div>`;
+  }
+
+  function filesTab() {
+    return `<div class="c-wide"><div class="c-card c-full"><h3>Files</h3><div class="c-drop"><p>Nothing shared yet.</p><span>Drop files here, or add one so the engineer can see it.</span><button class="btn sm" data-act="noop">Add file</button></div></div></div>`;
+  }
+
+  function chatPanel() {
+    const P = ppl();
+    C.unread = false;
+    return `<div class="c-dw" style="width:100%"><div class="c-dwh"><b>Chat with ${P.eng.first}</b><span class="c-free" style="margin-left:auto">Free</span></div>
+      <div class="c-msgs" id="cMsgs">${C.msgs.map(m => `<div class="c-msg ${m.me ? "me" : ""}"><div class="av" data-face="${m.me ? "RM" : P.eng.ini}" style="background:${m.me ? "#6D3BD4" : P.eng.c}"></div><div><small>${m.me ? "You" : P.eng.first}, ${m.t}</small><div class="b">${m.x}</div></div></div>`).join("")}</div>
+      <form class="c-compose" id="cForm"><input id="cIn" placeholder="Message ${P.eng.first}" aria-label="Message"><button class="btn go" aria-label="Send">${ic("send")}</button></form></div>`;
   }
 
   function summaryHTML() {
     const P = ppl(), sc = scope();
-    const tabs = [["ctx", sc.kind === "project" ? "Project" : sc.kind === "session" ? "Session" : "About"], ["eng", "Engineer"], ["files", "Files"]];
-    return `<div class="c-sum"><div class="c-sumin" style="display:block"><div class="c-hero"><div><h2 class="display">Session with ${P.eng.first}</h2><p class="c-lede" style="margin:0">Notes build here while you talk. Nothing you need to write down.</p></div>${stepper(sc)}</div>
-      <div class="c-cols"><div class="c-stk">${notesCard()}${draftCard(sc)}</div>
-      <div class="c-card c-side"><div class="c-sxbar">${tabs.map(([v, l]) => `<button data-act="sx" data-v="${v}" aria-pressed="${C.sx === v}">${l}</button>`).join("")}</div>${ctxPanel(sc)}</div></div></div></div>`;
+    const tabs = [["notes", "Notes"], ["ctx", sc.kind === "project" ? "Project" : sc.kind === "session" ? "Session" : "About"], ["eng", "Engineer"], ["files", "Files"]];
+    const body = C.sx === "ctx" ? contextTab(sc) : C.sx === "eng" ? engineerTab(sc) : C.sx === "files" ? filesTab() : notesTab(sc);
+    return `<div class="c-sum"><div class="c-sumin"><div class="c-hero">${stepper(sc)}</div>
+      <div class="c-utabs">${tabs.map(([v, l]) => `<button data-act="sx" data-v="${v}" aria-pressed="${C.sx === v}">${l}</button>`).join("")}</div>${body}</div></div>`;
   }
 
   function destination() {
@@ -7831,7 +7883,7 @@ if(!maybeWelcome()) revealDashboard();
         <button class="c-cb end" data-cact="ask">${ic("end")}Leave</button></div>
       <div class="c-rr"><button class="c-cb sq ${C.drawer === "chat" ? "on" : ""}" data-act="dw" data-v="${C.drawer === "chat" ? "close" : "chat"}" title="Chat (C)">${ic("chat")}${C.unread && C.drawer !== "chat" ? '<span class="c-dot"></span>' : ""}</button>
         <button class="c-cb sq ${C.drawer === "info" ? "on" : ""}" data-act="dw" data-v="${C.drawer === "info" ? "close" : "info"}" title="Engineer (I)">${ic("info")}</button></div></div>`;
-    root.innerHTML = head + tabs + `<div class="c-body">${stage}<aside class="c-drawer ${C.drawer ? "open" : ""}">${drawerHTML()}</aside></div>` + ctl;
+    root.innerHTML = head + tabs + `<div class="c-body">${stage}${inCall ? `<aside class="c-drawer ${C.drawer ? "open" : ""}">${drawerHTML()}</aside>` : `<aside class="c-chatp">${chatPanel()}</aside>`}</div>` + ctl;
     paint(); paintMini(); wirePip();
     const m = $("#cMsgs"); if (m) m.scrollTop = m.scrollHeight;
   }
@@ -7910,7 +7962,7 @@ if(!maybeWelcome()) revealDashboard();
        finished so it does not greet you again on the way back out. */
     try { coachDone = true; coachStop(); hintStop(); } catch (_) {}
     if (C.on && !C.ended && C.phase === "live") { C.min = false; render(); return; }
-    Object.assign(C, { on: true, min: false, key: PEOPLE[key] ? key : "sj", n: 2, engShare: false, meShare: false, engCam: true, pin: null, tab: "call", sx: "ctx", drawer: null, speaking: "eng", pip: { x: 0, y: 0 } });
+    Object.assign(C, { on: true, min: false, key: PEOPLE[key] ? key : "sj", n: 2, engShare: false, meShare: false, engCam: true, pin: null, tab: "call", sx: "notes", myNotes: "", drawer: null, speaking: "eng", pip: { x: 0, y: 0 } });
     C.mic = true; C.cam = true;
     connect();
   };
@@ -8062,6 +8114,8 @@ if(!maybeWelcome()) revealDashboard();
     else if (a === "profile") { hidePop(); window.__drawerKey = t.dataset.key; openPerson(t.dataset.key); }
   }, true);
 
+  document.addEventListener("input", e => { if (e.target.id === "cMy") C.myNotes = e.target.value; });
+
   document.addEventListener("submit", e => {
     if (e.target.id !== "cForm") return;
     e.preventDefault();
@@ -8096,7 +8150,8 @@ if(!maybeWelcome()) revealDashboard();
     C.sec++;
     $$(".c-timer").forEach(t => { t.textContent = fmt(C.sec); });
     $$(".c-timer2").forEach(t => { t.textContent = `${fmt(C.sec)} so far`; });
-    if (C.tab === "summary" && NOTES.some(([t]) => t === C.sec)) render();
+    $$(".c-timer2b").forEach(t => { t.textContent = fmt(C.sec); });
+    if (C.tab === "summary" && NOTES.some(([t]) => t === C.sec)) refreshLive();
   }, 1000);
   setInterval(() => {
     if (!C.on || C.phase !== "live" || C.ended || C.min) return;
