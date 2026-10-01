@@ -1128,6 +1128,13 @@ body.hascalls .scope-wrap{display:inline-flex}
   transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease);
 }
 .wl-drop svg{width:21px;height:21px}
+.wl-drop{position:relative;overflow:hidden;padding:0}
+.wl-pic{position:absolute;inset:0;display:none}
+.wl-pic img{width:100%;height:100%;display:block;object-fit:cover}
+/* with a photo in it, it is a face and not a drop target */
+.wl-drop.has{border:0}
+.wl-drop.has .wl-pic{display:block}
+.wl-drop.has svg{display:none}
 .wl-drop:hover{border-color:var(--accent-line);color:var(--accent);background:var(--accent-soft)}
 .wl-photo-tx b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.006em;margin-bottom:2px}
 .wl-photo-tx span{display:block;font-size:12.5px;line-height:1.45;color:var(--muted)}
@@ -1140,19 +1147,16 @@ body.hascalls .scope-wrap{display:inline-flex}
   transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
 }
 .wl-in::placeholder{color:var(--faint)}
-.wl-in:focus{border-color:var(--accent-line);box-shadow:0 0 0 3.5px rgba(var(--accent-rgb),.11)}
-.wl-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-.wl-chip{
-  font-size:13px;color:var(--muted);background:var(--card);cursor:pointer;font-family:inherit;
-  border:1px solid var(--line);border-radius:999px;padding:8px 14px;
-  transition:border-color .14s var(--ease),color .14s var(--ease),
-             background .14s var(--ease),transform .14s var(--spring);
+/* it grows to fit (fitBio), so it never needs a scrollbar of its own */
+textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
+.wl-sel{
+  appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:40px;
+  background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23879096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/16px;
 }
-.wl-chip:hover{border-color:var(--accent-line);color:var(--accent-deep)}
-/* chosen reads as filled, not merely outlined — at a glance you can see how
-   far down the card you have got without reading any of it */
-.wl-chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-deep);
-  font-weight:600;transform:scale(1.03)}
+.wl-sel:invalid{color:var(--faint)}   /* "Pick one" reads as a placeholder */
+/* the typed answer sits under the list it came from, not a field apart */
+#wlRoleOther{margin-top:-10px}
+.wl-in:focus{border-color:var(--accent-line);box-shadow:0 0 0 3.5px rgba(var(--accent-rgb),.11)}
 .wl-go{
   width:100%;font-size:15.5px;font-weight:700;letter-spacing:-.006em;color:#fff;
   cursor:pointer;font-family:inherit;
@@ -1183,8 +1187,6 @@ body.hascalls .scope-wrap{display:inline-flex}
   .wl-photo{padding:11px;margin-bottom:15px;gap:12px}
   .wl-drop{width:46px;height:46px}
   .wl-in{padding:11px 13px;margin-bottom:15px}
-  .wl-chips{gap:7px;margin-bottom:15px}
-  .wl-chip{font-size:12.5px;padding:7px 12px}
   .wl-go{padding:13px 20px}
 }
 @media (max-width:900px){
@@ -1902,6 +1904,12 @@ body.hascalls .scope-wrap{display:inline-flex}
 .pf-id{display:flex;gap:17px;margin-bottom:20px}
 .pf-name{font-family:"Bricolage Grotesque",sans-serif;font-size:23px;font-weight:600;letter-spacing:-.02em}
 .pf-role{font-size:13.5px;color:var(--muted);margin-top:2px}
+/* a blank answer still has to be somewhere to click while editing */
+.pf-job:empty::before,.pf-bio:empty::before{color:var(--faint)}
+.pf-job:empty::before{content:'Add what you do'}
+.pf-bio:empty::before{content:'Add a bit about you, for your engineers'}
+/* no role, no dot hanging off the front of the projects */
+.pf-job:empty:not([contenteditable="true"])+.pf-projs{display:none}
 .pf-meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--faint);margin-top:7px}
 .pf-meta i{font-style:normal;color:var(--line)}
 .pf-bio{font-size:13.5px;line-height:1.55;margin-top:9px;max-width:82ch}
@@ -2508,8 +2516,8 @@ body.hascalls .scope-wrap{display:inline-flex}
               <button class="starter">I do not understand this error message</button>
             </div>
 
-            <!-- First-time view only: it is hidden until the coach above has
-                 finished and gone, and is then the part it never said. The
+            <!-- First-time view only, and up from the first glance — it shows
+                 alongside the coach bubble rather than waiting for it. The
                  returning view never shows it — that customer has called
                  before, and their page leads with the last session instead.
                  Three engineers who are free this minute, the fact of it in
@@ -3617,7 +3625,9 @@ body.hascalls .scope-wrap{display:inline-flex}
           <div class="av xxl" data-dot="live" style="background:#6D3BD4">RM</div>
           <div>
             <div class="pf-name editable ed-id">Rohan Mehta</div>
-            <div class="pf-role editable ed-id">Founder &middot; Palm Seas, daun, TrackFit</div>
+            <!-- only the role is yours to edit; the projects after it are
+                 whatever you have, and follow the projects list -->
+            <div class="pf-role"><span class="pf-job editable ed-id">Founder</span><span class="pf-projs"> &middot; Palm Seas, daun, TrackFit</span></div>
             <div class="pf-meta">
               <span>10:42 local &middot; Bengaluru</span><i>&bull;</i>
               <span>With Relay since March 2026</span><i>&bull;</i>
@@ -3742,7 +3752,7 @@ body.hascalls .scope-wrap{display:inline-flex}
 
         <div class="band">
           <div class="band-h"><h2>Account</h2></div>
-          <div class="fld"><div class="fld-l">Name</div><div class="fld-v editable">Rohan Mehta</div><button class="btn sm" data-edit>Change</button></div>
+          <div class="fld"><div class="fld-l">Name</div><div class="fld-v editable" id="setName">Rohan Mehta</div><button class="btn sm" data-edit>Change</button></div>
           <div class="fld"><div class="fld-l">Email</div><div class="fld-v editable">rohan@palmseas.co</div><button class="btn sm" data-edit>Change</button></div>
           <div class="fld"><div class="fld-l">Photo</div><div class="fld-v">Uploaded</div><button class="btn sm" data-photo>Replace</button></div>
           <div class="fld"><div class="fld-l">Time zone</div><div class="fld-v editable">India Standard Time &middot; UTC+5:30</div><button class="btn sm" data-edit>Change</button></div>
@@ -3886,6 +3896,9 @@ body.hascalls .scope-wrap{display:inline-flex}
 <div class="mscrim" id="mScrim"></div>
 <div class="mwrap" id="mWrap"><div class="mcard" id="mCard"></div></div>
 
+<!-- the one picker behind every "change your photo" — welcome card and settings -->
+<input type="file" id="mePhoto" accept="image/*" hidden>
+
 <!-- ============ FIRST-TIME WELCOME ============ -->
 <div class="welcome" id="welcome" hidden>
   <div class="wl-scrim" id="wlScrim"></div>
@@ -3894,39 +3907,45 @@ body.hascalls .scope-wrap{display:inline-flex}
 
     <span class="orb wl-orb" aria-hidden="true"></span>
     <h2 id="wlTitle">Hi Rohan &mdash; welcome to Relay</h2>
-    <p class="wl-sub">When you get stuck, a real engineer joins you on a call. Two
-      questions first, so we know who to wake up. Skip them if you would rather not.</p>
+    <p class="wl-sub">When you get stuck, a real engineer joins you on a call. This
+      is what they will see about you — skip it if you would rather not, and
+      change it any time from your profile.</p>
 
     <div class="wl-photo">
+      <!-- the same photo as the profile — PHOTOS.RM — so it shows the one you
+           have, and picking a new one here changes it everywhere -->
       <button class="wl-drop" id="wlDrop" aria-label="Add a photo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 1 2-2h2l1.5-2h7L17 7h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.4"/></svg>
+        <span class="wl-pic" id="wlPic"></span>
       </button>
       <div class="wl-photo-tx">
-        <b>Add a photo</b>
+        <b id="wlPhotoB">Add a photo</b>
         <span>So the person on the call knows who they are talking to. Optional.</span>
       </div>
     </div>
 
     <label class="wl-l" for="wlName">Your name</label>
-    <input class="wl-in" id="wlName" value="Rohan Mehta" autocomplete="name">
+    <!-- The same three things the profile page shows, in the same order, and
+         backed by the same record (ME): filled from it when the card opens,
+         written back to it on Continue. Edit the profile and this card says
+         the same; answer this card and the profile does. -->
+    <input class="wl-in" id="wlName" autocomplete="name">
 
-    <!-- Both of these are picked, not typed. Nothing here should feel like
-         homework, and someone who is already stuck will not write a sentence
-         about their hobbies to get to a help button. -->
-    <p class="wl-l" id="wlDoL">What do you like making?</p>
-    <div class="wl-chips" id="wlDo" role="group" aria-labelledby="wlDoL">
-      <button class="wl-chip">Websites</button>
-      <button class="wl-chip">Apps</button>
-      <button class="wl-chip">Online shops</button>
-      <button class="wl-chip">Little tools for myself</button>
-      <button class="wl-chip">Still working that out</button>
-    </div>
+    <!-- picked, not typed — and "Other" opens a box for whatever the list
+         does not cover. It is the role on the profile either way. -->
+    <label class="wl-l" for="wlRole">What you do</label>
+    <select class="wl-in wl-sel" id="wlRole" required>
+      <option value="" disabled>Pick one</option>
+      <option>Student</option>
+      <option>Vibe coder</option>
+      <option>Founder</option>
+      <option>Business owner</option>
+      <option>Other</option>
+    </select>
+    <input class="wl-in" id="wlRoleOther" placeholder="Tell us what you do" aria-label="What you do" hidden>
 
-    <!-- Typed, not picked: the chips above cover the thing everyone answers
-         the same way, and there is no shortlist that would not put words in
-         somebody's mouth here. Blank is a fine answer — the card is skippable. -->
-    <label class="wl-l" for="wlLike">And what do you like doing most?</label>
-    <input class="wl-in" id="wlLike" placeholder="Designing it, shipping it, fixing what breaks&hellip;">
+    <label class="wl-l" for="wlBio">About yourself</label>
+    <textarea class="wl-in" id="wlBio" rows="3" placeholder="What you are building, how you like to work, when you are around&hellip;"></textarea>
 
     <button class="wl-go" id="wlGo">Continue</button>
     <button class="wl-skip" id="wlSkip">Skip</button>
@@ -5820,6 +5839,69 @@ document.addEventListener('click',e=>{
 
 /* ================= PROFILE ================= */
 
+/* You, once. The welcome card and the profile page ask the same three things,
+   so they read and write this one record rather than each keeping a copy —
+   change it in either and the other, the rail, the home greeting and the
+   settings name all say the same. A blank name keeps the old one: everything
+   that greets you needs something to call you. */
+const ME={
+  name:'Rohan Mehta',
+  role:'Founder',
+  bio:'Not an engineer, but I have watched enough builds to know what I am looking at. I care more about whether the thing still works on a Sunday than how it was written. If I go quiet I am probably on a flight.'
+};
+const meFirst=()=>ME.name.split(/\s+/)[0];
+
+function setMe(ch){
+  if('name' in ch && ch.name) ME.name=ch.name;
+  if('role' in ch) ME.role=ch.role;
+  if('bio'  in ch) ME.bio =ch.bio;
+  paintMe();
+}
+function paintMe(){
+  const set=(sel,t)=>document.querySelectorAll(sel).forEach(el=>{el.textContent=t});
+  set('#pfProfile .pf-name, .me .me-name, #setName',ME.name);
+  set('#pfProfile .pf-job',ME.role);
+  set('#pfProfile .pf-bio',ME.bio);
+  set('.ask-name .who',meFirst());
+  const t=document.getElementById('wlTitle');
+  if(t) t.innerHTML='Hi '+escHtml(meFirst())+' &mdash; welcome to Relay';
+}
+
+/* Your photo is PHOTOS.RM: every face of yours in the app — rail, profile,
+   chats, the call — is painted from it, so changing it there changes them all.
+   The welcome card's slot reads it too, rather than keeping a photo of its own. */
+const mePhoto=document.getElementById('mePhoto');
+function pickMePhoto(){ mePhoto.click() }
+mePhoto.addEventListener('change',()=>{
+  const f=mePhoto.files[0];
+  mePhoto.value='';                    /* so picking the same file again still fires */
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    PHOTOS.RM=r.result;
+    document.querySelectorAll('.av[data-initials="RM"]').forEach(el=>paintAvatar(el,'RM'));
+    paintMePhoto();
+    toast('Photo updated — this is what engineers see');
+  };
+  r.readAsDataURL(f);
+});
+function paintMePhoto(){
+  const drop=document.getElementById('wlDrop'), pic=document.getElementById('wlPic');
+  if(!drop||!pic) return;
+  const has=!!PHOTOS.RM;
+  pic.innerHTML='';
+  if(has){
+    const img=document.createElement('img');
+    img.alt='';
+    img.onerror=()=>{drop.classList.remove('has')};   /* offline — back to the camera */
+    img.src=PHOTOS.RM;
+    pic.appendChild(img);
+  }
+  drop.classList.toggle('has',has);
+  drop.setAttribute('aria-label',has?'Change your photo':'Add a photo');
+  document.getElementById('wlPhotoB').textContent=has?'Your photo':'Add a photo';
+}
+
 const STATUS=[
   {e:'🟢',t:'Online',        d:'live'},
   {e:'🟠',t:'In a meeting',  d:'busy'},
@@ -5859,7 +5941,12 @@ document.addEventListener('click',e=>{
     ed.textContent=opening?'Save':'Edit profile';
     ed.classList.toggle('solid',opening);
     if(opening){parts[0].focus();document.getSelection().selectAllChildren(parts[0]);document.getSelection().collapseToEnd()}
-    else toast('Profile updated — this is what engineers see from now on');
+    else{
+      /* into the one record, and from there everywhere else it shows */
+      const q=s=>document.querySelector('#pfProfile '+s).textContent.trim();
+      setMe({name:q('.pf-name'), role:q('.pf-job'), bio:q('.pf-bio')});
+      toast('Profile updated — this is what engineers see from now on');
+    }
     return;
   }
 
@@ -5873,10 +5960,13 @@ document.addEventListener('click',e=>{
     fe.textContent=opening?'Save':'Change';
     fe.classList.toggle('solid',opening);
     if(opening){v.focus();document.getSelection().selectAllChildren(v);document.getSelection().collapseToEnd()}
-    else toast(fe.closest('.fld').querySelector('.fld-l').textContent+' updated');
+    else{
+      if(v.id==='setName') setMe({name:v.textContent.trim()});
+      toast(fe.closest('.fld').querySelector('.fld-l').textContent+' updated');
+    }
     return;
   }
-  if(e.target.closest('[data-photo]')){e.stopPropagation();toast('Pick a new photo — square images work best');return}
+  if(e.target.closest('[data-photo]')){e.stopPropagation();pickMePhoto();return}
 
   /* ---- connectors ---- */
   const cn=e.target.closest('[data-connect]');
@@ -6696,6 +6786,29 @@ function runGhost(){
 /* ---- the welcome card ---- */
 const welcome=document.getElementById('welcome');
 const wlName =document.getElementById('wlName');
+const wlRole =document.getElementById('wlRole');
+const wlRoleOther=document.getElementById('wlRoleOther');
+/* The list in the dropdown. A role that is not one of these — typed on the
+   profile, or under Other — shows as Other with the words in the box. */
+const ROLES=[...wlRole.options].map(o=>o.value).filter(v=>v&&v!=='Other');
+function roleShow(role){
+  const known=ROLES.includes(role);
+  wlRole.value=known?role:(role?'Other':'');
+  wlRoleOther.value=known?'':role;
+  wlRoleOther.hidden=wlRole.value!=='Other';
+}
+function roleRead(){
+  if(wlRole.value!=='Other') return wlRole.value;
+  return wlRoleOther.value.trim()||'Other';
+}
+wlRole.addEventListener('change',()=>{
+  wlRoleOther.hidden=wlRole.value!=='Other';
+  if(!wlRoleOther.hidden) wlRoleOther.focus();
+});
+const wlBio  =document.getElementById('wlBio');
+/* the box is as tall as what is in it, so a long bio is never cut off mid-line */
+function fitBio(){ wlBio.style.height='auto'; wlBio.style.height=wlBio.scrollHeight+'px' }
+wlBio.addEventListener('input',fitBio);
 const WL_OUT =240;                   /* how long the card takes to leave */
 let wlOpen=false;
 
@@ -6705,6 +6818,12 @@ let welcomeSeen=false;
 function openWelcome(){
   if(wlOpen) return;
   welcomeSeen=true; wlOpen=true;
+  /* whatever the profile says now, so the two never disagree */
+  wlName.value=ME.name;
+  roleShow(ME.role);
+  wlBio.value =ME.bio;
+  setTimeout(fitBio);                 /* once it is on screen and can be measured */
+  paintMePhoto();
   welcome.hidden=false;
   welcome.classList.remove('out');
   /* stagger the card's own contents — reading order and arrival order match */
@@ -6723,32 +6842,11 @@ function closeWelcome(){
      and the sweep is worth watching on its own. */
   setTimeout(revealDashboard,WL_OUT*SPEED);
 }
-/* One answer per question. Pressing the chosen one again takes it back — the
-   whole card is skippable, so an answered question has to be un-answerable
-   too, or the only way out of a mis-tap is the Skip link. */
-['wlDo'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',e=>{
-    const chip=e.target.closest('.wl-chip');
-    if(!chip) return;
-    e.stopPropagation();
-    const was=chip.classList.contains('on');
-    [...e.currentTarget.children].forEach(c=>c.classList.remove('on'));
-    chip.classList.toggle('on',!was);
-  });
-});
 document.getElementById('wlGo').addEventListener('click',e=>{
   e.stopPropagation();
-  /* the one answer that has somewhere to go — if they changed their name the
-     page had better be calling them by it a second later */
-  const n=wlName.value.trim();
-  if(n){
-    const first=n.split(/\s+/)[0];
-    /* only the name moves — the greeting around it is markup now, and the
-       green span has to survive being called something else */
-    document.querySelectorAll('.ask-name .who').forEach(el=>{
-      el.textContent=first;
-    });
-  }
+  /* Continue saves; Skip and the cross do not. Whatever they wrote is the
+     profile from here on — the page calls them by it a second later. */
+  setMe({name:wlName.value.trim(), role:roleRead(), bio:wlBio.value.trim()});
   closeWelcome();
   toast('All set — tell us what you are stuck on');
 });
@@ -6756,7 +6854,7 @@ document.getElementById('wlSkip').addEventListener('click',e=>{e.stopPropagation
 document.getElementById('wlX')   .addEventListener('click',e=>{e.stopPropagation();closeWelcome()});
 document.getElementById('wlScrim').addEventListener('click',e=>{e.stopPropagation();closeWelcome()});
 document.getElementById('wlDrop').addEventListener('click',e=>{
-  e.stopPropagation();toast('Photo upload is not wired up in the prototype');
+  e.stopPropagation();pickMePhoto();
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&wlOpen) closeWelcome()});
 
@@ -6826,6 +6924,8 @@ function startHome(){
   askText.focus({preventScroll:true});
   hero.classList.add('focused');
   runGhost();
+  /* the faces arrive with the page — they are who is free, not a coaching step */
+  hintStart();
   /* And last of all, the bubble. It is the loudest thing on the screen and the
      only one that moves on its own, so it does not get to speak over the page
      arriving — it waits out the ghost's first line, long enough that somebody
@@ -7106,12 +7206,11 @@ addEventListener('resize',()=>{
 });
 
 /* ============================================================
-   THE HINT — what the coach leaves behind, under the card
+   THE HINT — who is free, under the card
    ============================================================ */
-/* The bubble is a visitor: it walks its two stops and retires, and the page is
-   then back to a blank box with nothing on it that says what to do. This picks
-   up at that moment, shows who is waiting, and names the button that reaches
-   them — once, and then it stays put until the first keystroke.
+/* The bubble is a visitor: it walks its two stops and retires. This stays:
+   it arrives with the page, shows who is waiting, and names the button that
+   reaches them — once, and then it stays put until the first call.
 
    The standing part is all CSS, including the highlight on a hovered face.
    What is left here is the one thing CSS cannot do: put the hover label over
@@ -7187,9 +7286,8 @@ function hintStart(){
   /* First-time view only. A returning customer has called before, so the
      page they come back to leads with their last session, not with faces. */
   if(home.dataset.view!=='new') return;
-  /* it is the coach's second half and waits its turn: the bubble tours,
-     retires, and hands over */
-  if(!coachDone) return;
+  /* It does not wait for the coach: who is free is part of the first glance,
+     so it is up while the bubble tours rather than after it. */
   hintEl.classList.add('on');
   hintLit(true);
 }
@@ -7567,7 +7665,7 @@ if(!maybeWelcome()) revealDashboard();
     const s = PEOPLE[sk];
     return {
       eng: { id: "eng", key: C.key, name: e.n, first: e.n.split(" ")[0], ini: e.i, c: e.c, role: "Engineer", status: e.r, bio: e.b, tags: TAGS[C.key] || [], extra: C.key === "sj" ? "12 sessions together" : "" },
-      me: { id: "me", key: null, name: "Rohan Mehta", first: "You", ini: "RM", c: "#6D3BD4", role: "You", status: "34.8 minutes used", bio: "", tags: [], extra: "" },
+      me: { id: "me", key: null, name: escHtml(ME.name), first: "You", ini: "RM", c: "#6D3BD4", role: escHtml(ME.role) || "You", status: "34.8 minutes used", bio: escHtml(ME.bio), tags: [], extra: "" },
       sup: { id: "sup", key: sk, name: s.n, first: s.n.split(" ")[0], ini: s.i, c: s.c, role: "Supervisor", status: "Supervisor, listening in", bio: SUP_BIO, tags: [], extra: "" }
     };
   }
@@ -7785,7 +7883,7 @@ if(!maybeWelcome()) revealDashboard();
     connect.h = setTimeout(() => {
       C.phase = "live"; C.sec = 0; C.tab = "call"; C.drawer = null; C.pin = null;
       const p = ppl().eng;
-      C.msgs = [{ t: now(), x: `Hi Rohan, I am here. What are we looking at today?` }];
+      C.msgs = [{ t: now(), x: `Hi ${escHtml(meFirst())}, I am here. What are we looking at today?` }];
       C.unread = true; render();
       toast(`<span class="av" data-face="${p.ini}" style="background:${p.c}"></span>${p.name} joined`);
       clearTimeout(connect.sup); clearTimeout(connect.shr);
