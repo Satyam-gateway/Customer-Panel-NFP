@@ -348,6 +348,8 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
 
 /* ---------- home: quiet sections ---------- */
 .quiet{margin-top:28px}
+/* on home it follows the starters, and 28px read as part of the same block */
+#home .quiet{margin-top:56px}
 /* The heading now has a way out beside it, so it is a row rather than a word:
    the label on the left, the link to the rest on the right, pushed apart. */
 .quiet-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
@@ -504,6 +506,9 @@ button.tagp:hover{background:var(--line);color:var(--ink)}
   caret-color:var(--accent);position:relative;z-index:1;
 }
 .askwrap .ask-field textarea::placeholder{color:var(--faint)}
+/* while the ghost types, its bar is the only caret — the real one blinking at
+   the start of the line reads as a second cursor */
+.askwrap .ask-field textarea.ghosting{caret-color:transparent}
 
 /* the suggestion typing itself out behind the caret */
 .field-wrap{position:relative}
@@ -877,6 +882,9 @@ body.hascalls .scope-wrap{display:inline-flex}
   opacity:0;transition:opacity .45s var(--ease);
 }
 .askhint.on{opacity:1}
+/* a returning customer has called before — the faces are a first-run thing,
+   and leaving the hidden row in the layout would hold a gap open */
+#home[data-view="returning"] .askhint{display:none}
 
 /* the faces and the fact, on one line: three people and what is true of them */
 .hint-who{display:flex;align-items:center;gap:13px}
@@ -2500,17 +2508,17 @@ body.hascalls .scope-wrap{display:inline-flex}
               <button class="starter">I do not understand this error message</button>
             </div>
 
-            <!-- On the first-time view this is hidden until the coach above
-                 has finished and gone, and is then the part it never said; on
-                 the returning view, where there is no coach, it is simply
-                 there. Three engineers who are free this minute, the fact of
-                 it in words, and under them one line that names the button
-                 which reaches them — by drawing it, in the middle of the
-                 sentence, at the size of a word. Both views share this card,
-                 so both views get this.
+            <!-- First-time view only: it is hidden until the coach above has
+                 finished and gone, and is then the part it never said. The
+                 returning view never shows it — that customer has called
+                 before, and their page leads with the last session instead.
+                 Three engineers who are free this minute, the fact of it in
+                 words, and under them one line that names the button which
+                 reaches them — by drawing it, in the middle of the sentence,
+                 at the size of a word.
 
-                 It arrives once and stays put for as long as the box is empty,
-                 and goes at the first keystroke. The three faces are real
+                 It arrives once and stays put while they type, and goes for
+                 good when the first call starts. The three faces are real
                  buttons: hover one and it steps out of the stack, click one
                  for their profile, which the document-level [data-person]
                  handler opens in the same drawer as every other face in the
@@ -4145,10 +4153,10 @@ document.querySelectorAll('.vs').forEach(b=>{
     document.querySelector('.main').scrollTop=0;
     /* The welcome and the coach bubble belong to the first-run view: they are
        introductions, and a returning customer has already been introduced.
-       The row of faces under the card is not an introduction — it is who is
-       free this minute, which changes by the hour — so it comes up on both.
-       It waits out the switch the same 420ms either way, so it arrives after
-       the view has finished changing shape rather than during. */
+       So is the row of faces under the card: a returning customer has called
+       before, so hintStart() keeps it to the first-run view. It waits out the
+       switch 420ms, so it arrives after the view has finished changing shape
+       rather than during. */
     if(v==='new'){
       if(typeof maybeWelcome==='function') maybeWelcome();
       if(typeof coachStart==='function') setTimeout(coachStart,420);
@@ -6600,6 +6608,7 @@ function ghostStop(){
   ghostTimer=null;
   ghost.innerHTML='';
   askText.placeholder=PLACEHOLDER;
+  askText.classList.remove('ghosting');
 }
 
 /* The page opens with the caret already in the box and the ghost typing —
@@ -6645,10 +6654,13 @@ function startedTyping(){
   if(touched) return;
   touched=true;
   ghostStop();                        /* back to the plain hint if they clear it */
-  /* they are writing — the coaching is over, and neither half of it should be
-     seen to linger a moment past the first keystroke */
+  /* they are writing — the bubble's tour is over. The row of faces is not
+     coaching, it is who will pick up, so it stays (or arrives now, if the
+     bubble was cut short) until a call is made. */
+  const wasTouring=!!coachTimer;
   coachStop();
-  hintStop();
+  coachDone=true;
+  setTimeout(hintStart,wasTouring?380:0);
 }
 /* type -> hold -> erase -> next. Only ever runs on an untouched, empty field. */
 function runGhost(){
@@ -6677,6 +6689,7 @@ function runGhost(){
   }
   function next(){si=(si+1)%SUGGESTIONS.length;ghostTimer=setTimeout(typeIn,320)}
   askText.placeholder='';            /* the ghost replaces it */
+  askText.classList.add('ghosting'); /* and its bar replaces the caret */
   typeIn();
 }
 
@@ -7162,17 +7175,21 @@ hintEl.querySelectorAll('.hint-faces .av').forEach(av=>{
   av.addEventListener('click',hintTipOff);
 });
 
+/* Set when the first call starts. The faces were there to say who would pick
+   up, and once a call has been made the customer knows. */
+let hintRetired=false;
+
 function hintStart(){
-  if(touched||askText.value.trim()) return;
+  if(hintRetired) return;
   if(inCall()) return;
   const home=document.getElementById('home');
   if(!home.classList.contains('on')) return;
-  /* On the first-time view it is the coach's second half and waits its turn:
-     the bubble tours, retires, and hands over. The returning view has no
-     bubble to wait for — and needs this just as much, because who is free
-     right now is not something a returning customer already knows. It is the
-     same card either way, so it is the same row of faces either way. */
-  if(home.dataset.view==='new'&&!coachDone) return;
+  /* First-time view only. A returning customer has called before, so the
+     page they come back to leads with their last session, not with faces. */
+  if(home.dataset.view!=='new') return;
+  /* it is the coach's second half and waits its turn: the bubble tours,
+     retires, and hands over */
+  if(!coachDone) return;
   hintEl.classList.add('on');
   hintLit(true);
 }
@@ -7190,7 +7207,7 @@ function hintLit(on){
 const _show=show;
 show=function(id){
   _show(id);
-  if(id==='home'){ if(!touched){ setTimeout(coachStart,420); setTimeout(hintStart,420); } }
+  if(id==='home'){ if(!touched) setTimeout(coachStart,420); setTimeout(hintStart,420); }
   else { coachStop(); hintStop(); }
 };
 
@@ -7784,7 +7801,7 @@ if(!maybeWelcome()) revealDashboard();
     /* The first-run coaching exists to get you into a call. Once you are in
        one it has nothing left to say — so it comes down now, and is marked
        finished so it does not greet you again on the way back out. */
-    try { coachDone = true; coachStop(); hintStop(); } catch (_) {}
+    try { coachDone = true; hintRetired = true; coachStop(); hintStop(); } catch (_) {}
     if (C.on && !C.ended && C.phase === "live") { C.min = false; render(); return; }
     Object.assign(C, { on: true, min: false, key: PEOPLE[key] ? key : "sj", n: 2, engShare: false, meShare: false, engCam: true, pin: null, tab: "call", drawer: null, speaking: "eng", pip: { x: 0, y: 0 } });
     C.mic = true; C.cam = true;
