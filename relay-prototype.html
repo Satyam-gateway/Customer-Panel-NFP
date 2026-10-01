@@ -2168,7 +2168,7 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-danger{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r-sm);background:var(--stop);color:#fff;font-weight:600;font-size:13px}
 .c-danger:hover{background:#A82A24}
 
-.c-tabrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 24px 10px}
+.c-tabrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 24px 4px}
 .c-tabs{display:flex;gap:6px}
 .c-tab{padding:6px 18px;border:1px solid transparent;border-radius:999px;color:var(--muted);font-weight:600}
 .c-tab:hover{color:var(--ink)}
@@ -2183,7 +2183,7 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-conn i b{width:3px;background:var(--live);border-radius:1px}
 
 .c-body{display:grid;grid-template-columns:minmax(0,1fr) auto;min-height:0;position:relative}
-.c-stage{position:relative;min-height:0;min-width:0;padding:2px 24px 14px;display:flex;flex-direction:column;gap:10px}
+.c-stage{position:relative;min-height:0;min-width:0;padding:0 24px 14px;display:flex;flex-direction:column;gap:10px}
 .c-banner{flex:none;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:var(--r-md);background:var(--moving-bg);color:var(--moving);font-weight:600;font-size:13px}
 .c-banner .btn{margin-left:auto}
 .c-lay{flex:1;min-height:0;position:relative;display:flex}
@@ -7780,10 +7780,6 @@ if(!maybeWelcome()) revealDashboard();
   }
 
   function ctxPanel(sc) {
-    const P = ppl();
-    if (C.sx === "eng") {
-      return `${eCard(P.eng)}${sc.kind === "first" ? "" : `<div class="c-kv" style="margin-top:18px"><b>Left open from your last calls</b></div>${openList()}`}`;
-    }
     if (C.sx === "files") return `<p class="c-empty">Nothing shared yet.</p><button class="btn sm" style="margin-top:10px" data-act="noop">Add file</button>`;
     if (sc.kind === "project") {
       const Pj = PROJECTS[sc.key];
@@ -7803,7 +7799,7 @@ if(!maybeWelcome()) revealDashboard();
 
   function summaryHTML() {
     const P = ppl(), sc = scope();
-    const tabs = [["ctx", sc.kind === "project" ? "Project" : sc.kind === "session" ? "Session" : "About"], ["eng", "Engineer"], ["files", "Files"]];
+    const tabs = [["ctx", sc.kind === "project" ? "Project" : sc.kind === "session" ? "Session" : "About"], ["files", "Files"]];
     return `<div class="c-sum"><div class="c-sumin"><div class="c-hero"><div><h2 class="display">Session with ${P.eng.first}</h2><p class="c-lede" style="margin:0">Notes build here while you talk. Nothing you need to write down.</p></div>${stepper(sc)}</div>
       <div class="c-cols"><div class="c-stk">
         <div class="c-card c-doc"><div class="c-hd"><h3>Summary draft</h3><span class="c-badge">Finished when you end the call</span></div><div class="c-draft3" id="cDraft">${draftInner(sc)}</div></div>
