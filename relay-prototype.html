@@ -2153,6 +2153,8 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-seg button{padding:3px 11px;border-radius:999px;color:#C9CFD3;white-space:nowrap}
 .c-seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:600}
 .c-app{flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
+.c-app.c-fit{grid-template-rows:auto auto minmax(0,684px) 1fr}
+.c-app.c-fit .c-ctl{align-self:center}
 
 .c-head{display:flex;align-items:center;gap:16px;padding:16px 24px 4px}
 .c-head h1{font-size:21px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2222,7 +2224,7 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tile.sm .c-pinb{top:8px;right:8px;width:28px;height:28px}
 
 /* gallery + focus */
-.c-gal{display:grid;width:100%;height:100%;max-height:660px;gap:16px;margin:0 auto auto;grid-auto-rows:minmax(0,1fr)}
+.c-gal{display:grid;width:100%;height:100%;max-height:660px;gap:16px;margin:10px auto auto;grid-auto-rows:minmax(0,1fr)}
 .c-gal.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .c-gal.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .c-st{display:grid;width:100%;gap:14px;grid-template-columns:minmax(0,1fr) clamp(200px,21%,264px);grid-template-rows:minmax(0,1fr)}
@@ -7826,6 +7828,7 @@ if(!maybeWelcome()) revealDashboard();
     $$(".nav-item").forEach(n => n.classList.toggle("in-call", C.on && n.dataset.go === "sessions"));
     if (!C.on) return;
 
+    root.classList.remove("c-fit");
     if (C.phase === "connecting") {
       root.innerHTML = `<div class="c-center conn" style="grid-row:1/-1">${(() => { const p = P.eng; return `<div>${face(p)}<h2 class="display">Connecting you to ${p.name}</h2><p>Getting your camera and microphone ready.</p><button class="btn" data-cact="cancel">Cancel</button></div>`; })()}</div>`;
       paint(); paintMini(); return;
@@ -7851,6 +7854,7 @@ if(!maybeWelcome()) revealDashboard();
         <button class="c-cb end" data-cact="ask">${ic("end")}Leave</button></div>
       <div class="c-rr"><button class="c-cb sq ${C.drawer === "chat" ? "on" : ""}" data-act="dw" data-v="${C.drawer === "chat" ? "close" : "chat"}" title="Chat (C)">${ic("chat")}${C.unread && C.drawer !== "chat" ? '<span class="c-dot"></span>' : ""}</button>
         <button class="c-cb sq ${C.drawer === "info" ? "on" : ""}" data-act="dw" data-v="${C.drawer === "info" ? "close" : "info"}" title="Engineer (I)">${ic("info")}</button></div></div>`;
+    root.classList.toggle("c-fit", inCall && !focusId());
     root.innerHTML = head + tabs + `<div class="c-body">${stage}<aside class="c-drawer ${C.drawer ? "open" : ""}">${drawerHTML()}</aside></div>` + ctl;
     paint(); paintMini(); wirePip();
     const m = $("#cMsgs"); if (m) m.scrollTop = m.scrollHeight;
