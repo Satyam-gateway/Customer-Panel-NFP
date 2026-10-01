@@ -2222,9 +2222,10 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tile.sm .c-pinb{top:8px;right:8px;width:28px;height:28px}
 
 /* gallery + focus */
-.c-gal{display:grid;width:100%;gap:14px;grid-auto-rows:minmax(0,1fr);align-content:center}
-.c-gal.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.c-gal.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.c-gal{display:grid;width:100%;gap:14px;margin:auto;align-content:center}
+.c-gal .c-tile{aspect-ratio:4/3}
+.c-gal.n2{max-width:780px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.c-gal.n3{max-width:1080px;grid-template-columns:repeat(3,minmax(0,1fr))}
 .c-st{display:grid;width:100%;gap:14px;grid-template-columns:minmax(0,1fr) clamp(200px,21%,264px);grid-template-rows:minmax(0,1fr)}
 .c-st.solo{grid-template-columns:minmax(0,1fr)}
 .c-main{min-height:0;min-width:0;display:flex}
@@ -2325,6 +2326,22 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tl li{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line-soft);align-items:center;font-size:13px}
 .c-tl li:first-child{border-top:0}
 .c-tl .when{margin-left:auto;color:var(--faint);font-size:12px}
+.c-eyebrow{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.c-card>p.c-body{font-size:13.5px;line-height:1.6;color:var(--ink);margin-bottom:14px}
+.c-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
+.c-grid2 b{display:block;font-size:11.5px;margin-bottom:3px}
+.c-grid2 span{font-size:12.5px;color:var(--muted);line-height:1.55}
+.c-next{margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
+.c-next b{display:block;font-size:11.5px;margin-bottom:8px}
+.c-note{margin-top:14px;font-size:12.5px;color:var(--muted)}
+.c-skel{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.c-skel i{display:block;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--line-soft) 25%,var(--line) 50%,var(--line-soft) 75%);background-size:200% 100%;animation:c-shim 1.6s linear infinite}
+.c-skel i:nth-child(2){width:86%}.c-skel i:nth-child(3){width:64%}
+@keyframes c-shim{to{background-position:-200% 0}}
+.c-steps{list-style:none;counter-reset:st;display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.c-steps li{counter-increment:st;display:flex;gap:10px;font-size:13px;color:var(--muted)}
+.c-steps li::before{content:counter(st);flex:none;width:20px;height:20px;border-radius:50%;background:var(--line-soft);color:var(--ink);font-size:11.5px;font-weight:700;display:grid;place-items:center}
+.c-steps b{color:var(--ink)}
 .c-back{position:absolute;right:24px;bottom:18px;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--ink);color:#fff;box-shadow:var(--shadow-lift);z-index:5;font-weight:600;font-size:13px}
 .c-back .av{width:26px;height:26px}
 .c-back .t{background:rgba(255,255,255,.14);padding:1px 8px;border-radius:999px;font-variant-numeric:tabular-nums}
@@ -7658,18 +7675,91 @@ if(!maybeWelcome()) revealDashboard();
     return `<div class="c-dw">${head}<div class="c-scroll"><div class="c-card" style="margin-bottom:14px">${eCard(P.eng)}</div><div class="c-card"><div class="c-eye">Left open from your last calls</div>${openList()}</div></div></div>`;
   }
 
-  function summaryHTML() {
+  const NEXT = {
+    palmseas: ["Decide on the queue rebuild quote", "Move stock reservation out of the checkout request", "Add retry handling for failed payments"],
+    epicmail: ["Answer whether bounces retry or are only reported", "Review the bounce log after a week"],
+    trackfit: ["Kick off the sync rewrite on Mon 29 Sep"]
+  };
+  const NOTES = [
+    [10, "Checkout times out when several carts arrive together"],
+    [24, "The stock reservation step holds the request open"],
+    [40, "Plan: queue the reservation, keep payment in the request"]
+  ];
+
+  /* where this call will be filed, which decides what the Summary tab shows */
+  function scope() {
+    const f = window.__callFiling || {};
+    const S = f.sess && SESSIONS[f.sess];
+    if (S && S.proj && PROJECTS[S.proj]) return { kind: "project", key: S.proj };
+    if (f.proj && PROJECTS[f.proj]) return { kind: "project", key: f.proj };
+    if (S) return { kind: "session", key: f.sess };
+    return { kind: document.body.classList.contains("hascalls") ? "new" : "first" };
+  }
+
+  function notesCard() {
+    const live = NOTES.filter(([t]) => C.sec >= t);
+    if (!live.length) {
+      return `<div class="c-card"><h3>So far this session</h3><p class="c-empty"><span class="c-wave"><i></i><i></i><i></i><i></i></span>Listening. Key points and decisions will appear as they come up.</p></div>`;
+    }
+    return `<div class="c-card"><h3>So far this session</h3><ul class="c-li">${live.map(([, t]) => `<li><span class="ok">&bull;</span>${t}</li>`).join("")}</ul></div>`;
+  }
+
+  function projectCard(key) {
+    const P = PROJECTS[key];
+    const next = NEXT[key] || [];
+    return `<div class="c-card"><div class="c-eyebrow">Project summary &middot; ${P.n}</div>
+      <p class="c-body">${P.blurb}</p>
+      <div class="c-grid2"><div><b>Where it stands</b><span>${P.stands}</span></div><div><b>Waiting on you</b><span>${P.waiting}</span></div></div>
+      ${next.length ? `<div class="c-next"><b>Next steps</b><ul class="c-li">${next.map(t => `<li><span class="wa">&bull;</span>${t}</li>`).join("")}</ul></div>` : ""}
+      <p class="c-note">When the call ends, this session is added to the project summary.</p></div>`;
+  }
+
+  function sessionCard(key) {
+    const S = SESSIONS[key];
+    const n = (S.calls || []).length + 1;
+    return `<div class="c-card"><div class="c-eyebrow">Session summary</div>
+      <h3>${S.t}</h3><p class="c-body">${S.sum}</p>
+      <p class="c-note">This call is call ${n} of this session. When it ends, the summary above is rewritten to include it.</p></div>`;
+  }
+
+  function placeCard(first) {
+    return `<div class="c-card"><div class="c-eyebrow">${first ? "Your first session" : "This session"}</div>
+      <h3>${first ? "Your summary is written for you" : "Not in a project yet"}</h3>
+      <ol class="c-steps"><li><span><b>Talk it through.</b> Notes build here while you do.</span></li>
+        <li><span><b>End the session.</b> Relay writes the full summary straight away.</span></li>
+        <li><span><b>Choose where it lives.</b> Keep it in a project, and the project summary picks it up. Skip, and it stays a session of its own.</span></li></ol>
+      ${first ? `<div class="c-skel" aria-hidden="true"><i></i><i></i><i></i></div>` : ""}</div>`;
+  }
+
+  function sessionsCard(sc) {
     const P = ppl();
-    const past = C.key === "sj"
-      ? `<li><div class="av" data-face="SJ" style="background:#00875A"></div><span>Checkout timing out on Palm Seas</span><span class="when">Tue, 23 Sep, 18 min</span></li><li><div class="av" data-face="PN" style="background:#2456C8"></div><span>Epicmail bounce handling</span><span class="when">Mon, 22 Sep, 7 min</span></li>`
-      : "";
+    const keys = sc.kind === "project" ? SESS_ORDER.filter(k => SESSIONS[k].proj === sc.key) : sc.kind === "session" ? [sc.key] : [];
+    const rows = keys.map(k => {
+      const S = SESSIONS[k], p = PEOPLE[S.who], m = sessMins(S);
+      return `<li><div class="av" data-face="${p.i}" style="background:${p.c}"></div><span>${S.t}</span><span class="when">${S.last}${m ? `, ${m} min` : ""}</span></li>`;
+    }).join("");
+    return `<div class="c-card"><h3>Sessions${sc.kind === "project" ? ` in ${PROJECTS[sc.key].n}` : ""}</h3><ul class="c-tl"><li><span class="pill live">Live</span><span>Today with ${P.eng.first}</span><span class="when c-timer2">${fmt(C.sec)} so far</span></li>${rows}</ul></div>`;
+  }
+
+  function summaryHTML() {
+    const P = ppl(), sc = scope();
+    const lede = sc.kind === "project" ? `Filed under ${PROJECTS[sc.key].n}. Notes build here while you talk.`
+      : sc.kind === "session" ? "Picking up where you left off. Notes build here while you talk."
+      : "Notes build here while you talk. Nothing you need to write down.";
+    const ctx = sc.kind === "project" ? projectCard(sc.key) : sc.kind === "session" ? sessionCard(sc.key) : placeCard(sc.kind === "first");
+    const open = sc.kind === "first" ? "" : `<div class="c-card"><h3>Left open from your last calls</h3>${openList()}</div>`;
     return `<div class="c-sum"><div class="c-sumin"><div class="c-stk">
-      <div><h2 class="display">Session with ${P.eng.first}</h2><p class="c-lede">Notes build here while you talk. Nothing you need to write down.</p></div>
-      <div class="c-card"><h3>So far this session</h3><p class="c-empty"><span class="c-wave"><i></i><i></i><i></i><i></i></span>Listening. Key points and decisions will appear as they come up.</p></div>
-      <div class="c-card"><h3>Left open from your last calls</h3>${openList()}</div>
-      <div class="c-card"><h3>Sessions</h3><ul class="c-tl"><li><span class="pill live">Live</span><span>Today with ${P.eng.first}</span><span class="when c-timer2">${fmt(C.sec)} so far</span></li>${past}</ul></div>
+      <div><h2 class="display">Session with ${P.eng.first}</h2><p class="c-lede">${lede}</p></div>
+      ${notesCard()}${ctx}${open}${sessionsCard(sc)}
     </div><div class="c-stk"><div class="c-card">${eCard(P.eng)}</div>
       <div class="c-card"><h3>Files</h3><p class="c-empty">Nothing shared yet.</p><button class="btn sm" style="margin-top:10px" data-act="noop">Add file</button></div></div></div></div>`;
+  }
+
+  function destination() {
+    const sc = scope();
+    if (sc.kind === "project") return `It will be added to the ${PROJECTS[sc.key].n} project summary.`;
+    if (sc.kind === "session") return `It will be added to the session summary for “${SESSIONS[sc.key].t}”.`;
+    return "Next, Relay will ask whether to keep this session in a project.";
   }
 
   function render() {
@@ -7687,7 +7777,7 @@ if(!maybeWelcome()) revealDashboard();
       paint(); paintMini(); return;
     }
     if (C.ended) {
-      root.innerHTML = `<div class="c-center" style="grid-row:1/-1"><div class="c-card" style="max-width:440px;padding:32px">${face(P.eng)}<h2 class="display">Session ended</h2><p>${fmt(C.sec)} with ${P.eng.first}. Your summary is being prepared and will show up under Calls.</p><div style="display:flex;gap:10px;justify-content:center"><button class="btn" data-cact="rejoin">Rejoin session</button><button class="btn go" data-cact="close">Back to Relay</button></div></div></div>`;
+      root.innerHTML = `<div class="c-center" style="grid-row:1/-1"><div class="c-card" style="max-width:440px;padding:32px">${face(P.eng)}<h2 class="display">Session ended</h2><p>${fmt(C.sec)} with ${P.eng.first}. Your summary is being prepared.</p><p>${destination()}</p><div class="c-skel" style="margin:12px 0 22px" aria-hidden="true"><i></i><i></i><i></i></div><div style="display:flex;gap:10px;justify-content:center"><button class="btn" data-cact="rejoin">Rejoin session</button><button class="btn go" data-cact="close">Back to Relay</button></div></div></div>`;
       paint(); paintMini(); return;
     }
 
@@ -7971,6 +8061,7 @@ if(!maybeWelcome()) revealDashboard();
     C.sec++;
     $$(".c-timer").forEach(t => { t.textContent = fmt(C.sec); });
     $$(".c-timer2").forEach(t => { t.textContent = `${fmt(C.sec)} so far`; });
+    if (C.tab === "summary" && NOTES.some(([t]) => t === C.sec)) render();
   }, 1000);
   setInterval(() => {
     if (!C.on || C.phase !== "live" || C.ended || C.min) return;
