@@ -2222,9 +2222,9 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tile.sm .c-pinb{top:8px;right:8px;width:28px;height:28px}
 
 /* gallery + focus */
-.c-gal{display:grid;width:100%;height:100%;max-height:560px;gap:16px;margin:auto;grid-auto-rows:minmax(0,1fr)}
-.c-gal.n2{max-width:1180px;grid-template-columns:repeat(2,minmax(0,1fr))}
-.c-gal.n3{max-width:1560px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.c-gal{display:grid;width:100%;height:100%;max-height:760px;gap:16px;margin:auto;grid-auto-rows:minmax(0,1fr)}
+.c-gal.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.c-gal.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .c-st{display:grid;width:100%;gap:14px;grid-template-columns:minmax(0,1fr) clamp(200px,21%,264px);grid-template-rows:minmax(0,1fr)}
 .c-st.solo{grid-template-columns:minmax(0,1fr)}
 .c-main{min-height:0;min-width:0;display:flex}
@@ -2317,7 +2317,7 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-li .ok{color:var(--live);font-weight:700}.c-li .wa{color:var(--turn);font-weight:700}
 .c-empty{font-size:13px;color:var(--muted)}
 .c-sum{grid-column:1;min-height:0;overflow:auto;padding:4px 24px 24px}
-.c-sumin{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:16px;align-items:start}
+.c-sumin{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:16px;align-items:start}
 .c-sum h2{font-size:26px;font-weight:600;margin-bottom:4px}
 .c-lede{color:var(--muted);margin-bottom:16px}
 .c-stk{display:flex;flex-direction:column;gap:16px}
@@ -2327,7 +2327,13 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tl .when{margin-left:auto;color:var(--faint);font-size:12px}
 .c-eyebrow{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
 .c-card>p.c-body{font-size:13.5px;line-height:1.6;color:var(--ink);margin-bottom:14px}
-.c-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
+.c-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.c-grid2>div{background:var(--paper);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:12px 14px}
+.c-grid2 .c-li{gap:6px}
+.c-chip2{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink)}
+.c-chip2 i{width:7px;height:7px;border-radius:50%;background:var(--turn);flex:none}
+.c-chip2.ok i{background:var(--live)}
+.c-sec{display:flex;align-items:center;justify-content:space-between;margin:2px 2px -6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .c-grid2 b{display:block;font-size:11.5px;margin-bottom:3px}
 .c-grid2 span{font-size:12.5px;color:var(--muted);line-height:1.55}
 .c-next{margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft)}
@@ -7712,8 +7718,8 @@ if(!maybeWelcome()) revealDashboard();
     const next = NEXT[key] || [];
     return `<div class="c-card"><div class="c-eyebrow">Project summary &middot; ${P.n}</div>
       <p class="c-body">${P.blurb}</p>
-      <div class="c-grid2"><div><b>Where it stands</b><span>${P.stands}</span></div><div><b>Waiting on you</b><span>${P.waiting}</span></div></div>
-      ${next.length ? `<div class="c-next"><b>Next steps</b><ul class="c-li">${next.map(t => `<li><span class="wa">&bull;</span>${t}</li>`).join("")}</ul></div>` : ""}
+      <div class="c-grid2"><div><b>Where it stands</b><span>${P.stands}</span></div><div><b>Waiting on you</b><span>${P.waiting}</span></div>
+      ${next.length ? `<div><b>Next steps</b><ul class="c-li">${next.map(t => `<li><span class="wa">&bull;</span>${t}</li>`).join("")}</ul></div>` : ""}</div>
       <p class="c-note">When the call ends, this session is added to the project summary.</p></div>`;
   }
 
@@ -7746,15 +7752,18 @@ if(!maybeWelcome()) revealDashboard();
 
   function summaryHTML() {
     const P = ppl(), sc = scope();
-    const lede = sc.kind === "project" ? `Filed under ${PROJECTS[sc.key].n}. Notes build here while you talk.`
-      : sc.kind === "session" ? "Picking up where you left off. Notes build here while you talk."
-      : "Notes build here while you talk. Nothing you need to write down.";
+    const filing = sc.kind === "project" ? `<span class="c-chip2 ok"><i></i>Filed under ${PROJECTS[sc.key].n}</span>`
+      : sc.kind === "session" ? `<span class="c-chip2 ok"><i></i>Part of “${SESSIONS[sc.key].t}”</span>`
+      : `<span class="c-chip2"><i></i>Not filed yet. Relay asks when the call ends</span>`;
     const ctx = sc.kind === "project" ? projectCard(sc.key) : sc.kind === "session" ? sessionCard(sc.key) : placeCard(sc.kind === "first");
     const open = sc.kind === "first" ? "" : `<div class="c-card"><h3>Left open from your last calls</h3>${openList()}</div>`;
     return `<div class="c-sum"><div class="c-sumin"><div class="c-stk">
-      <div><h2 class="display">Session with ${P.eng.first}</h2><p class="c-lede">${lede}</p></div>
-      ${notesCard()}${ctx}${open}${sessionsCard(sc)}
-    </div><div class="c-stk"><div class="c-card">${eCard(P.eng)}</div>
+      <div><h2 class="display">Session with ${P.eng.first}</h2><div style="margin-top:10px">${filing}</div></div>
+      <div class="c-sec"><span>Right now</span></div>${notesCard()}
+      <div class="c-sec"><span>${sc.kind === "project" ? "The project" : sc.kind === "session" ? "The session" : "What happens next"}</span></div>${ctx}
+      <div class="c-sec"><span>History</span></div>${sessionsCard(sc)}
+    </div><div class="c-stk"><div class="c-sec"><span>On this call</span></div><div class="c-card">${eCard(P.eng)}</div>
+      ${open}
       <div class="c-card"><h3>Files</h3><p class="c-empty">Nothing shared yet.</p><button class="btn sm" style="margin-top:10px" data-act="noop">Add file</button></div></div></div></div>`;
   }
 
