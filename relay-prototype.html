@@ -1441,6 +1441,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
   transition:background .12s,border-color .12s,color .12s}
 .back:hover{background:var(--line-soft);border-color:var(--muted);color:#000}
 .proj-h{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
+.proj-acts{display:flex;align-items:center;gap:9px;flex:none}
 .proj-h h1{font-size:27px;margin:0 0 8px}
 .stack{display:flex;gap:6px;flex-wrap:wrap}
 .stack span{font-size:11.5px;font-weight:600;color:var(--muted);
@@ -1450,6 +1451,8 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
   display:flex;align-items:center;gap:8px}
 .psum-h .stamp{margin-left:auto;font-weight:500}
 .psum.fresh{animation:sumin 1.6s ease-out}
+/* a row that has only just arrived, same ring the summaries use */
+.row.fresh{animation:sumin 2.2s ease-out}
 .psum>p{font-size:13.5px;line-height:1.6;color:var(--ink);margin:0 0 16px;max-width:70ch}
 .psum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px;
   border-top:1px solid var(--line);padding-top:15px}
@@ -1482,7 +1485,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
 
 /* ---------- main ---------- */
 .main{overflow-y:auto;position:relative}
-.screen{display:none;padding:34px 40px 80px;max-width:1080px;margin-inline:auto}
+.screen{display:none;padding:34px 40px 80px;max-width:none}
 .screen.on{display:block}
 .screen.wide{max-width:none}
 .page-h{margin-bottom:28px}
@@ -2040,15 +2043,19 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
 
 /* the name block takes the slack; the name itself sits at its natural width
    so what follows it stays right alongside, not flung to the far end */
-.tb-name{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:8px}
+.tb-name{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:14px}
 .tb-name b{flex:0 1 auto;min-width:0;
   font-family:"Bricolage Grotesque","Public Sans",sans-serif;font-weight:600;
   font-size:16px;letter-spacing:-.012em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* the label rides the far end of the bar, not the name's shoulder */
 .tb-name .tb-sub{font-size:12.5px;color:var(--muted);white-space:nowrap;
-  flex:0 6 auto;min-width:0;overflow:hidden}
-.tb-name .tb-sub::before{content:"\00b7";color:var(--faint);margin-right:7px}
+  flex:0 6 auto;min-width:0;overflow:hidden;margin-left:auto}
 
 .tb-sp{flex:1;min-width:8px}
+/* on a detail bar the name block already soaks up the slack, so the
+   spacer stops growing — otherwise the two split it and the label
+   stalls halfway instead of reaching the end */
+.tb-name+.tb-sp{flex:0 0 16px;min-width:0}
 .tb-new{display:inline-flex;align-items:center;gap:7px;flex:none;
   padding:9px 17px 9px 14px;border-radius:999px;font-weight:600;font-size:13px;
   border:1px solid var(--accent-line);background:var(--accent-bg);color:var(--accent);
@@ -2145,6 +2152,16 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
   background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
   padding:12px 14px;resize:vertical;min-height:88px;line-height:1.55}
 .m-ta:focus{outline:none;border-color:var(--live);box-shadow:0 0 0 3px var(--live-bg);background:var(--card)}
+/* ---------- the two ways to be quoted ---------- */
+.qk{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+.qk-opt{display:block;width:100%;text-align:left;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:13px 15px;transition:border-color .14s,background .14s,box-shadow .14s}
+.qk-opt:hover{border-color:var(--accent);background:var(--accent-soft);
+  box-shadow:0 0 0 3px var(--accent-bg)}
+.qk-opt b{display:block;font-size:14.5px;font-weight:600;color:var(--ink)}
+.qk-opt span{display:block;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:3px}
+
 .m-who{display:flex;align-items:center;gap:12px;text-align:left;
   background:var(--accent-soft);border:1px solid var(--accent-line);
   border-radius:var(--r-md);padding:12px 14px;margin-top:4px}
@@ -2785,14 +2802,14 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           <button class="ci" data-thread="t-c1">
             <div class="ci-kind">&#9707;</div>
             <div style="min-width:0">
-              <div class="ci-name">daun <span class="pill contract">Ship</span></div>
+              <div class="ci-name">daun <span class="pill contract">Go live</span></div>
               <div class="ci-sub">Satyam &middot; webhook retries are on staging</div>
             </div>
           </button>
           <button class="ci" data-thread="t-c2">
             <div class="ci-kind">&#9707;</div>
             <div style="min-width:0">
-              <div class="ci-name">daun <span class="pill contract">Maintain</span></div>
+              <div class="ci-name">daun <span class="pill contract">Maintenance</span></div>
               <div class="ci-sub">Priya &middot; all checks passed this week</div>
             </div>
           </button>
@@ -3105,7 +3122,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           <div class="thread-h">
             <div class="ci-kind lg">&#9707;</div>
             <div style="flex:1">
-              <div class="who">daun <span class="pill contract">Ship</span></div>
+              <div class="who">daun <span class="pill contract">Go live</span></div>
               <div class="st">Satyam owns this contract &middot; delivers 2 Oct</div>
             </div>
             <button class="btn sm" data-go="progress">View progress</button>
@@ -3131,7 +3148,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
               <div class="sd-acts"><button class="btn sm" data-note="kn-c1a">Read notes</button></div>
 
               <div class="knote" id="kn-c1a">
-                <div class="kn-h">KICKOFF NOTES &middot; daun Ship &middot; Mon 15 Sep</div>
+                <div class="kn-h">KICKOFF NOTES &middot; daun Go live &middot; Mon 15 Sep</div>
 
                 <div class="kn-row">
                   <div class="kn-k">Scope</div>
@@ -3196,7 +3213,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
               <div class="sd-acts"><button class="btn sm" data-note="kn-c1b">Read notes</button></div>
 
               <div class="knote" id="kn-c1b">
-                <div class="kn-h">CHECK-IN NOTES &middot; daun Ship &middot; Mon 22 Sep</div>
+                <div class="kn-h">CHECK-IN NOTES &middot; daun Go live &middot; Mon 22 Sep</div>
 
                 <div class="kn-row">
                   <div class="kn-k">Where it stands</div>
@@ -3259,7 +3276,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
               <div class="sd-h">Planned</div>
               <ul>
                 <li>Walk through the payments milestone before sign-off</li>
-                <li>Decide whether the Maintain contract picks this up afterwards</li>
+                <li>Decide whether the Maintenance contract picks this up afterwards</li>
               </ul>
               <div class="sd-acts"><button class="btn sm">Reschedule</button><button class="btn sm">Add to calendar</button></div>
             </div>
@@ -3283,7 +3300,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           <div class="thread-h">
             <div class="ci-kind lg">&#9707;</div>
             <div style="flex:1">
-              <div class="who">daun <span class="pill contract">Maintain</span></div>
+              <div class="who">daun <span class="pill contract">Maintenance</span></div>
               <div class="st">Priya keeps this running &middot; renews 1 Oct</div>
             </div>
             <button class="btn sm" data-go="progress">View progress</button>
@@ -3291,7 +3308,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           </div>
           <div class="thread-body">
             <div class="cx-note">
-              Maintain contracts are mostly quiet. Priya checks in monthly, and writes here when
+              Maintenance contracts are mostly quiet. Priya checks in monthly, and writes here when
               something needs you.
             </div>
             <button class="smark" data-sess="c2a">
@@ -3379,7 +3396,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           <button class="row contract" data-contract="ship">
             <div class="av" data-dot="live" style="background:#00875A">SJ</div>
             <div class="row-main">
-              <div class="row-title">daun <span class="pill contract">Ship</span></div>
+              <div class="row-title">daun <span class="pill contract">Go live</span></div>
               <div class="row-sub">Satyam owns this &middot; delivers 2 Oct</div>
             </div>
             <div class="row-side">
@@ -3390,7 +3407,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           <button class="row contract" data-contract="maintain">
             <div class="av" data-dot="busy" style="background:#2456C8">PN</div>
             <div class="row-main">
-              <div class="row-title">daun <span class="pill contract">Maintain</span></div>
+              <div class="row-title">daun <span class="pill contract">Maintenance</span></div>
               <div class="row-sub">Priya owns this &middot; rolling monthly &middot; renews 1 Oct</div>
             </div>
             <div class="row-side">
@@ -3401,34 +3418,10 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
         </div>
       </div>
 
+      <!-- painted by renderPipeline() so a new quote request can join it -->
       <div class="band">
-        <div class="band-h"><h2>In the pipeline</h2><span class="n">3</span></div>
-        <div class="rows">
-          <button class="row turn" data-contract="palmseas">
-            <div class="av" data-dot="live" style="background:#00875A">SJ</div>
-            <div class="row-main">
-              <div class="row-title">Rebuild Palm Seas checkout <span class="pill turn">Your turn</span></div>
-              <div class="row-sub">Quote ready &middot; sent this morning &middot; nothing starts until you decide</div>
-            </div>
-            <div class="row-side"><span class="money">&euro;3,200</span></div>
-          </button>
-          <button class="row moving" data-contract="bounce">
-            <div class="av" data-dot="live" style="background:#2456C8">PN</div>
-            <div class="row-main">
-              <div class="row-title">Epicmail bounce handling</div>
-              <div class="row-sub">Priya is reading your code &middot; quote expected tomorrow</div>
-            </div>
-            <div class="row-side"><span class="pill moving">Being reviewed</span></div>
-          </button>
-          <button class="row contract" data-contract="sync">
-            <div class="av" data-dot="busy" style="background:#B45309">MI</div>
-            <div class="row-main">
-              <div class="row-title">TrackFit sync rewrite</div>
-              <div class="row-sub">You accepted on 25 Sep &middot; kickoff booked for Mon 29 Sep</div>
-            </div>
-            <div class="row-side"><span class="pill contract">Kickoff booked</span><span class="money">&euro;2,800</span></div>
-          </button>
-        </div>
+        <div class="band-h"><h2>In the pipeline</h2><span class="n" id="pipeN">3</span></div>
+        <div class="rows" id="pipeRows"></div>
       </div>
 
       <div class="band">
@@ -3457,7 +3450,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
       <button class="back" data-back>&larr; Back</button>
       <div class="page-h">
         <h1>daun</h1>
-        <p>Satyam is building this for you · Ship contract</p>
+        <p>Satyam is building this for you · Go live contract</p>
       </div>
 
       <div class="focus">
@@ -3554,7 +3547,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
       <button class="back" data-back>&larr; Back</button>
       <div class="page-h">
         <h1>daun</h1>
-        <p>Priya keeps this running &middot; Maintain contract</p>
+        <p>Priya keeps this running &middot; Maintenance contract</p>
       </div>
 
       <div class="focus">
@@ -3776,7 +3769,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
           <div class="band-h"><h2>Contracts</h2><span class="n">2</span></div>
           <div class="pgrid">
             <button class="pc" data-contract="ship">
-              <div class="pc-t">daun &mdash; Ship</div>
+              <div class="pc-t">daun &mdash; Go live</div>
               <div class="pc-s">Checkout rebuild &middot; started 2 Sep</div>
               <div class="pc-f">
                 <div class="av" style="background:#00875A">SJ</div>
@@ -3784,7 +3777,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
               </div>
             </button>
             <button class="pc" data-contract="maintain">
-              <div class="pc-t">daun &mdash; Maintain</div>
+              <div class="pc-t">daun &mdash; Maintenance</div>
               <div class="pc-s">Rolling monthly &middot; renews 1 Oct</div>
               <div class="pc-f">
                 <div class="av" style="background:#2456C8">PN</div>
@@ -3928,7 +3921,7 @@ textarea.wl-in{display:block;resize:none;line-height:1.5;overflow:hidden}
       <div class="n">12 sessions together</div>
       <ul>
         <li>Knows Palm Seas, daun and TrackFit</li>
-        <li>Building your daun Ship contract right now</li>
+        <li>Building your daun Go live contract right now</li>
         <li>First worked with you in March</li>
       </ul>
     </div>
@@ -4256,7 +4249,7 @@ document.querySelectorAll('.vs').forEach(b=>{
 /* ================= contract detail ================= */
 const CONTRACTS={
   ship:{
-    title:'daun', kind:'Ship', kindPill:'contract', tag:1, who:'sj', money:'&euro;4,500',
+    title:'daun', kind:'Go live', kindPill:'contract', tag:1, who:'sj', money:'&euro;4,500',
     meta:'Fixed price &middot; Satyam Jha owns this &middot; delivers 2 Oct',
     status:'<span class="pill live"><i class="dot"></i>On track &middot; 60% done</span>',
     acts:'<button class="btn solid" data-progress="progress">View daily progress</button>'+
@@ -4272,7 +4265,7 @@ const CONTRACTS={
     ]
   },
   maintain:{
-    title:'daun', kind:'Maintain', kindPill:'contract', tag:1, who:'pn', money:'&euro;2,500',
+    title:'daun', kind:'Maintenance', kindPill:'contract', tag:1, who:'pn', money:'&euro;2,500',
     meta:'Rolling monthly &middot; Priya Nair owns this &middot; renews 1 Oct',
     status:'<span class="pill live"><i class="dot"></i>Healthy &middot; all checks passed this week</span>',
     acts:'<button class="btn solid" data-progress="upkeep">View this month&rsquo;s upkeep</button>'+
@@ -4356,7 +4349,9 @@ let currentContract=null;
 function renderContract(key){
   const c=CONTRACTS[key]; if(!c) return;
   currentContract=key;
-  const p=PEOPLE[c.who]||PEOPLE.sj;
+  /* face lets a contract with no engineer yet show a placeholder
+     rather than borrowing somebody's face from the fallback */
+  const p=c.face||PEOPLE[c.who]||PEOPLE.sj;
   const steps=c.steps.map(s=>{
     const [state,t,sub,offp,gate]=s;
     const node=state==='done'?'&#10003;':state==='now'?'&#9679;':state==='stop'?'&times;':'';
@@ -4384,11 +4379,50 @@ function renderContract(key){
   show('contract');
 }
 
-document.querySelectorAll('[data-contract]').forEach(card=>{
-  card.addEventListener('click',e=>{
-    e.stopPropagation();
-    renderContract(card.dataset.contract);
-  });
+/* ---------- the pipeline band ----------
+   data rather than markup, so a quote raised from a project can join it */
+const PIPELINE=[
+  {k:'palmseas', cls:'turn', av:{d:'live',c:'#00875A',i:'SJ'},
+   title:'Rebuild Palm Seas checkout', pill:{c:'turn',t:'Your turn'},
+   sub:'Quote ready &middot; sent this morning &middot; nothing starts until you decide',
+   side:'<span class="money">&euro;3,200</span>'},
+  {k:'bounce', cls:'moving', av:{d:'live',c:'#2456C8',i:'PN'},
+   title:'Epicmail bounce handling',
+   sub:'Priya is reading your code &middot; quote expected tomorrow',
+   side:'<span class="pill moving">Being reviewed</span>'},
+  {k:'sync', cls:'contract', av:{d:'busy',c:'#B45309',i:'MI'},
+   title:'TrackFit sync rewrite',
+   sub:'You accepted on 25 Sep &middot; kickoff booked for Mon 29 Sep',
+   side:'<span class="pill contract">Kickoff booked</span><span class="money">&euro;2,800</span>'}
+];
+
+function pipeRow(p){
+  return '<button class="row '+p.cls+(p.fresh?' fresh':'')+'" data-contract="'+p.k+'">'+
+    '<div class="av" data-dot="'+p.av.d+'" style="background:'+p.av.c+'">'+p.av.i+'</div>'+
+    '<div class="row-main">'+
+      '<div class="row-title">'+p.title+
+        (p.pill?' <span class="pill '+p.pill.c+'">'+p.pill.t+'</span>':'')+'</div>'+
+      '<div class="row-sub">'+p.sub+'</div>'+
+    '</div>'+
+    '<div class="row-side">'+(p.side||'')+'</div>'+
+  '</button>';
+}
+
+function renderPipeline(){
+  const rows=document.getElementById('pipeRows');
+  if(!rows) return;
+  rows.innerHTML=PIPELINE.map(pipeRow).join('');
+  paintIn(rows);
+  const n=document.getElementById('pipeN');
+  if(n) n.textContent=PIPELINE.length;
+}
+
+/* delegated: rows are repainted, so a direct binding would die with them */
+document.addEventListener('click',e=>{
+  const card=e.target.closest('[data-contract]');
+  if(!card) return;
+  e.stopPropagation();
+  renderContract(card.dataset.contract);
 });
 
 /* where "Back" goes from progress / upkeep -------------- */
@@ -5149,7 +5183,10 @@ function renderProject(key){
     '<div class="proj-h">'+
       '<div><h1>'+P.n+'</h1>'+
         '<div class="stack">'+P.stack.map(t=>'<span>'+t+'</span>').join('')+'</div></div>'+
-      '<button class="btn callb" data-projcall="'+key+'">'+PHONE_IC+'Start a call</button>'+
+      '<div class="proj-acts">'+
+        '<button class="btn" data-getquote="'+key+'">Get a quote</button>'+
+        '<button class="btn callb" data-projcall="'+key+'">'+PHONE_IC+'Start a call</button>'+
+      '</div>'+
     '</div>'+
     '<div class="psum'+(P.flash?' fresh':'')+'">'+
       '<div class="psum-h">'+SPARK+'<span>PROJECT SUMMARY</span>'+
@@ -5525,6 +5562,7 @@ document.addEventListener('click',e=>{
 
 renderSessFeed();
 renderProjects();
+renderPipeline();
 
 /* the section bar only grows its edge once there is something under it */
 (function(){
@@ -6507,6 +6545,101 @@ function createBlankProject(name,stackStr){
   return key;
 }
 
+/* ================= GET A QUOTE =================
+   project -> pick a kind -> optional brief -> a request in the pipeline */
+
+let quoteFor=null;     /* which project the open quote card belongs to */
+let quoteKind=null;    /* 'Go live' or 'Maintenance' */
+
+function openQuoteKind(key){
+  const P=PROJECTS[key]; if(!P) return;
+  quoteFor=key; quoteKind=null;
+  openModal(
+    '<h3>Get a quote for '+P.n+'</h3>'+
+    '<p>Two ways an engineer can take this on. Pick the one that fits &mdash; asking costs '+
+    'nothing and nothing starts until you accept a price.</p>'+
+    '<div class="qk">'+
+      '<button class="qk-opt" data-qkind="Go live"><b>Go live</b>'+
+        '<span>A fixed piece of work, built and handed back to you.</span></button>'+
+      '<button class="qk-opt" data-qkind="Maintenance"><b>Maintenance</b>'+
+        '<span>Someone keeps it running, month to month.</span></button>'+
+    '</div>'+
+    '<div class="m-acts"><button class="btn" id="qkCancel">Cancel</button></div>');
+}
+
+function openQuoteBrief(kind){
+  const P=PROJECTS[quoteFor]; if(!P) return;
+  quoteKind=kind;
+  openModal(
+    '<h3>'+kind+' &mdash; '+P.n+'</h3>'+
+    '<p>Anything you tell the engineer now saves a round trip later: what the product does, '+
+    'who uses it, and what must not break.</p>'+
+    '<textarea class="m-ta" id="qbText" data-focus placeholder="'+
+      'It is a booking site for a diving school. Checkout is the part that matters — '+
+      'if that breaks on a weekend I lose real bookings."></textarea>'+
+    '<div class="m-help">Optional. Skip it and whoever picks this up will ask you directly instead.</div>'+
+    '<div class="m-acts">'+
+      '<button class="btn" id="qbSkip">Skip</button>'+
+      '<button class="btn go" id="qbGo">Request bid</button>'+
+    '</div>');
+}
+
+/* both Skip and Request bid land here — skip simply carries no note */
+function raiseQuote(note){
+  const key=quoteFor, kind=quoteKind, P=PROJECTS[key];
+  if(!P||!kind) return;
+  const clean=(note||'').trim();
+
+  let base='q-'+key+'-'+kind.toLowerCase().replace(/[^a-z]+/g,''), id=base, i=2;
+  while(CONTRACTS[id]) id=base+'-'+(i++);
+
+  CONTRACTS[id]={
+    title:P.n+' &mdash; '+kind, kind:kind, kindPill:'contract', tag:1,
+    who:null, face:{d:'off',c:'#9AA1A6',i:'?',n:'Not assigned yet'}, money:'',
+    meta:'Quote requested just now &middot; no engineer has picked it up yet',
+    status:'<span class="pill moving">Finding an engineer</span>',
+    acts:'<button class="btn" data-project="'+key+'">Open '+P.n+'</button>',
+    steps:[
+      ['done','You asked for a quote','Just now &mdash; '+kind+' on '+P.n],
+      (clean
+        ? ['done','You added a brief','&ldquo;'+clean.replace(/[<>]/g,'')+'&rdquo;']
+        : ['done','No brief added','You skipped this &mdash; the engineer will ask you directly']),
+      ['now','An engineer picks it up','Two are free right now &middot; usually within the hour'],
+      ['wait','They read your code','So the price is based on what is actually there'],
+      ['wait','A quote arrives','Nothing starts, and nothing is owed, until you accept it']
+    ]
+  };
+
+  PIPELINE.unshift({
+    k:id, cls:'moving', fresh:true, av:{d:'off',c:'#9AA1A6',i:'?'},
+    title:P.n+' &mdash; '+kind,
+    sub:'Finding an engineer &middot; just now'+(clean?' &middot; brief attached':''),
+    side:'<span class="pill moving">Just requested</span>'
+  });
+
+  closeModal();
+  renderPipeline();
+
+  /* the contracts tab owes you one more look now */
+  const cb=document.querySelector('.nav-item[data-go="contracts"] .count');
+  if(cb) cb.textContent=String((parseInt(cb.textContent,10)||0)+1);
+
+  show('contracts');
+  const row=document.querySelector('#pipeRows [data-contract="'+id+'"]');
+  if(row){
+    row.scrollIntoView({block:'center',behavior:'smooth'});
+    /* the ring is one-shot; drop it once it has played so it does not
+       replay every time the pipeline repaints */
+    setTimeout(()=>{
+      const p=PIPELINE.find(x=>x.k===id);
+      if(p) p.fresh=false;
+      row.classList.remove('fresh');
+    },2400);
+  }
+  toast(kind+' quote requested — tracking it under Contracts');
+  quoteFor=null; quoteKind=null;
+}
+
 /* ---- a session that belongs to nothing ---- */
 function newSessionCard(){
   const who=freeKey(), p=PEOPLE[who], first=fName(who);
@@ -6699,8 +6832,23 @@ document.addEventListener('click',e=>{
     deleteProject(document.getElementById('dpGo').dataset.key);
     return;
   }
+  /* --- get a quote: kind -> brief -> raised --- */
+  const gq=e.target.closest('[data-getquote]');
+  if(gq){e.stopPropagation();openQuoteKind(gq.dataset.getquote);return}
+
+  const qk=e.target.closest('[data-qkind]');
+  if(qk){e.stopPropagation();openQuoteBrief(qk.dataset.qkind);return}
+
+  if(e.target.closest('#qbGo')){
+    e.stopPropagation();
+    raiseQuote(document.getElementById('qbText').value);
+    return;
+  }
+  if(e.target.closest('#qbSkip')){e.stopPropagation();raiseQuote('');return}
+
   if(e.target.closest('#scCancel')||e.target.closest('#nsCancel')||
-     e.target.closest('#npCancel')||e.target.closest('#dpCancel')){
+     e.target.closest('#npCancel')||e.target.closest('#dpCancel')||
+     e.target.closest('#qkCancel')){
     e.stopPropagation(); closeModal(); return;
   }
 });
