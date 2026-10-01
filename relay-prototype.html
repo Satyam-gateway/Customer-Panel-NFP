@@ -2222,10 +2222,9 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-tile.sm .c-pinb{top:8px;right:8px;width:28px;height:28px}
 
 /* gallery + focus */
-.c-gal{display:grid;width:100%;gap:14px;margin:auto;align-content:center}
-.c-gal .c-tile{aspect-ratio:4/3}
-.c-gal.n2{max-width:780px;grid-template-columns:repeat(2,minmax(0,1fr))}
-.c-gal.n3{max-width:1080px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.c-gal{display:grid;width:100%;height:100%;max-height:560px;gap:16px;margin:auto;grid-auto-rows:minmax(0,1fr)}
+.c-gal.n2{max-width:1180px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.c-gal.n3{max-width:1560px;grid-template-columns:repeat(3,minmax(0,1fr))}
 .c-st{display:grid;width:100%;gap:14px;grid-template-columns:minmax(0,1fr) clamp(200px,21%,264px);grid-template-rows:minmax(0,1fr)}
 .c-st.solo{grid-template-columns:minmax(0,1fr)}
 .c-main{min-height:0;min-width:0;display:flex}
@@ -2372,10 +2371,13 @@ body.hascalls .scope-wrap{display:inline-flex}
 .c-toast .av{width:26px;height:26px}
 .c-modalwrap{position:absolute;inset:0;background:rgba(20,24,26,.4);display:none;place-items:center;z-index:70}
 .c-modalwrap.on{display:grid}
-.c-modal{width:min(400px,92vw);background:var(--card);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow-lift)}
-.c-modal h3{font-size:20px;margin-bottom:6px}
-.c-modal p{color:var(--muted);margin-bottom:18px}
-.c-modal .row{display:flex;gap:10px;justify-content:flex-end}
+.c-modal{width:min(440px,92vw);background:var(--card);border-radius:20px;padding:28px 28px 24px;box-shadow:var(--shadow-lift);text-align:center}
+.c-mico{width:52px;height:52px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;background:var(--stop-bg);color:var(--stop)}
+.c-mico .c-i{width:24px;height:24px}
+.c-modal h3{font-size:22px;margin-bottom:8px}
+.c-modal p{color:var(--muted);font-size:14px;line-height:1.55;margin:0 auto 24px;max-width:34ch}
+.c-macts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c-macts .btn,.c-macts .c-danger{justify-content:center;padding:12px 16px;font-size:14px;border-radius:12px}
 .c-mini{position:fixed;left:16px;bottom:76px;z-index:36;display:none;align-items:center;gap:9px;padding:7px 14px 7px 8px;border-radius:999px;background:var(--ink);color:#fff;box-shadow:var(--shadow-lift);font-weight:600;font-size:12.5px}
 .c-mini.on{display:flex}
 .c-mini .av{width:24px;height:24px}
@@ -7521,9 +7523,10 @@ if(!maybeWelcome()) revealDashboard();
   <div class="c-pop" id="cPop"></div>
   <div class="c-modalwrap" id="cModal">
     <div class="c-modal">
+      <div class="c-mico"><svg class="c-i"><use href="#ci-end"/></svg></div>
       <h3>End this session?</h3>
       <p>The clock stops now and your summary starts building. You can keep chatting afterwards.</p>
-      <div class="row"><button class="btn" data-cact="keep">Keep going</button><button class="c-danger" data-cact="end">End session</button></div>
+      <div class="c-macts"><button class="btn" data-cact="keep">Keep going</button><button class="c-danger" data-cact="end">End session</button></div>
     </div>
   </div>
 </div>
